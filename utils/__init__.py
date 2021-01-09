@@ -12,4 +12,5 @@ class DriverUtils:
         options = webdriver.ChromeOptions()
         # https://www.python2.net/questions-80772.htm
         options.add_experimental_option("detach", True)
+        options.add_argument("download.default_directory=C:/raw_data/")
         return webdriver.Chrome(chrome_options=options)
