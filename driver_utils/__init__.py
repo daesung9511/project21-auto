@@ -1,6 +1,6 @@
 from selenium.webdriver.android.webdriver import WebDriver
 from selenium import webdriver
-from chromedriver_py import binary_path
+import chromedriver_binary  # Adds chromedriver binary to path
 
 DEFAULT_TIMEOUT_DELAY = 5
 
@@ -12,4 +12,4 @@ class DriverUtils:
         options = webdriver.ChromeOptions()
         # https://www.python2.net/questions-80772.htm
         options.add_experimental_option("detach", True)
-        return webdriver.Chrome(executable_path=binary_path, chrome_options=options)
+        return webdriver.Chrome(chrome_options=options)
