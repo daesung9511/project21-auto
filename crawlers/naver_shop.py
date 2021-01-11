@@ -93,12 +93,17 @@ class Naver_shop:
             pw_form.send_keys(account["pw"])
             pw_form.send_keys(Keys.RETURN)
 
-    def move_page(self, driver):
-        # click ok button
-        ok_button = driver.find_element_by_css_selector("#mat-dialog-0 > naver-login-confirm > mat-dialog-content > div.margin-top-30.button-area-center > button")
-        ok_button.click()
+            time.sleep(2)
 
-        driver.implicitly_wait(1)
+    def move_page(self, driver):
+        try:
+            # click ok button
+            ok_button = driver.find_element_by_css_selector("#mat-dialog-0 > naver-login-confirm > mat-dialog-content > div.margin-top-30.button-area-center > button")
+            ok_button.click()
+
+            driver.implicitly_wait(1)
+        except:
+            pass
 
         # click AD Management button
         ad_management_button = driver.find_element_by_xpath("//*[@id='container']/my-screen/div/div[1]/div/my-screen-board/div/div[1]/div[1]/board-campaign-type/div[1]/a")
