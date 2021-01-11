@@ -111,7 +111,6 @@ def naver_login(account):
 
     time.sleep(2)
 
-
 def login(account):
     if account["type"] == "naver":
         naver_login(account)
@@ -125,16 +124,50 @@ def login(account):
         pw_form.send_keys(account["pw"])
         pw_form.send_keys(Keys.RETURN)
 
+def move_page():
+    # click ok button
+    ok_button = driver.find_element_by_css_selector("#mat-dialog-0 > naver-login-confirm > mat-dialog-content > div.margin-top-30.button-area-center > button")
+    ok_button.click()
+
+    driver.implicitly_wait(1)
+
+    # click AD Management button
+    ad_management_button = driver.find_element_by_xpath("//*[@id='container']/my-screen/div/div[1]/div/my-screen-board/div/div[1]/div[1]/board-campaign-type/div[1]/a")
+    ad_management_button.click()
+
+    time.sleep(4)
+
+def select_date():
+    driver.switch_to.window(driver.window_handles[-1])
+
+    date_form = driver.find_element_by_xpath("//*[@id='root']/div/div[2]/div/div[1]/div/div[2]/div/div/span/div/div")
+    # date_form = driver.find_element_by_css_selector("#root > div > div.sc-pTIqm.hbMQAb > div > div.sc-fzowVh.equHBw > div > div.inner-right > div > div > span > div > div")
+
+    date_form.click()
+    
+    driver.implicitly_wait(1)
+
+    yesterday_button = driver.find_element_by_xpath("//*[@id='root']/div/div[2]/div/div[1]/div/div[2]/div/div/div/div[1]/div[2]/span")
+    yesterday_button.click()
+
+    time.sleep(1)
+    
+
 def main():
     # account list
     # lavena, yuge, anua, project21
     account = accounts["lavena"]
+
     get_driver()
     login(account)
-    driver.implicitly_wait(5)
-    print(driver.current_url)
 
+    driver.implicitly_wait(2)
 
+    move_page()
+
+    driver.implicitly_wait(1)
+
+    select_date()
 
 if __name__ == "__main__":
     main()
