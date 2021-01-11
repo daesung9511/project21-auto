@@ -4,14 +4,14 @@ from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.wait import WebDriverWait
 
-from utils import DriverUtils, DEFAULT_TIMEOUT_DELAY
+from utils import Utils, DEFAULT_TIMEOUT_DELAY
 
 
 class Ezadmin:
 
     @staticmethod
     def get_admin_page(domain: str, id: str, password: str) -> WebDriver:
-        driver = DriverUtils.get_chrome_driver()
+        driver = Utils.get_chrome_driver()
         driver.get("https://www.ezadmin.co.kr/index.html#main")
         WebDriverWait(driver, 3).until(
             expected_conditions.presence_of_all_elements_located((By.ID, "login-popup"))
@@ -77,8 +77,10 @@ class Ezadmin:
 
             download = '#download'
             driver.find_element_by_css_selector(download).click()
-            driver.implicitly_wait(3)
-            driver.switch_to.alert().accept()
+            WebDriverWait(driver, DEFAULT_TIMEOUT_DELAY).until(
+                expected_conditions.alert_is_present()
+            )
+            driver.switch_to.alert.accept()
         except Exception as e:
             print("검색결과 없음")
 
