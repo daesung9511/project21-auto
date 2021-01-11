@@ -78,7 +78,7 @@ class Ezadmin:
             download = '#download'
             driver.find_element_by_css_selector(download).click()
             driver.implicitly_wait(3)
-            driver.switch_to.alert().accept()
+            driver.switch_to.alert.accept()
         except Exception as e:
             print("검색결과 없음")
 
