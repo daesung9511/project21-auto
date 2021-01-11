@@ -110,18 +110,28 @@ class Naver_shop:
         # switch to report tab
         driver.switch_to.window(driver.window_handles[-1])
 
+        # click date form
         date_form = driver.find_element_by_xpath("//*[@id='root']/div/div[2]/div/div[1]/div/div[2]/div/div/span/div/div")
-        # date_form = driver.find_element_by_css_selector("#root > div > div.sc-pTIqm.hbMQAb > div > div.sc-fzowVh.equHBw > div > div.inner-right > div > div > span > div > div")
-
         date_form.click()
 
         driver.implicitly_wait(1)
 
+        # click yesterday button
         yesterday_button = driver.find_element_by_xpath("//*[@id='root']/div/div[2]/div/div[1]/div/div[2]/div/div/div/div[1]/div[2]/span")
         yesterday_button.click()
 
-        time.sleep(1)
+        time.sleep(2)
         
+        #
+        # TODO : change 3 days if today is MONDAY
+        #
+
+    def download_csv(self, driver):
+        download_button = driver.find_element_by_xpath("//*[@id='root']/div/div[2]/div/div[3]/div/div[1]/div[1]/div[2]/div/button")
+        download_button.click()
+
+        driver.implicitly_wait(5)
+        time.sleep(5)
 
     def run(self, uid, upw, utype):
         # account list
@@ -145,3 +155,5 @@ class Naver_shop:
         self.move_page(driver)
         driver.implicitly_wait(1)
         self.select_date(driver)
+
+        self.download_csv(driver)
