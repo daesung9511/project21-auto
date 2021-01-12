@@ -79,17 +79,23 @@ class Naver_shop:
         naver_banner = """//*[@id="log.naver"]"""
         self.wait_popup(driver, naver_banner, DEFAULT_TIMEOUT_DELAY)
 
+        time.sleep(1)
+
         # get naver id form
         id_form = driver.find_element_by_id("id")
         clip_id = pyperclip.copy(account["id"])
         id_form.click()
         id_form.send_keys(Keys.CONTROL, "v")
 
+        time.sleep(1)
+
         # get naver pw form
         pw_form = driver.find_element_by_id("pw")
         clip_pw = pyperclip.copy(account["pw"])
         pw_form.click()
         pw_form.send_keys(Keys.CONTROL, "v")
+
+        time.sleep(1)
 
         # get login button
         login_button = driver.find_element_by_id("log.login")
@@ -99,13 +105,20 @@ class Naver_shop:
         if account["type"] == "naver":
             self.naver_login(driver, account)
         else:
+            time.sleep(1)
+
             # get id form
             id_form = driver.find_element_by_id("uid")
             id_form.send_keys(account["id"])
 
+            time.sleep(1)
+
             # get pw form
             pw_form = driver.find_element_by_id("upw")
             pw_form.send_keys(account["pw"])
+
+            time.sleep(1)
+            
             pw_form.send_keys(Keys.RETURN)
 
     def move_page(self, driver):
