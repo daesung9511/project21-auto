@@ -22,7 +22,7 @@ def start():
     naver_shop = Naver_shop()
 
     # LAVENA[naver_shop]
-    naver_shop.run(LAVENA_NAVERSHOP_ID, LAVENA_NAVERSHOP_PW, LAVENA_NAVERSHOP_TYPE)
+    # naver_shop.run(LAVENA_NAVERSHOP_ID, LAVENA_NAVERSHOP_PW, LAVENA_NAVERSHOP_TYPE)
 
     # ANUA[naver_shop]
     # naver_shop.run(ANUA_NAVERSHOP_ID, ANUA_NAVERSHOP_PW, ANUA_NAVERSHOP_TYPE)
@@ -31,7 +31,7 @@ def start():
     # naver_shop.run(YUGE_NAVERSHOP_ID, YUGE_NAVERSHOP_PW, YUGE_NAVERSHOP_TYPE)
 
     # # PROJECT21[naver_shop]
-    # naver_shop.run(PROJECT21_NAVERSHOP_ID, PROJECT21_NAVERSHOP_PW, PROJECT21_NAVERSHOP_TYPE)
+    naver_shop.run(PROJECT21_NAVERSHOP_ID, PROJECT21_NAVERSHOP_PW, PROJECT21_NAVERSHOP_TYPE)
 
 
 if __name__ == '__main__':
