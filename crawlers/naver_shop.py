@@ -2,21 +2,43 @@
 #
 # Naver Shopping CSV Automation
 #
-# Date : 2021. 01. 11
-# Author : choiys(Yongseon Choi)
-# Email : hcy3bkj@gmail.com
-#
 
 import time
 import selenium
 import pyperclip
 from selenium import webdriver
+from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions
 from selenium.common.exceptions import ElementNotVisibleException
+from utils import DEFAULT_TIMEOUT_DELAY
 
 class Naver_shop:
+
+    def wait(self, driver, selector, sec):
+        WebDriverWait(driver, sec).until(
+            expected_conditions.presence_of_element_located((By.XPATH, selector))
+        )
+    
+    def switch_popup(self, driver):
+        windows = driver.window_handles
+        driver.switch_to.window(windows[-1])  
+        
+    def switch_main(self, driver):
+        windows = driver.window_handles
+        driver.switch_to.window(windows[0])
+
+    def wait_popup(self, driver, selector, sec):
+        while True:
+            try:
+                self.switch_popup(driver)
+                WebDriverWait(driver, sec).until(
+                    expected_conditions.presence_of_element_located((By.XPATH, selector))
+                )
+                break
+            except:
+                pass
 
     def close_popup(self, driver):
         windows = driver.window_handles
@@ -28,19 +50,22 @@ class Naver_shop:
 
         driver.switch_to.window(main)
 
-    def get_driver(self, login_url, download_path):
+    def get_driver(self, url, download_path):
         options = webdriver.ChromeOptions()
+        options.add_argument("--start-fullscreen")
         # options.add_argument("headless")
         # options.add_experimental_option("detach", True)
         base_path = "download.default_directory="
         download_path = base_path + download_path
-        options.add_argument("download_path")
+        options.add_argument(download_path)
 
         driver = webdriver.Chrome("chromedriver.exe", options=options)
 
-        driver.get(login_url)
+        driver.get(url)
         
-        driver.implicitly_wait(5)
+        # Wait for browser loading
+        naver_login_button = """//*[@id="container"]/main/div/div[1]/home-login/div/div/button/span"""
+        self.wait(driver, naver_login_button, 10)
         
         return driver
 
@@ -49,11 +74,9 @@ class Naver_shop:
         naver_login = driver.find_element_by_class_name("naver_login_btn")
         naver_login.click()
 
-        time.sleep(2)
-
-        # switch to popup window
-        windows = driver.window_handles
-        driver.switch_to.window(windows[-1])
+        # wait for login popup
+        naver_banner = """//*[@id="log.naver"]"""
+        self.wait_popup(driver, naver_banner, DEFAULT_TIMEOUT_DELAY)
 
         # get naver id form
         id_form = driver.find_element_by_id("id")
@@ -61,24 +84,15 @@ class Naver_shop:
         id_form.click()
         id_form.send_keys(Keys.CONTROL, "v")
 
-        time.sleep(1)
-
         # get naver pw form
         pw_form = driver.find_element_by_id("pw")
         clip_pw = pyperclip.copy(account["pw"])
         pw_form.click()
         pw_form.send_keys(Keys.CONTROL, "v")
 
-        time.sleep(1)
-
         # get login button
         login_button = driver.find_element_by_id("log.login")
         login_button.click()
-
-        # return to main window
-        driver.switch_to.window(windows[0])
-
-        time.sleep(2)
 
     def login(self, driver, account):
         if account["type"] == "naver":
@@ -93,15 +107,15 @@ class Naver_shop:
             pw_form.send_keys(account["pw"])
             pw_form.send_keys(Keys.RETURN)
 
-            time.sleep(2)
-
     def move_page(self, driver):
-        try:
-            # click ok button
-            ok_button = driver.find_element_by_css_selector("#mat-dialog-0 > naver-login-confirm > mat-dialog-content > div.margin-top-30.button-area-center > button")
-            ok_button.click()
+        # return to main window
+        self.switch_main(driver)
 
-            driver.implicitly_wait(1)
+        login_ok_button = """//*[@id="mat-dialog-0"]/naver-login-confirm/mat-dialog-content/div[2]/button/span"""
+
+        try:
+            self.wait(driver, login_ok_button, DEFAULT_TIMEOUT_DELAY)
+            driver.find_element_by_xpath(login_ok_button).click()
         except:
             pass
 
@@ -109,22 +123,19 @@ class Naver_shop:
         ad_management_button = driver.find_element_by_xpath("//*[@id='container']/my-screen/div/div[1]/div/my-screen-board/div/div[1]/div[1]/board-campaign-type/div[1]/a")
         ad_management_button.click()
 
-        time.sleep(4)
+        date_button = """//*[@id="root"]/div/div[2]/div/div[1]/div/div[2]/div/div/span/div/div"""
+        self.wait_popup(driver, date_button, DEFAULT_TIMEOUT_DELAY)
 
     def select_date(self, driver):
-        # switch to report tab
-        driver.switch_to.window(driver.window_handles[-1])
-
         # click date form
         date_form = driver.find_element_by_xpath("//*[@id='root']/div/div[2]/div/div[1]/div/div[2]/div/div/span/div/div")
         date_form.click()
-
-        driver.implicitly_wait(1)
 
         # click yesterday button
         yesterday_button = driver.find_element_by_xpath("//*[@id='root']/div/div[2]/div/div[1]/div/div[2]/div/div/div/div[1]/div[2]/span")
         yesterday_button.click()
 
+        # wait for loading
         time.sleep(2)
         
         #
@@ -135,14 +146,13 @@ class Naver_shop:
         download_button = driver.find_element_by_xpath("//*[@id='root']/div/div[2]/div/div[3]/div/div[1]/div[1]/div[2]/div/button")
         download_button.click()
 
-        driver.implicitly_wait(5)
         time.sleep(5)
 
     def run(self, uid, upw, utype):
         # account list
         # lavena, yuge, anua, project21
 
-        login_url = "https://searchad.naver.com/"
+        url = "https://searchad.naver.com/"
         download_path = "C:/Downloads"
 
         account = {
@@ -151,14 +161,9 @@ class Naver_shop:
             "type": utype
         }
 
-        driver = self.get_driver(login_url, download_path)
+        driver = self.get_driver(url, download_path)
         self.close_popup(driver)
-
         self.login(driver, account)
-        driver.implicitly_wait(2)
-
         self.move_page(driver)
-        driver.implicitly_wait(1)
         self.select_date(driver)
-
         self.download_csv(driver)
