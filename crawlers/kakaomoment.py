@@ -9,7 +9,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions
 from selenium.common.exceptions import ElementNotVisibleException
-from utils import DEFAULT_TIMEOUT_DELAY
+from utils import Utils, DEFAULT_TIMEOUT_DELAY
 
 
 class Kakaomoment:
@@ -25,7 +25,7 @@ class Kakaomoment:
     def wait(self, driver, selector, sec):
         try:
             WebDriverWait(driver, sec).until(
-                expected_conditions.presence_of_element_located((By.XPATH, selector))
+                expected_conditions.presence_of_element_located((By.CSS_SELECTOR, selector))
             )
         except:
             pass
@@ -35,7 +35,7 @@ class Kakaomoment:
             try:
                 self.switch_popup(driver)
                 WebDriverWait(driver, sec).until(
-                    expected_conditions.presence_of_element_located((By.XPATH, selector))
+                    expected_conditions.presence_of_element_located((By.CSS_SELECTOR, selector))
                 )
                 break
             except:
@@ -51,21 +51,11 @@ class Kakaomoment:
 
         driver.switch_to.window(main)
 
-    def get_driver(self, url, download_path):
-        options = webdriver.ChromeOptions()
-        options.add_argument("--start-fullscreen")
-        # options.add_argument("headless")
-        # options.add_experimental_option("detach", True)
-        base_path = "download.default_directory="
-        download_path = base_path + download_path
-        options.add_argument(download_path)
-
-        driver = webdriver.Chrome("chromedriver.exe", options=options)
-
+    def init(self, driver, url):
         driver.get(url)
         
         # Wait for browser loading
-        kakao_login_button = """//*[@id="login-form"]/fieldset/div[8]/button[1]"""
+        kakao_login_button = """#login-form > fieldset > div.wrap_btn > button.btn_g.btn_confirm.submit"""
         self.wait(driver, kakao_login_button, 10)
         
         return driver
@@ -75,158 +65,95 @@ class Kakaomoment:
 
         # get kakao id form
         id_form = driver.find_element_by_id("id_email_2")
-        clip_id = pyperclip.copy(account["id"])
-        id_form.click()
-        id_form.send_keys(Keys.CONTROL, "v")
+        id_form.send_keys(account["id"])
 
         time.sleep(1)
 
         # get kakao pw form
         pw_form = driver.find_element_by_id("id_password_3")
-        clip_pw = pyperclip.copy(account["pw"])
-        pw_form.click()
-        pw_form.send_keys(Keys.CONTROL, "v")
+        pw_form.send_keys(account["pw"])
 
         time.sleep(1)
 
         # get kakao login button
-        kakao_login_button = driver.find_element_by_xpath("""//*[@id="login-form"]/fieldset/div[8]/button[1]""")
+        kakao_login_button = driver.find_element_by_css_selector("""#login-form > fieldset > div.wrap_btn > button.btn_g.btn_confirm.submit""")
         kakao_login_button.click()
 
         # wait for login
-        dashboard = """//*[@id="kakaoContent"]/div[1]/ul/li[1]/a"""
+        dashboard = """#kakaoContent > div.cont_feature > ul > li.on > a"""
 
         try:
             self.wait(driver, dashboard, DEFAULT_TIMEOUT_DELAY)
         except:
             time.sleep(1)
 
-    def move_dashboard(self, driver, url):
-        # move to dashboard
-        dashboard_url = f"https://moment.kakao.com/{domain}/report/customreport/all"
+    def move_dashboard_anua(self, driver, number):
+        # dashboard url 
+        dashboard_url = f"https://moment.kakao.com/{number}/report/customreport/all"
+
+        #move to dashboard
         driver.get(dashboard_url)
-
-        report_name = """//*[@id="mArticle"]/div/div[2]/div[2]/table/tbody/tr[1]/td[2]/div/a"""
-        self.wait(driver, report_name, DEFAULT_TIMEOUT_DELAY)
-        
-
-    def press_ok(self, driver):
-        # wait for ok button after login
-        login_ok_button = """//*[@id="app"]/div/div[2]/div[2]/div/div[2]/span/div/div/div[2]/div[3]/button"""
-
-        try:
-            self.wait(driver, login_ok_button, DEFAULT_TIMEOUT_DELAY)
-            driver.find_element_by_xpath(login_ok_button).click()
-        except:
-            pass
-
-    def switch_user(self, driver, domain):
-        # click user menu dropdown
-        user_menu_dropdown = driver.find_element_by_xpath("""//*[@id="app"]/div/div[1]/div/ul/li[1]/a""")
-        user_menu_dropdown.click()
-
-        # wait for user menu
-        user_name = """//*[@id="app"]/div/div[1]/div/ul/li[1]/ul/li[3]/div/div[3]/div/div/div/ul/li[1]/label/span[2]"""
-        self.wait(driver, user_name, DEFAULT_TIMEOUT_DELAY)
-
-        # time.sleep(1)
-
-        pattern = ""
-        if domain == "lavena":
-            pattern = "라베나코리아"
-        elif domain == "yuge":
-            pattern = "유즈"
-        else:
-            pattern = "더파운더즈"
-
-        user = """//*[@id="app"]/div/div[1]/div/ul/li[1]/ul/li[3]/div/div[3]/div/div/div/ul/li[1]/label/span[1]"""
-        try:
-            for i in range(1, 10+1):
-                user_name = driver.find_element_by_xpath(f"""//*[@id="app"]/div/div[1]/div/ul/li[1]/ul/li[3]/div/div[3]/div/div/div/ul/li[{i}]/label/span[2]""")
-                if pattern in user_name.text:
-                    user = f"""//*[@id="app"]/div/div[1]/div/ul/li[1]/ul/li[3]/div/div[3]/div/div/div/ul/li[{i}]/label/span[1]"""
-                    break
-
-        except Exception as e:
-            print(e)
-
-        # switch user
-        user = driver.find_element_by_xpath(user)
-        user.click()
-
-    def move_page(self, driver, domain):
-        # click report button 
-        report_button = """//*[@id="app"]/div/div[2]/div[1]/div/div[2]/ul/li[2]/a"""
-        self.wait(driver, report_button, DEFAULT_TIMEOUT_DELAY)
-        driver.find_element_by_xpath(report_button).click()
-
-        # wait for report name
-        report_name = """//*[@id="app"]/div/div[2]/div[2]/div/div[2]/div/div/div/div[2]/div/div/div/div/div[1]/div[2]/div/table/tbody/tr[1]/td[1]/a"""
-        self.wait(driver, report_name, DEFAULT_TIMEOUT_DELAY)
         
         # find report name
-        pattern = "광고비 리포트"
-        if domain in ("lavena", "yuge"):
-            pattern = "광고비 리포트"
-        elif domain == "anua":
-            pattern = "성과 리포트"
-        
-        try:
-            for i in range(1, 20+1):
-                report_name = driver.find_element_by_xpath(f"""//*[@id="app"]/div/div[2]/div[2]/div/div[2]/div/div/div/div[2]/div/div/div/div/div[1]/div[2]/div/table/tbody/tr[{i}]/td[1]/a""")
-                if pattern in report_name.text:
-                    # move to detail page
-                    report_name.click()
-                    break
+        report_name = """#mArticle > div > div.ad_managebox > div.tblg2_wrap > table > tbody > tr:nth-child(1) > td:nth-child(2) > div > a"""
+        self.wait(driver, report_name, DEFAULT_TIMEOUT_DELAY)
 
+        pattern = "광고비"
+        try:
+            for i in range(1, 10+1):
+                report_name = f"""#mArticle > div > div.ad_managebox > div.tblg2_wrap > table > tbody > tr:nth-child({i}) > td:nth-child(2) > div > a"""
+                report_name_element = driver.find_element_by_css_selector(report_name)
+                if pattern == report_name_element.text:
+                    report_name_element.click()
+                    break
         except Exception as e:
             print(e)
 
+        date_form = """#mArticle > div > div.set_table > div.set_head > div.f_right > div:nth-child(3) > div > div.btn_gm.gm_calendar > a"""
+        self.wait(driver, date_form, DEFAULT_TIMEOUT_DELAY)
+
+    def move_dashboard_yuge(self, driver, number):
+        # dashboard url 
+        dashboard_url = f"https://moment.kakao.com/dashboard/{number}"
+
+        # move to dashboard
+        driver.get(dashboard_url)
+
+        # click ok button on alert
+        ok_button = """#app > section > div:nth-child(4) > div > div > div > div.layer_foot > div > button > span"""
+        try:
+            self.wait(driver, ok_button, DEFAULT_TIMEOUT_DELAY)
+            driver.find_element_by_css_selector(ok_button).click()
+        except Exception as e:
+            print(e)
+
+        date_form = """#mArticle > div > div.dashboard_check > div.f_right > div:nth-child(1) > div > div.btn_gm.gm_calendar > a"""
+        self.wait(driver, date_form, DEFAULT_TIMEOUT_DELAY)
+
     def select_date(self, driver, domain):
-        date_form = """//*[@id="app"]/div/div[2]/div[2]/div/div[2]/div[1]/div/div[1]/div[2]/div/div/div[1]/button[2]"""
-        yesterday_button = """//*[@id="app"]/div/div[2]/div[2]/div/div[2]/div[1]/div/div[1]/div[2]/div/div/div[2]/div/div[1]/ul/li[2]/button"""
-        ok_button = """//*[@id="app"]/div/div[2]/div[2]/div/div[2]/div[1]/div/div[1]/div[2]/div/div/div[2]/div/div[2]/div[2]/div/button[2]"""
-        confirm_button = """//*[@id="app"]/div/div[2]/div[2]/div/div[2]/div[1]/div/div[4]/button"""
-        if domain in ("lavena", "yuge"):
-            confirm_button = """//*[@id="app"]/div/div[2]/div[2]/div/div[2]/div[1]/div/div[4]/button"""
-        elif domain == "anua":
-            confirm_button = """//*[@id="app"]/div/div[2]/div[2]/div/div[2]/div[1]/div/div[6]/button"""
-            
+        if domain == "anua":
+            date_form = """#mArticle > div > div.set_table > div.set_head > div.f_right > div:nth-child(3) > div > div.btn_gm.gm_calendar > a"""
+            yesterday_button = """#mArticle > div > div.set_table > div.set_head > div.f_right > div:nth-child(3) > div > div.btn_gm.gm_calendar.open > div > div > div.layer_body > ul > li.on > a"""
+            ok_button = """#mArticle > div > div.set_table > div.set_head > div.f_right > div:nth-child(3) > div > div.btn_gm.gm_calendar.open > div > div > div.layer_body > div > div.btn_wrap > button.btn_gm.gm_bl > span"""
+        elif domain == "yuge":
+            date_form = """#mArticle > div > div.dashboard_check > div.f_right > div:nth-child(1) > div > div.btn_gm.gm_calendar > a"""
+            yesterday_button = """#mArticle > div > div.dashboard_check > div.f_right > div:nth-child(1) > div > div.btn_gm.gm_calendar.open > div > div > div.layer_body > ul > li:nth-child(2) > a"""
+            ok_button = """#mArticle > div > div.dashboard_check > div.f_right > div:nth-child(1) > div > div.btn_gm.gm_calendar.open > div > div > div.layer_body > div > div.btn_wrap > button.btn_gm.gm_bl > span"""
 
         # click date form
         self.wait(driver, date_form, DEFAULT_TIMEOUT_DELAY)
-        date_form = driver.find_element_by_xpath(date_form)
+        date_form = driver.find_element_by_css_selector(date_form)
         date_form.click()
 
         # click yesterday button
         self.wait(driver, yesterday_button, DEFAULT_TIMEOUT_DELAY)
-        yesterday_button = driver.find_element_by_xpath(yesterday_button)
+        yesterday_button = driver.find_element_by_css_selector(yesterday_button)
         yesterday_button.click()
 
         # click ok button
         self.wait(driver, ok_button, DEFAULT_TIMEOUT_DELAY)
-        ok_button = driver.find_element_by_xpath(ok_button)
+        ok_button = driver.find_element_by_css_selector(ok_button)
         ok_button.click()
-
-        # click campaign button
-        if domain == "anua":
-            analysis_level = """//*[@id="app"]/div/div[2]/div[2]/div/div[2]/div[1]/div/div[2]/div[2]/label[2]/span"""
-            self.wait(driver, analysis_level, DEFAULT_TIMEOUT_DELAY)
-            pattern = "캠페인"
-            try:
-                for i in range(1, 10+1):
-                    analysis_level_name = driver.find_element_by_xpath(f"""//*[@id="app"]/div/div[2]/div[2]/div/div[2]/div[1]/div/div[2]/div[2]/label[{i}]/span""")
-                    if pattern == analysis_level_name.text:
-                        analysis_level_name.click()
-                        break
-                        
-            except Exception as e:
-                print(e)
-
-        # click confirm button
-        self.wait(driver, confirm_button, DEFAULT_TIMEOUT_DELAY)
-        confirm_button = driver.find_element_by_xpath(confirm_button)
-        confirm_button.click()
 
         # wait for loading
         time.sleep(2)
@@ -236,31 +163,37 @@ class Kakaomoment:
         #
 
     def download_csv(self, driver, domain):
-        download_button = driver.find_element_by_xpath("""//*[@id="app"]/div/div[2]/div[2]/div/div[2]/div[2]/div/div/div[1]/div/div[2]/a/button""")
+        if domain == "anua":
+            download_button = """#mArticle > div > div.set_table > div.set_head > div.f_right > div:nth-child(4) > a > span > span"""
+        if domain == "yuge":
+            download_button = """div.set_head > div.f_right > div:nth-child(3) > a > span > span"""
+
+        self.wait(driver, download_button, DEFAULT_TIMEOUT_DELAY)
+        download_button = driver.find_element_by_css_selector(download_button)
         download_button.click()
 
         time.sleep(5)
 
-    def run(self, uid, upw, udomain):
+    def run(self, uid, upw, udomain, unumber):
         # account list
         # lavena, yuge, anua, project21
 
         url = "https://accounts.kakao.com/login/kakaoforbusiness?continue=https://business.kakao.com/dashboard/?sid=kmo&redirect=https://moment.kakao.com/dashboard"
-        download_path = "C:/Downloads"
 
         account = {
             "id": uid,
             "pw": upw,
-            "domain": udomain
+            "domain": udomain,
+            "number": unumber
         }
-
-        driver = self.get_driver(url, download_path)
-        # self.close_popup(driver)
+        
+        driver = Utils.get_chrome_driver()
+        driver.set_window_size(1980, 1080)
+        self.init(driver, url)
         self.login(driver, account)
-        self.move_dashboard(driver, account["domain"])
-        # self.press_ok(driver)
-        # self.switch_user(driver, account["domain"])
-        # self.press_ok(driver)
-        # self.move_page(driver, account["domain"])
-        # self.select_date(driver, account["domain"])
-        # self.download_csv(driver, account["domain"])
+        if account["domain"] == "anua":
+            self.move_dashboard_anua(driver, account["number"])
+        elif account["domain"] == "yuge":
+            self.move_dashboard_yuge(driver, account["number"])
+        self.select_date(driver, account["domain"])
+        self.download_csv(driver, account["domain"])
