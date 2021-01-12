@@ -1,7 +1,4 @@
 #coding: utf-8
-#
-# Naver Shopping CSV Automation
-#
 
 import time
 import pyperclip
@@ -13,6 +10,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions
 from selenium.common.exceptions import ElementNotVisibleException
 from utils import DEFAULT_TIMEOUT_DELAY
+
 
 class Naver_shop:
 
