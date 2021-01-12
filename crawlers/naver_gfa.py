@@ -72,12 +72,14 @@ class Naver_GFA:
 
     def login(self, driver, account):
         # get naver login button
-        naver_login_button = driver.find_element_by_class_name("naver_login_btn")
-        naver_login.click()
+        naver_login_button = driver.find_element_by_xpath("""/html/body/div/div[2]/div/div/div[2]/ul/li[1]/a""")
+        naver_login_button.click()
 
         # wait for login popup
         naver_banner = """//*[@id="log.naver"]"""
         self.wait(driver, naver_banner, DEFAULT_TIMEOUT_DELAY)
+
+        time.sleep(1)
 
         # get naver id form
         id_form = driver.find_element_by_id("id")
@@ -85,17 +87,21 @@ class Naver_GFA:
         id_form.click()
         id_form.send_keys(Keys.CONTROL, "v")
 
+        time.sleep(1)
+
         # get naver pw form
         pw_form = driver.find_element_by_id("pw")
         clip_pw = pyperclip.copy(account["pw"])
         pw_form.click()
         pw_form.send_keys(Keys.CONTROL, "v")
 
+        time.sleep(1)
+
         # get login button
         login_button = driver.find_element_by_id("log.login")
         login_button.click()
 
-    def move_page(self, driver):
+    def press_ok(self, driver):
         # wait for ok button after login
         login_ok_button = """//*[@id="app"]/div/div[2]/div[2]/div/div[2]/span/div/div/div[2]/div[3]/button"""
 
@@ -105,49 +111,80 @@ class Naver_GFA:
         except:
             pass
 
-    def switch_user(self, driver, account):
-        domain = account["domain"]
-
+    def switch_user(self, driver, domain):
         # click user menu dropdown
-        user_menu_dropdown = driver.find_export_by_xpath("""//*[@id="app"]/div/div[1]/div/ul/li[1]/a""")
+        user_menu_dropdown = driver.find_element_by_xpath("""//*[@id="app"]/div/div[1]/div/ul/li[1]/a""")
         user_menu_dropdown.click()
 
+        # wait for user menu
+        user_name = """//*[@id="app"]/div/div[1]/div/ul/li[1]/ul/li[3]/div/div[3]/div/div/div/ul/li[1]/label/span[2]"""
+        self.wait(driver, user_name, DEFAULT_TIMEOUT_DELAY)
 
-    def select_date(self, driver, uid):
-        if uid != "lavenakorea":
-            driver.find_element_by_xpath("""//*[@id="root"]/div/div[1]/div/div[1]/div[2]/div/div/div[1]/ul/li[2]/div/a""").click()
-            multi_report = """//*[@id="root"]/div/div[1]/div/div[1]/div[2]/div/div/div[1]/ul/li[2]/div/div/div[1]/a/button"""
-            self.wait(driver, multi_report, DEFAULT_TIMEOUT_DELAY)
-            driver.find_element_by_xpath(multi_report).click()
-            
-            try:
-                for i in range(1, 20+1):
-                    report_name = f"""//*[@id="root"]/div/div[2]/div/div/div[4]/div/div[3]/table/tbody/tr[{i}]/td[2]/a"""
-                    self.wait(driver, report_name, DEFAULT_TIMEOUT_DELAY)
-                    report_name = driver.find_element_by_xpath(report_name)
+        # time.sleep(1)
 
-                    if uid == "anua":
-                        pattern = "광고비"
-                    elif uid == "yuge":
-                        pattern = "광고비("
-                    else:
-                        pattern = "광고비매출보고서"
-
-                    if pattern in report_name.text:
-                        report_name.click()
-                        break
-                    
-            except Exception as e:
-                print(e)
-
-            date_form = """//*[@id="root"]/div/div[2]/div/div/div[2]/div/div/div[2]/div/div[1]/div/div[1]/div[2]/div/div/span/div/div"""
-            yesterday_button = """//*[@id="root"]/div/div[2]/div/div/div[2]/div/div/div[2]/div/div[1]/div/div[1]/div[2]/div/div/div/div[1]/div[1]/span"""
-        
+        pattern = ""
+        if domain == "lavena":
+            pattern = "라베나코리아"
+        elif domain == "yuge":
+            pattern = "유즈"
         else:
-            # click date form
-            date_form = """//*[@id='root']/div/div[2]/div/div[1]/div/div[2]/div/div/span/div/div"""
-            yesterday_button = """//*[@id='root']/div/div[2]/div/div[1]/div/div[2]/div/div/div/div[1]/div[2]/span"""
+            pattern = "더파운더즈"
 
+        user = """//*[@id="app"]/div/div[1]/div/ul/li[1]/ul/li[3]/div/div[3]/div/div/div/ul/li[1]/label/span[1]"""
+        try:
+            for i in range(1, 10+1):
+                user_name = driver.find_element_by_xpath(f"""//*[@id="app"]/div/div[1]/div/ul/li[1]/ul/li[3]/div/div[3]/div/div/div/ul/li[{i}]/label/span[2]""")
+                if pattern in user_name.text:
+                    user = f"""//*[@id="app"]/div/div[1]/div/ul/li[1]/ul/li[3]/div/div[3]/div/div/div/ul/li[{i}]/label/span[1]"""
+                    break
+
+        except Exception as e:
+            print(e)
+
+        # switch user
+        user = driver.find_element_by_xpath(user)
+        user.click()
+
+    def move_page(self, driver, domain):
+        # click report button 
+        report_button = """//*[@id="app"]/div/div[2]/div[1]/div/div[2]/ul/li[2]/a"""
+        self.wait(driver, report_button, DEFAULT_TIMEOUT_DELAY)
+        driver.find_element_by_xpath(report_button).click()
+
+        # wait for report name
+        report_name = """//*[@id="app"]/div/div[2]/div[2]/div/div[2]/div/div/div/div[2]/div/div/div/div/div[1]/div[2]/div/table/tbody/tr[1]/td[1]/a"""
+        self.wait(driver, report_name, DEFAULT_TIMEOUT_DELAY)
+        
+        # find report name
+        pattern = "광고비 리포트"
+        if domain in ("lavena", "yuge"):
+            pattern = "광고비 리포트"
+        elif domain == "anua":
+            pattern = "성과 리포트"
+        
+        try:
+            for i in range(1, 20+1):
+                report_name = driver.find_element_by_xpath(f"""//*[@id="app"]/div/div[2]/div[2]/div/div[2]/div/div/div/div[2]/div/div/div/div/div[1]/div[2]/div/table/tbody/tr[{i}]/td[1]/a""")
+                if pattern in report_name.text:
+                    # move to detail page
+                    report_name.click()
+                    break
+
+        except Exception as e:
+            print(e)
+
+    def select_date(self, driver, domain):
+        date_form = """//*[@id="app"]/div/div[2]/div[2]/div/div[2]/div[1]/div/div[1]/div[2]/div/div/div[1]/button[2]"""
+        yesterday_button = """//*[@id="app"]/div/div[2]/div[2]/div/div[2]/div[1]/div/div[1]/div[2]/div/div/div[2]/div/div[1]/ul/li[2]/button"""
+        ok_button = """//*[@id="app"]/div/div[2]/div[2]/div/div[2]/div[1]/div/div[1]/div[2]/div/div/div[2]/div/div[2]/div[2]/div/button[2]"""
+        confirm_button = """//*[@id="app"]/div/div[2]/div[2]/div/div[2]/div[1]/div/div[4]/button"""
+        if domain in ("lavena", "yuge"):
+            confirm_button = """//*[@id="app"]/div/div[2]/div[2]/div/div[2]/div[1]/div/div[4]/button"""
+        elif domain == "anua":
+            confirm_button = """//*[@id="app"]/div/div[2]/div[2]/div/div[2]/div[1]/div/div[6]/button"""
+            
+
+        # click date form
         self.wait(driver, date_form, DEFAULT_TIMEOUT_DELAY)
         date_form = driver.find_element_by_xpath(date_form)
         date_form.click()
@@ -157,6 +194,31 @@ class Naver_GFA:
         yesterday_button = driver.find_element_by_xpath(yesterday_button)
         yesterday_button.click()
 
+        # click ok button
+        self.wait(driver, ok_button, DEFAULT_TIMEOUT_DELAY)
+        ok_button = driver.find_element_by_xpath(ok_button)
+        ok_button.click()
+
+        # click campaign button
+        if domain == "anua":
+            analysis_level = """//*[@id="app"]/div/div[2]/div[2]/div/div[2]/div[1]/div/div[2]/div[2]/label[2]/span"""
+            self.wait(driver, analysis_level, DEFAULT_TIMEOUT_DELAY)
+            pattern = "캠페인"
+            try:
+                for i in range(1, 10+1):
+                    analysis_level_name = driver.find_element_by_xpath(f"""//*[@id="app"]/div/div[2]/div[2]/div/div[2]/div[1]/div/div[2]/div[2]/label[{i}]/span""")
+                    if pattern == analysis_level_name.text:
+                        analysis_level_name.click()
+                        break
+                        
+            except Exception as e:
+                print(e)
+
+        # click confirm button
+        self.wait(driver, confirm_button, DEFAULT_TIMEOUT_DELAY)
+        confirm_button = driver.find_element_by_xpath(confirm_button)
+        confirm_button.click()
+
         # wait for loading
         time.sleep(2)
         
@@ -164,12 +226,8 @@ class Naver_GFA:
         # TODO : change 3 days if today is MONDAY
         #
 
-    def download_csv(self, driver, uid):
-        if uid == "lavenakorea":
-            download_button = driver.find_element_by_xpath("""//*[@id='root']/div/div[2]/div/div[3]/div/div[1]/div[1]/div[2]/div/button""")
-        else:
-            download_button = driver.find_element_by_xpath("""//*[@id="root"]/div/div[2]/div/div/div[1]/div[2]/button""")
-
+    def download_csv(self, driver, domain):
+        download_button = driver.find_element_by_xpath("""//*[@id="app"]/div/div[2]/div[2]/div/div[2]/div[2]/div/div/div[1]/div/div[2]/a/button""")
         download_button.click()
 
         time.sleep(5)
@@ -190,6 +248,9 @@ class Naver_GFA:
         driver = self.get_driver(url, download_path)
         # self.close_popup(driver)
         self.login(driver, account)
-        self.move_page(driver)
-        # self.select_date(driver, account["id"])
-        # self.download_csv(driver, account["id"])
+        self.press_ok(driver)
+        self.switch_user(driver, account["domain"])
+        self.press_ok(driver)
+        self.move_page(driver, account["domain"])
+        self.select_date(driver, account["domain"])
+        self.download_csv(driver, account["domain"])
