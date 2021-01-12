@@ -12,7 +12,7 @@ from selenium.common.exceptions import ElementNotVisibleException
 from utils import DEFAULT_TIMEOUT_DELAY
 
 
-class Naver_shop:
+class Naver_GFA:
 
     def switch_popup(self, driver):
         windows = driver.window_handles
@@ -65,19 +65,19 @@ class Naver_shop:
         driver.get(url)
         
         # Wait for browser loading
-        naver_login_button = """//*[@id="container"]/main/div/div[1]/home-login/div/div/button/span"""
+        naver_login_button = """/html/body/div/div[2]/div/div/div[2]/ul/li[1]/a"""
         self.wait(driver, naver_login_button, 10)
         
         return driver
 
-    def naver_login(self, driver, account):
+    def login(self, driver, account):
         # get naver login button
-        naver_login = driver.find_element_by_class_name("naver_login_btn")
+        naver_login_button = driver.find_element_by_class_name("naver_login_btn")
         naver_login.click()
 
         # wait for login popup
         naver_banner = """//*[@id="log.naver"]"""
-        self.wait_popup(driver, naver_banner, DEFAULT_TIMEOUT_DELAY)
+        self.wait(driver, naver_banner, DEFAULT_TIMEOUT_DELAY)
 
         # get naver id form
         id_form = driver.find_element_by_id("id")
@@ -95,24 +95,9 @@ class Naver_shop:
         login_button = driver.find_element_by_id("log.login")
         login_button.click()
 
-    def login(self, driver, account):
-        if account["type"] == "naver":
-            self.naver_login(driver, account)
-        else:
-            # get id form
-            id_form = driver.find_element_by_id("uid")
-            id_form.send_keys(account["id"])
-
-            # get pw form
-            pw_form = driver.find_element_by_id("upw")
-            pw_form.send_keys(account["pw"])
-            pw_form.send_keys(Keys.RETURN)
-
     def move_page(self, driver):
-        # return to main window
-        self.switch_main(driver)
-
-        login_ok_button = """//*[@id="mat-dialog-0"]/naver-login-confirm/mat-dialog-content/div[2]/button/span"""
+        # wait for ok button after login
+        login_ok_button = """//*[@id="app"]/div/div[2]/div[2]/div/div[2]/span/div/div/div[2]/div[3]/button"""
 
         try:
             self.wait(driver, login_ok_button, DEFAULT_TIMEOUT_DELAY)
@@ -120,12 +105,13 @@ class Naver_shop:
         except:
             pass
 
-        # click AD Management button
-        ad_management_button = driver.find_element_by_xpath("""//*[@id="container"]/my-screen/div/div[1]/div/my-screen-board/div/div[1]/div[1]/board-campaign-type/div[1]/a""")
-        ad_management_button.click()
+    def switch_user(self, driver, account):
+        domain = account["domain"]
 
-        date_button = """//*[@id="root"]/div/div[2]/div/div[1]/div/div[2]/div/div/span/div/div"""
-        self.wait_popup(driver, date_button, DEFAULT_TIMEOUT_DELAY)
+        # click user menu dropdown
+        user_menu_dropdown = driver.find_export_by_xpath("""//*[@id="app"]/div/div[1]/div/ul/li[1]/a""")
+        user_menu_dropdown.click()
+
 
     def select_date(self, driver, uid):
         if uid != "lavenakorea":
@@ -188,22 +174,22 @@ class Naver_shop:
 
         time.sleep(5)
 
-    def run(self, uid, upw, utype):
+    def run(self, uid, upw, udomain):
         # account list
         # lavena, yuge, anua, project21
 
-        url = "https://searchad.naver.com/"
+        url = "https://auth.glad.naver.com/login?destination=http://gfa.naver.com/adAccount"
         download_path = "C:/Downloads"
 
         account = {
             "id": uid,
             "pw": upw,
-            "type": utype
+            "domain": udomain
         }
 
         driver = self.get_driver(url, download_path)
-        self.close_popup(driver)
+        # self.close_popup(driver)
         self.login(driver, account)
         self.move_page(driver)
-        self.select_date(driver, account["id"])
-        self.download_csv(driver, account["id"])
+        # self.select_date(driver, account["id"])
+        # self.download_csv(driver, account["id"])
