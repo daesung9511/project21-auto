@@ -12,6 +12,7 @@ class Ezadmin:
     @staticmethod
     def get_admin_page(domain: str, id: str, password: str) -> WebDriver:
         driver = Utils.get_chrome_driver()
+        driver.set_window_size(1980, 1080)
         driver.get("https://www.ezadmin.co.kr/index.html#main")
         WebDriverWait(driver, 3).until(
             expected_conditions.presence_of_all_elements_located((By.ID, "login-popup"))
