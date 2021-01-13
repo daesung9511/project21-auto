@@ -16,7 +16,7 @@ class Utils:
         options = webdriver.ChromeOptions()
         # https://www.python2.net/questions-80772.htm
         options.add_experimental_option("detach", True)
-        path = os.path.dirname(os.path.abspath(Path(__file__).parent)) + '/raw_data'
+        path = os.path.dirname(os.path.abspath(Path(__file__).parent)) + '\\raw_data'
         prefs = {
             "profile.default_content_settings.popups": 0,
             'download.default_directory': path,
@@ -33,3 +33,13 @@ class Utils:
     def get_yesterday() -> str:
         date = datetime.date.today() - datetime.timedelta(1)
         return date.isoformat()
+
+    @staticmethod
+    def get_3daysago() -> str:
+        date = datetime.date.today() - datetime.timedelta(3)
+        return date.isoformat()
+
+    @staticmethod
+    def get_weekday() -> str:
+        # It's MONDAY when return value is 0
+        return datetime.datetime.today().weekday()
