@@ -33,3 +33,13 @@ class Utils:
     def get_yesterday() -> str:
         date = datetime.date.today() - datetime.timedelta(1)
         return date.isoformat()
+
+    @staticmethod
+    def get_3daysago() -> str:
+        date = datetime.date.today() - datetime.timedelta(3)
+        return date.isoformat()
+
+    @staticmethod
+    def get_weekday() -> str:
+        # It's MONDAY when return value is 0
+        return datetime.datetime.today().weekday()

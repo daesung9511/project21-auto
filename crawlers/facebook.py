@@ -27,8 +27,18 @@ class Facebook:
             WebDriverWait(driver, sec).until(
                 expected_conditions.presence_of_element_located((By.CSS_SELECTOR, selector))
             )
-        except:
-            pass
+            return True
+        except Exception as e:
+            return False
+
+    def wait_xpath(self, driver, selector, sec):
+        try:
+            WebDriverWait(driver, sec).until(
+                expected_conditions.presence_of_element_located((By.XPATH, selector))
+            )
+            return True
+        except Exception as e:
+            return False
 
     def wait_popup(self, driver, selector, sec):
         while True:
@@ -38,8 +48,8 @@ class Facebook:
                     expected_conditions.presence_of_element_located((By.CSS_SELECTOR, selector))
                 )
                 break
-            except:
-                pass
+            except Exception as e:
+                print(e)
 
     def close_popup(self, driver):
         windows = driver.window_handles
@@ -51,139 +61,130 @@ class Facebook:
 
         driver.switch_to.window(main)
 
+    def close_popup_facebook(self, driver):
+        try:
+            accessible_elems = driver.find_elements_by_class_name("accessible_elem")
+            for accessible_elem in accessible_elems:
+                if accessible_elem.text == "닫기":
+                    return accessible_elem
+                    break
+
+        except Exception as e:
+            return False
+        
+
     def init(self, driver, url):
         driver.get(url)
         
         # Wait for browser loading
-        kakao_login_button = """#login-form > fieldset > div.wrap_btn > button.btn_g.btn_confirm.submit"""
-        self.wait(driver, kakao_login_button, 10)
+        facebook_login_button = """#loginbutton"""
+        self.wait(driver, facebook_login_button, 10)
         
         return driver
 
     def login(self, driver, account):
         time.sleep(1)
 
-        # get kakao id form
-        id_form = driver.find_element_by_id("id_email_2")
+        # get facebook id form
+        id_form = driver.find_element_by_id("email")
         id_form.send_keys(account["id"])
 
         time.sleep(1)
 
-        # get kakao pw form
-        pw_form = driver.find_element_by_id("id_password_3")
+        # get facebook pw form
+        pw_form = driver.find_element_by_id("pass")
         pw_form.send_keys(account["pw"])
 
         time.sleep(1)
 
-        # get kakao login button
-        kakao_login_button = driver.find_element_by_css_selector("""#login-form > fieldset > div.wrap_btn > button.btn_g.btn_confirm.submit""")
-        kakao_login_button.click()
+        # get facebook login button
+        facebook_login_button = driver.find_element_by_css_selector("""#loginbutton""")
+        facebook_login_button.click()
 
-        # wait for login
-        dashboard = """#kakaoContent > div.cont_feature > ul > li.on > a"""
+        # wait for 2fa
+        facebook_continue_button = "#checkpointSubmitButton"
+        self.wait(driver, facebook_continue_button, DEFAULT_TIMEOUT_DELAY)
 
-        try:
-            self.wait(driver, dashboard, DEFAULT_TIMEOUT_DELAY)
-        except:
-            time.sleep(1)
+        # wait for dashboard in 180 seconds
+        facebook_banner = "#global_nav_app_name_id > div > span"
+        if self.wait(driver, facebook_banner, DEFAULT_TIMEOUT_DELAY) == False:
+            self.wait(driver, facebook_banner, 60)
 
-    def move_dashboard_anua(self, driver, number):
-        # dashboard url 
-        dashboard_url = f"https://moment.kakao.com/{number}/report/customreport/all"
 
-        #move to dashboard
-        driver.get(dashboard_url)
+    def move_dashboard(self, driver, number):
+        start = Utils.get_yesterday()
+        end = Utils.get_today()
+        # when today is MONDAY
+        if Utils.get_weekday() == 0:
+            start = Utils.get_3daysago()
+
+        url = f"https://business.facebook.com/adsmanager/manage/campaigns?business_id=346749235781856&act={number}&date={start}_{end}&time_breakdown=days_1"
+        driver.get(url)
+
+        dashboard_totem = "#pe_toolbar > div > div > div > div:nth-child(1) > div > div:nth-child(1) > div"
+        self.wait(driver, dashboard_totem, 10)
+
+        # close popup with agree button
+        agree_button = """body > div._10._d2i.uiLayer._4-hy._3qw > div._59s7._9l2g > div > div > div > div > div > div > div._4iyh._2pia._2pi4 > span._4iyi > div > div > button"""
+        if self.wait(driver, agree_button, 2):
+            driver.find_element_by_css_selector(agree_button).click()
+
+        for _ in range(2):
+            time.sleep(0.5)
+            accessible_elem = self.close_popup_facebook(driver)
+            if accessible_elem:
+                accessible_elem.click()
+
+        # wait popup delay
+        time.sleep(1)
+
+    def download_csv(self, driver):
+        # click report button
+        report_button = "#pe_toolbar > div > div > div > div:nth-child(3) > span:nth-child(4)"
+        self.wait(driver, report_button, DEFAULT_TIMEOUT_DELAY)
+        driver.find_element_by_css_selector(report_button).click()
+
+        # wait for menu
+        time.sleep(1)
+
+        # find with xpath
+        for i in range(1, 20):
+            download_button = f"""//*[@id="facebook"]/body/div[{i}]/div[1]/div[1]/div/div/div[1]/div[2]/div/div[1]/div/div/div/div/div/div"""
+            try:
+                download_button = driver.find_element_by_xpath(download_button)
+                if "테이블 데이터 내보내기" in download_button.text:
+                    print("Found download!")
+                    download_button.click()
+                    # wait for menu
+                    time.sleep(2)
+                    for j in range(1, 20):
+                        export_button = f"""//*[@id="facebook"]/body/div[{j}]/div[2]/div/div/div/div/div[1]/div/div[3]/div[2]/div[3]/div[1]/span/div/div/div"""
+                        try:
+                            export_button = driver.find_element_by_xpath(export_button)
+                            if export_button.text == "내보내기":
+                                print("Found export!")
+                                export_button.click()
+                                break
+                        except:
+                            pass
+            except:
+                pass
+
         
-        # find report name
-        report_name = """#mArticle > div > div.ad_managebox > div.tblg2_wrap > table > tbody > tr:nth-child(1) > td:nth-child(2) > div > a"""
-        self.wait(driver, report_name, DEFAULT_TIMEOUT_DELAY)
+        # wait for download
+        driver.implicitly_wait(5)
+        time.sleep(10)
 
-        pattern = "광고비"
-        try:
-            for i in range(1, 10+1):
-                report_name = f"""#mArticle > div > div.ad_managebox > div.tblg2_wrap > table > tbody > tr:nth-child({i}) > td:nth-child(2) > div > a"""
-                report_name_element = driver.find_element_by_css_selector(report_name)
-                if pattern == report_name_element.text:
-                    report_name_element.click()
-                    break
-        except Exception as e:
-            print(e)
 
-        date_form = """#mArticle > div > div.set_table > div.set_head > div.f_right > div:nth-child(3) > div > div.btn_gm.gm_calendar > a"""
-        self.wait(driver, date_form, DEFAULT_TIMEOUT_DELAY)
-
-    def move_dashboard_yuge(self, driver, number):
-        # dashboard url 
-        dashboard_url = f"https://moment.kakao.com/dashboard/{number}"
-
-        # move to dashboard
-        driver.get(dashboard_url)
-
-        # click ok button on alert
-        ok_button = """#app > section > div:nth-child(4) > div > div > div > div.layer_foot > div > button > span"""
-        try:
-            self.wait(driver, ok_button, DEFAULT_TIMEOUT_DELAY)
-            driver.find_element_by_css_selector(ok_button).click()
-        except Exception as e:
-            print(e)
-
-        date_form = """#mArticle > div > div.dashboard_check > div.f_right > div:nth-child(1) > div > div.btn_gm.gm_calendar > a"""
-        self.wait(driver, date_form, DEFAULT_TIMEOUT_DELAY)
-
-    def select_date(self, driver, domain):
-        if domain == "anua":
-            date_form = """#mArticle > div > div.set_table > div.set_head > div.f_right > div:nth-child(3) > div > div.btn_gm.gm_calendar > a"""
-            yesterday_button = """#mArticle > div > div.set_table > div.set_head > div.f_right > div:nth-child(3) > div > div.btn_gm.gm_calendar.open > div > div > div.layer_body > ul > li.on > a"""
-            ok_button = """#mArticle > div > div.set_table > div.set_head > div.f_right > div:nth-child(3) > div > div.btn_gm.gm_calendar.open > div > div > div.layer_body > div > div.btn_wrap > button.btn_gm.gm_bl > span"""
-        elif domain == "yuge":
-            date_form = """#mArticle > div > div.dashboard_check > div.f_right > div:nth-child(1) > div > div.btn_gm.gm_calendar > a"""
-            yesterday_button = """#mArticle > div > div.dashboard_check > div.f_right > div:nth-child(1) > div > div.btn_gm.gm_calendar.open > div > div > div.layer_body > ul > li:nth-child(2) > a"""
-            ok_button = """#mArticle > div > div.dashboard_check > div.f_right > div:nth-child(1) > div > div.btn_gm.gm_calendar.open > div > div > div.layer_body > div > div.btn_wrap > button.btn_gm.gm_bl > span"""
-
-        # click date form
-        self.wait(driver, date_form, DEFAULT_TIMEOUT_DELAY)
-        date_form = driver.find_element_by_css_selector(date_form)
-        date_form.click()
-
-        # click yesterday button
-        self.wait(driver, yesterday_button, DEFAULT_TIMEOUT_DELAY)
-        yesterday_button = driver.find_element_by_css_selector(yesterday_button)
-        yesterday_button.click()
-
-        # click ok button
-        self.wait(driver, ok_button, DEFAULT_TIMEOUT_DELAY)
-        ok_button = driver.find_element_by_css_selector(ok_button)
-        ok_button.click()
-
-        # wait for loading
-        time.sleep(2)
-        
-        #
-        # TODO : change 3 days if today is MONDAY
-        #
-
-    def download_csv(self, driver, domain):
-        if domain == "anua":
-            download_button = """#mArticle > div > div.set_table > div.set_head > div.f_right > div:nth-child(4) > a > span > span"""
-        if domain == "yuge":
-            download_button = """div.set_head > div.f_right > div:nth-child(3) > a > span > span"""
-
-        self.wait(driver, download_button, DEFAULT_TIMEOUT_DELAY)
-        download_button = driver.find_element_by_css_selector(download_button)
-        download_button.click()
-
-        time.sleep(5)
-
-    def run(self, uid, upw, udomain, unumber):
+    def run(self, uid, upw, unumber):
         # account list
         # lavena, yuge, anua, project21
 
-        url = "https://accounts.kakao.com/login/kakaoforbusiness?continue=https://business.kakao.com/dashboard/?sid=kmo&redirect=https://moment.kakao.com/dashboard"
+        url = "https://business.facebook.com/login/?next=https://business.facebook.com"
 
         account = {
             "id": uid,
             "pw": upw,
-            "domain": udomain,
             "number": unumber
         }
         
@@ -191,9 +192,5 @@ class Facebook:
         driver.set_window_size(1980, 1080)
         self.init(driver, url)
         self.login(driver, account)
-        if account["domain"] == "anua":
-            self.move_dashboard_anua(driver, account["number"])
-        elif account["domain"] == "yuge":
-            self.move_dashboard_yuge(driver, account["number"])
-        self.select_date(driver, account["domain"])
-        self.download_csv(driver, account["domain"])
+        self.move_dashboard(driver, account["number"])
+        self.download_csv(driver)
