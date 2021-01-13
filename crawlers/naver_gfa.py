@@ -1,6 +1,7 @@
 #coding: utf-8
 
 import time
+import datetime
 import pyperclip
 import selenium
 from selenium import webdriver
@@ -123,15 +124,15 @@ class Naver_GFA:
             pattern = "더파운더즈"
 
         user = """#app > div > div.header > div > ul > li.active.user > ul > li:nth-child(3) > div > div.account_list.active > div > div > div > ul > li:nth-child(1) > label > span.account_name"""
-        try:
-            for i in range(1, 10+1):
+        for i in range(1, 20+1):
+            try:
                 user_name = driver.find_element_by_css_selector(f"""#app > div > div.header > div > ul > li.active.user > ul > li:nth-child(3) > div > div.account_list.active > div > div > div > ul > li:nth-child({i}) > label > span.account_name""")
                 if pattern in user_name.text:
                     user = f"""#app > div > div.header > div > ul > li.active.user > ul > li:nth-child(3) > div > div.account_list.active > div > div > div > ul > li:nth-child({i}) > label > span.account_name"""
                     break
 
-        except Exception as e:
-            print(e)
+            except:
+                pass
 
         # switch user
         user = driver.find_element_by_css_selector(user)
@@ -165,14 +166,47 @@ class Naver_GFA:
         except Exception as e:
             print(e)
 
+    def calc_date(self):
+        today = datetime.date.today()
+        token = datetime.timedelta(1)
+
+        d1 = today - token
+        d2 = d1 - token
+        d3 = d2 - token
+
+        stat = 0
+        # 1 days ago : prev month
+        if d1.day < 0:
+            start = d3.day
+            end = d1.day
+            stat = 1
+        
+        # 2 days ago : prev month
+        elif d2.day < 0:
+            start = d2.day
+            stat = 2
+        
+        # 3 days ago : prev month
+        elif d3.day < 0:
+            start = d1.day
+            stat = 3
+
+        else:
+            stat = 0
+            start = d3.day
+            end = d1.day
+
+        return stat, start, end
+
     def select_date(self, driver, domain):
         date_form = """#app > div > div.container > div.content > div > div.panel_body > div:nth-child(1) > div > div:nth-child(1) > div:nth-child(2) > div > div > div.mx-input-wrapper.calendar_box > button.button.button_data"""
-        yesterday_button = """#app > div > div.container > div.content > div > div.panel_body > div:nth-child(1) > div > div:nth-child(1) > div:nth-child(2) > div > div > div.mx-datepicker-popup > div > div.mx-calendar.mx-shortcuts-wrapper > ul > li:nth-child(2) > button"""
         ok_button = """#app > div > div.container > div.content > div > div.panel_body > div:nth-child(1) > div > div:nth-child(1) > div:nth-child(2) > div > div > div.mx-datepicker-popup > div > div.mx-calendar-division > div.mx-datepicker-footer > div > button.mx-datepicker-btn.mx-datepicker-btn-confirm"""
         confirm_button = """#app > div > div.container > div.content > div > div.panel_body > div:nth-child(1) > div > div.center_button > button"""
         if domain in ("lavena", "yuge"):
+            yesterday_button = """#app > div > div.container > div.content > div > div.panel_body > div:nth-child(1) > div > div:nth-child(1) > div:nth-child(2) > div > div > div.mx-datepicker-popup > div > div.mx-calendar.mx-shortcuts-wrapper > ul > li:nth-child(2) > button"""
             confirm_button = """#app > div > div.container > div.content > div > div.panel_body > div:nth-child(1) > div > div.center_button > button"""
         elif domain == "anua":
+            yesterday_button = "#app > div > div.container > div.content > div > div.panel_body.report > div:nth-child(1) > div > div:nth-child(1) > div:nth-child(2) > div > div > div.mx-datepicker-popup > div > div.mx-calendar.mx-shortcuts-wrapper > ul > li:nth-child(2) > button"
             confirm_button = """#app > div > div.container > div.content > div > div.panel_body.report > div:nth-child(1) > div > div.center_button > button"""
             
 
@@ -183,8 +217,65 @@ class Naver_GFA:
 
         # click yesterday button
         self.wait(driver, yesterday_button, DEFAULT_TIMEOUT_DELAY)
-        yesterday_button = driver.find_element_by_css_selector(yesterday_button)
-        yesterday_button.click()
+
+        if Utils.get_weekday() == 0:
+        # if True:
+            stat = 0
+            stat, start, end = self.calc_date()
+
+            # get calendar elements
+            left = driver.find_element_by_css_selector(".mx-calendar-start-date")
+            right = driver.find_element_by_css_selector(".mx-calendar-end-date")
+
+            days = ".mx-calendar-content td"
+            start_days = left.find_elements_by_css_selector(days)
+            end_days = right.find_elements_by_css_selector(days)
+
+            left_prev_button = left.find_element_by_css_selector(".mx-calendar-header > a")
+            right_prev_button = right.find_element_by_css_selector(".mx-calendar-header > a")
+
+            # stat 0 : start-right, end-right
+            if stat == 0:
+                pass
+
+            # stat 1 : start-left, end-left
+            elif stat == 1:
+                # click prev month(start, end)
+                left_prev_button.click()
+                driver.implicitly_wait(1)
+                right_prev_button.click()
+                driver.implicitly_wait(1)
+
+            # stat 2 : start-left, end-right
+            # stat 3 : start-left, end-right
+            else:
+                # click prev month(start)
+                left_prev_button.click()
+                driver.implicitly_wait(1)
+
+            flag = False
+            for start_day in start_days:
+                if start_day.text == "1" and flag == False:
+                    flag = True
+
+                if flag and start_day.text == str(start):
+                    start_day.click()
+                    driver.implicitly_wait(1)
+                    break
+            
+            flag = False
+            for end_day in end_days:
+                if end_day.text == "1" and flag == False:
+                    flag = True
+
+                if flag and end_day.text == str(end):
+                    end_day.click()
+                    driver.implicitly_wait(1)
+                    break
+
+        else:
+            yesterday_button = driver.find_element_by_css_selector(yesterday_button)
+            yesterday_button.click()
 
         # click ok button
         self.wait(driver, ok_button, DEFAULT_TIMEOUT_DELAY)
