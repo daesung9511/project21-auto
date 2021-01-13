@@ -3,6 +3,7 @@
 import time
 import pyperclip
 import selenium
+import datetime
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -61,19 +62,13 @@ class Kakaomoment:
         return driver
 
     def login(self, driver, account):
-        time.sleep(1)
-
         # get kakao id form
         id_form = driver.find_element_by_id("id_email_2")
         id_form.send_keys(account["id"])
 
-        time.sleep(1)
-
         # get kakao pw form
         pw_form = driver.find_element_by_id("id_password_3")
         pw_form.send_keys(account["pw"])
-
-        time.sleep(1)
 
         # get kakao login button
         kakao_login_button = driver.find_element_by_css_selector("""#login-form > fieldset > div.wrap_btn > button.btn_g.btn_confirm.submit""")
@@ -130,6 +125,38 @@ class Kakaomoment:
         date_form = """#mArticle > div > div.dashboard_check > div.f_right > div:nth-child(1) > div > div.btn_gm.gm_calendar > a"""
         self.wait(driver, date_form, DEFAULT_TIMEOUT_DELAY)
 
+    def calc_date(self):
+        today = datetime.date.today()
+        token = datetime.timedelta(1)
+
+        d1 = today - token
+        d2 = d1 - token
+        d3 = d2 - token
+
+        stat = 0
+        # 1 days ago : prev month
+        if d1.day < 0:
+            start = d3.day
+            end = d1.day
+            stat = 1
+        
+        # 2 days ago : prev month
+        elif d2.day < 0:
+            start = d2.day
+            stat = 2
+        
+        # 3 days ago : prev month
+        elif d3.day < 0:
+            start = d1.day
+            stat = 3
+
+        else:
+            stat = 0
+            start = d3.day
+            end = d1.day
+
+        return stat, start, end
+
     def select_date(self, driver, domain):
         if domain == "anua":
             date_form = """#mArticle > div > div.set_table > div.set_head > div.f_right > div:nth-child(3) > div > div.btn_gm.gm_calendar > a"""
@@ -145,10 +172,63 @@ class Kakaomoment:
         date_form = driver.find_element_by_css_selector(date_form)
         date_form.click()
 
-        # click yesterday button
         self.wait(driver, yesterday_button, DEFAULT_TIMEOUT_DELAY)
-        yesterday_button = driver.find_element_by_css_selector(yesterday_button)
-        yesterday_button.click()
+
+        if Utils.get_weekday() == 0:
+            stat = 0
+            stat, start, end = self.calc_date()
+
+            # get calendar elements
+            calendar = driver.find_elements_by_css_selector("div.area_calendar")
+            left = calendar[0]
+            right = calendar[1]
+
+            days = ".inner_link_day"
+            prev_days = left.find_elements_by_css_selector(days)
+            current_days = right.find_elements_by_css_selector(days)
+
+            # stat 0 : start-right, end-right
+            if stat == 0:
+                cnt = 0
+                for current_day in current_days:
+                    if current_day.text in (str(start), str(end)):
+                        current_day.click()
+                        cnt += 1
+                        if cnt == 2:
+                            break
+
+                        driver.implicitly_wait(1)
+
+            # stat 1 : start-left, end-left
+            elif stat == 1:
+                cnt = 0
+                for prev_day in prev_days:
+                    if prev_day.text in (str(start), str(end)):
+                        prev_day.click()
+                        cnt += 1
+                        if cnt == 2:
+                            break
+
+                        driver.implicitly_wait(1)
+
+            # stat 2 : start-left, end-right
+            # stat 3 : start-left, end-right
+            else:
+                for prev_day in prev_days:
+                    if prev_day.text == str(start):
+                        prev_day.click()
+                        driver.implicitly_wait(1)
+                        break
+
+                for current_day in current_days:
+                    if current_day.text == str(end):
+                        current_day.click()
+                        break
+
+        else:
+            # click yesterday button
+            yesterday_button = driver.find_element_by_css_selector(yesterday_button)
+            yesterday_button.click()
 
         # click ok button
         self.wait(driver, ok_button, DEFAULT_TIMEOUT_DELAY)
@@ -157,10 +237,6 @@ class Kakaomoment:
 
         # wait for loading
         time.sleep(2)
-        
-        #
-        # TODO : change 3 days if today is MONDAY
-        #
 
     def download_csv(self, driver, domain):
         if domain == "anua":
@@ -172,7 +248,8 @@ class Kakaomoment:
         download_button = driver.find_element_by_css_selector(download_button)
         download_button.click()
 
-        time.sleep(5)
+        driver.implicitly_wait(1)
+        # time.sleep(5)
 
     def run(self, uid, upw, udomain, unumber):
         # account list

@@ -16,7 +16,13 @@ class Utils:
         options = webdriver.ChromeOptions()
         # https://www.python2.net/questions-80772.htm
         options.add_experimental_option("detach", True)
-        path = os.path.dirname(os.path.abspath(Path(__file__).parent)) + '\\raw_data'
+        
+        parent = os.path.dirname(os.path.abspath(Path(__file__).parent))
+        path = parent + '\\raw_data'
+
+        if os.path.isdir(path) == False:
+            os.mkdir(path)
+
         prefs = {
             "profile.default_content_settings.popups": 0,
             'download.default_directory': path,
