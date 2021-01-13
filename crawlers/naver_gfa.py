@@ -1,6 +1,7 @@
 #coding: utf-8
 
 import time
+import datetime
 import pyperclip
 import selenium
 from selenium import webdriver
@@ -9,7 +10,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions
 from selenium.common.exceptions import ElementNotVisibleException
-from utils import DEFAULT_TIMEOUT_DELAY
+from utils import Utils, DEFAULT_TIMEOUT_DELAY
 
 
 class Naver_GFA:
@@ -25,21 +26,31 @@ class Naver_GFA:
     def wait(self, driver, selector, sec):
         try:
             WebDriverWait(driver, sec).until(
+                expected_conditions.presence_of_element_located((By.CSS_SELECTOR, selector))
+            )
+            return True
+        except Exception as e:
+            return False
+
+    def wait_xpath(self, driver, selector, sec):
+        try:
+            WebDriverWait(driver, sec).until(
                 expected_conditions.presence_of_element_located((By.XPATH, selector))
             )
-        except:
-            pass
+            return True
+        except Exception as e:
+            return False
 
     def wait_popup(self, driver, selector, sec):
         while True:
             try:
                 self.switch_popup(driver)
                 WebDriverWait(driver, sec).until(
-                    expected_conditions.presence_of_element_located((By.XPATH, selector))
+                    expected_conditions.presence_of_element_located((By.CSS_SELECTOR, selector))
                 )
                 break
-            except:
-                pass
+            except Exception as e:
+                print(e)
 
     def close_popup(self, driver):
         windows = driver.window_handles
@@ -51,35 +62,23 @@ class Naver_GFA:
 
         driver.switch_to.window(main)
 
-    def get_driver(self, url, download_path):
-        options = webdriver.ChromeOptions()
-        options.add_argument("--start-fullscreen")
-        # options.add_argument("headless")
-        # options.add_experimental_option("detach", True)
-        base_path = "download.default_directory="
-        download_path = base_path + download_path
-        options.add_argument(download_path)
-
-        driver = webdriver.Chrome("chromedriver.exe", options=options)
-
+    def init(self, driver, url):
         driver.get(url)
         
         # Wait for browser loading
-        naver_login_button = """/html/body/div/div[2]/div/div/div[2]/ul/li[1]/a"""
+        naver_login_button = """body > div > div.container.bg_white > div > div > div.login_box > ul > li.selected > a"""
         self.wait(driver, naver_login_button, 10)
         
         return driver
 
     def login(self, driver, account):
         # get naver login button
-        naver_login_button = driver.find_element_by_xpath("""/html/body/div/div[2]/div/div/div[2]/ul/li[1]/a""")
+        naver_login_button = driver.find_element_by_css_selector("""body > div > div.container.bg_white > div > div > div.login_box > ul > li.selected > a > span.platform_name""")
         naver_login_button.click()
 
         # wait for login popup
-        naver_banner = """//*[@id="log.naver"]"""
+        naver_banner = """#log\.login"""
         self.wait(driver, naver_banner, DEFAULT_TIMEOUT_DELAY)
-
-        time.sleep(1)
 
         # get naver id form
         id_form = driver.find_element_by_id("id")
@@ -87,15 +86,11 @@ class Naver_GFA:
         id_form.click()
         id_form.send_keys(Keys.CONTROL, "v")
 
-        time.sleep(1)
-
         # get naver pw form
         pw_form = driver.find_element_by_id("pw")
         clip_pw = pyperclip.copy(account["pw"])
         pw_form.click()
         pw_form.send_keys(Keys.CONTROL, "v")
-
-        time.sleep(1)
 
         # get login button
         login_button = driver.find_element_by_id("log.login")
@@ -103,24 +98,22 @@ class Naver_GFA:
 
     def press_ok(self, driver):
         # wait for ok button after login
-        login_ok_button = """//*[@id="app"]/div/div[2]/div[2]/div/div[2]/span/div/div/div[2]/div[3]/button"""
+        login_ok_button = """#app > div > div.container > div.content > div > div.panel_body > span > div > div > div.ly_content > div.ly_footer.type_border > button"""
 
         try:
-            self.wait(driver, login_ok_button, DEFAULT_TIMEOUT_DELAY)
-            driver.find_element_by_xpath(login_ok_button).click()
+            self.wait(driver, login_ok_button, 2)
+            driver.find_element_by_css_selector(login_ok_button).click()
         except:
             pass
 
     def switch_user(self, driver, domain):
         # click user menu dropdown
-        user_menu_dropdown = driver.find_element_by_xpath("""//*[@id="app"]/div/div[1]/div/ul/li[1]/a""")
+        user_menu_dropdown = driver.find_element_by_css_selector("""#app > div > div.header > div > ul > li.user > a""")
         user_menu_dropdown.click()
 
         # wait for user menu
-        user_name = """//*[@id="app"]/div/div[1]/div/ul/li[1]/ul/li[3]/div/div[3]/div/div/div/ul/li[1]/label/span[2]"""
+        user_name = """#app > div > div.header > div > ul > li.user > a > span"""
         self.wait(driver, user_name, DEFAULT_TIMEOUT_DELAY)
-
-        # time.sleep(1)
 
         pattern = ""
         if domain == "lavena":
@@ -130,29 +123,29 @@ class Naver_GFA:
         else:
             pattern = "더파운더즈"
 
-        user = """//*[@id="app"]/div/div[1]/div/ul/li[1]/ul/li[3]/div/div[3]/div/div/div/ul/li[1]/label/span[1]"""
-        try:
-            for i in range(1, 10+1):
-                user_name = driver.find_element_by_xpath(f"""//*[@id="app"]/div/div[1]/div/ul/li[1]/ul/li[3]/div/div[3]/div/div/div/ul/li[{i}]/label/span[2]""")
+        user = """#app > div > div.header > div > ul > li.active.user > ul > li:nth-child(3) > div > div.account_list.active > div > div > div > ul > li:nth-child(1) > label > span.account_name"""
+        for i in range(1, 20+1):
+            try:
+                user_name = driver.find_element_by_css_selector(f"""#app > div > div.header > div > ul > li.active.user > ul > li:nth-child(3) > div > div.account_list.active > div > div > div > ul > li:nth-child({i}) > label > span.account_name""")
                 if pattern in user_name.text:
-                    user = f"""//*[@id="app"]/div/div[1]/div/ul/li[1]/ul/li[3]/div/div[3]/div/div/div/ul/li[{i}]/label/span[1]"""
+                    user = f"""#app > div > div.header > div > ul > li.active.user > ul > li:nth-child(3) > div > div.account_list.active > div > div > div > ul > li:nth-child({i}) > label > span.account_name"""
                     break
 
-        except Exception as e:
-            print(e)
+            except:
+                pass
 
         # switch user
-        user = driver.find_element_by_xpath(user)
+        user = driver.find_element_by_css_selector(user)
         user.click()
 
     def move_page(self, driver, domain):
         # click report button 
-        report_button = """//*[@id="app"]/div/div[2]/div[1]/div/div[2]/ul/li[2]/a"""
+        report_button = """#app > div > div.container > div.sidebar.undefined > div > div.menu > ul > li.report > a"""
         self.wait(driver, report_button, DEFAULT_TIMEOUT_DELAY)
-        driver.find_element_by_xpath(report_button).click()
+        driver.find_element_by_css_selector(report_button).click()
 
         # wait for report name
-        report_name = """//*[@id="app"]/div/div[2]/div[2]/div/div[2]/div/div/div/div[2]/div/div/div/div/div[1]/div[2]/div/table/tbody/tr[1]/td[1]/a"""
+        report_name = """#app > div > div.container > div.content > div > div.panel_body > div > div > div > div.ad_content > div > div > div > div > div.table_box > div.table_body > div > table > tbody > tr:nth-child(1) > td:nth-child(1) > a"""
         self.wait(driver, report_name, DEFAULT_TIMEOUT_DELAY)
         
         # find report name
@@ -164,7 +157,7 @@ class Naver_GFA:
         
         try:
             for i in range(1, 20+1):
-                report_name = driver.find_element_by_xpath(f"""//*[@id="app"]/div/div[2]/div[2]/div/div[2]/div/div/div/div[2]/div/div/div/div/div[1]/div[2]/div/table/tbody/tr[{i}]/td[1]/a""")
+                report_name = driver.find_element_by_css_selector(f"""#app > div > div.container > div.content > div > div.panel_body > div > div > div > div.ad_content > div > div > div > div > div.table_box > div.table_body > div > table > tbody > tr:nth-child({i}) > td:nth-child(1) > a""")
                 if pattern in report_name.text:
                     # move to detail page
                     report_name.click()
@@ -173,50 +166,140 @@ class Naver_GFA:
         except Exception as e:
             print(e)
 
+    def calc_date(self):
+        today = datetime.date.today()
+        token = datetime.timedelta(1)
+
+        d1 = today - token
+        d2 = d1 - token
+        d3 = d2 - token
+
+        stat = 0
+        # 1 days ago : prev month
+        if d1.day < 0:
+            start = d3.day
+            end = d1.day
+            stat = 1
+        
+        # 2 days ago : prev month
+        elif d2.day < 0:
+            start = d2.day
+            stat = 2
+        
+        # 3 days ago : prev month
+        elif d3.day < 0:
+            start = d1.day
+            stat = 3
+
+        else:
+            stat = 0
+            start = d3.day
+            end = d1.day
+
+        return stat, start, end
+
     def select_date(self, driver, domain):
-        date_form = """//*[@id="app"]/div/div[2]/div[2]/div/div[2]/div[1]/div/div[1]/div[2]/div/div/div[1]/button[2]"""
-        yesterday_button = """//*[@id="app"]/div/div[2]/div[2]/div/div[2]/div[1]/div/div[1]/div[2]/div/div/div[2]/div/div[1]/ul/li[2]/button"""
-        ok_button = """//*[@id="app"]/div/div[2]/div[2]/div/div[2]/div[1]/div/div[1]/div[2]/div/div/div[2]/div/div[2]/div[2]/div/button[2]"""
-        confirm_button = """//*[@id="app"]/div/div[2]/div[2]/div/div[2]/div[1]/div/div[4]/button"""
+        date_form = """#app > div > div.container > div.content > div > div.panel_body > div:nth-child(1) > div > div:nth-child(1) > div:nth-child(2) > div > div > div.mx-input-wrapper.calendar_box > button.button.button_data"""
+        ok_button = """#app > div > div.container > div.content > div > div.panel_body > div:nth-child(1) > div > div:nth-child(1) > div:nth-child(2) > div > div > div.mx-datepicker-popup > div > div.mx-calendar-division > div.mx-datepicker-footer > div > button.mx-datepicker-btn.mx-datepicker-btn-confirm"""
+        confirm_button = """#app > div > div.container > div.content > div > div.panel_body > div:nth-child(1) > div > div.center_button > button"""
         if domain in ("lavena", "yuge"):
-            confirm_button = """//*[@id="app"]/div/div[2]/div[2]/div/div[2]/div[1]/div/div[4]/button"""
+            yesterday_button = """#app > div > div.container > div.content > div > div.panel_body > div:nth-child(1) > div > div:nth-child(1) > div:nth-child(2) > div > div > div.mx-datepicker-popup > div > div.mx-calendar.mx-shortcuts-wrapper > ul > li:nth-child(2) > button"""
+            confirm_button = """#app > div > div.container > div.content > div > div.panel_body > div:nth-child(1) > div > div.center_button > button"""
         elif domain == "anua":
-            confirm_button = """//*[@id="app"]/div/div[2]/div[2]/div/div[2]/div[1]/div/div[6]/button"""
+            yesterday_button = "#app > div > div.container > div.content > div > div.panel_body.report > div:nth-child(1) > div > div:nth-child(1) > div:nth-child(2) > div > div > div.mx-datepicker-popup > div > div.mx-calendar.mx-shortcuts-wrapper > ul > li:nth-child(2) > button"
+            confirm_button = """#app > div > div.container > div.content > div > div.panel_body.report > div:nth-child(1) > div > div.center_button > button"""
             
 
         # click date form
         self.wait(driver, date_form, DEFAULT_TIMEOUT_DELAY)
-        date_form = driver.find_element_by_xpath(date_form)
+        date_form = driver.find_element_by_css_selector(date_form)
         date_form.click()
 
         # click yesterday button
         self.wait(driver, yesterday_button, DEFAULT_TIMEOUT_DELAY)
-        yesterday_button = driver.find_element_by_xpath(yesterday_button)
-        yesterday_button.click()
+
+        if Utils.get_weekday() == 0:
+        # if True:
+            stat = 0
+            stat, start, end = self.calc_date()
+
+            # get calendar elements
+            left = driver.find_element_by_css_selector(".mx-calendar-start-date")
+            right = driver.find_element_by_css_selector(".mx-calendar-end-date")
+
+            days = ".mx-calendar-content td"
+            start_days = left.find_elements_by_css_selector(days)
+            end_days = right.find_elements_by_css_selector(days)
+
+            left_prev_button = left.find_element_by_css_selector(".mx-calendar-header > a")
+            right_prev_button = right.find_element_by_css_selector(".mx-calendar-header > a")
+
+            # stat 0 : start-right, end-right
+            if stat == 0:
+                pass
+
+            # stat 1 : start-left, end-left
+            elif stat == 1:
+                # click prev month(start, end)
+                left_prev_button.click()
+                driver.implicitly_wait(1)
+                right_prev_button.click()
+                driver.implicitly_wait(1)
+
+            # stat 2 : start-left, end-right
+            # stat 3 : start-left, end-right
+            else:
+                # click prev month(start)
+                left_prev_button.click()
+                driver.implicitly_wait(1)
+
+            flag = False
+            for start_day in start_days:
+                if start_day.text == "1" and flag == False:
+                    flag = True
+
+                if flag and start_day.text == str(start):
+                    start_day.click()
+                    driver.implicitly_wait(1)
+                    break
+            
+            flag = False
+            for end_day in end_days:
+                if end_day.text == "1" and flag == False:
+                    flag = True
+
+                if flag and end_day.text == str(end):
+                    end_day.click()
+                    driver.implicitly_wait(1)
+                    break
+
+        else:
+            yesterday_button = driver.find_element_by_css_selector(yesterday_button)
+            yesterday_button.click()
 
         # click ok button
         self.wait(driver, ok_button, DEFAULT_TIMEOUT_DELAY)
-        ok_button = driver.find_element_by_xpath(ok_button)
+        ok_button = driver.find_element_by_css_selector(ok_button)
         ok_button.click()
 
         # click campaign button
         if domain == "anua":
-            analysis_level = """//*[@id="app"]/div/div[2]/div[2]/div/div[2]/div[1]/div/div[2]/div[2]/label[2]/span"""
+            analysis_level = """#app > div > div.container > div.content > div > div.panel_body.report > div:nth-child(1) > div > div:nth-child(2) > div:nth-child(2) > label:nth-child(4) > span"""
             self.wait(driver, analysis_level, DEFAULT_TIMEOUT_DELAY)
             pattern = "캠페인"
-            try:
-                for i in range(1, 10+1):
-                    analysis_level_name = driver.find_element_by_xpath(f"""//*[@id="app"]/div/div[2]/div[2]/div/div[2]/div[1]/div/div[2]/div[2]/label[{i}]/span""")
+            for i in range(1, 20+1):
+                try:
+                    analysis_level_name = driver.find_element_by_css_selector(f"""#app > div > div.container > div.content > div > div.panel_body.report > div:nth-child(1) > div > div:nth-child(2) > div:nth-child(2) > label:nth-child({i}) > span""")
                     if pattern == analysis_level_name.text:
                         analysis_level_name.click()
                         break
                         
-            except Exception as e:
-                print(e)
+                except:
+                    pass
 
         # click confirm button
         self.wait(driver, confirm_button, DEFAULT_TIMEOUT_DELAY)
-        confirm_button = driver.find_element_by_xpath(confirm_button)
+        confirm_button = driver.find_element_by_css_selector(confirm_button)
         confirm_button.click()
 
         # wait for loading
@@ -227,10 +310,14 @@ class Naver_GFA:
         #
 
     def download_csv(self, driver, domain):
-        download_button = driver.find_element_by_xpath("""//*[@id="app"]/div/div[2]/div[2]/div/div[2]/div[2]/div/div/div[1]/div/div[2]/a/button""")
-        download_button.click()
+        if domain == "anua":
+            download_button = ("""#app > div > div.container > div.content > div > div.panel_body.report > div:nth-child(2) > div > div > div.ad_title > div > div.inner_right > a > button""")
+        else:
+            download_button = "#app > div > div.container > div.content > div > div.panel_body > div:nth-child(2) > div > div > div.ad_title > div > div.inner_right > a > button"
 
-        time.sleep(5)
+        driver.find_element_by_css_selector(download_button).click()
+
+        driver.implicitly_wait(1)
 
     def run(self, uid, upw, udomain):
         # account list
@@ -244,8 +331,11 @@ class Naver_GFA:
             "pw": upw,
             "domain": udomain
         }
+        
+        driver = Utils.get_chrome_driver()
+        driver.set_window_size(1980, 1080)
 
-        driver = self.get_driver(url, download_path)
+        driver = self.init(driver, url)
         # self.close_popup(driver)
         self.login(driver, account)
         self.press_ok(driver)
