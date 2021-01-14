@@ -15,6 +15,7 @@ from utils import Utils, DEFAULT_TIMEOUT_DELAY
 
 class Kakaomoment:
 
+    flag = True
     def switch_popup(self, driver):
         windows = driver.window_handles
         driver.switch_to.window(windows[-1])  
@@ -260,13 +261,14 @@ class Kakaomoment:
 
         url = "https://accounts.kakao.com/login/kakaoforbusiness?continue=https://business.kakao.com/dashboard/?sid=kmo&redirect=https://moment.kakao.com/dashboard"
 
-        self.init(driver, url)
-        self.login(driver, account)
+        if self.flag:
+            self.init(driver, url)
+            self.login(driver, account)
+
         if account["domain"] == "anua":
             self.move_dashboard_anua(driver, account["number"])
         elif account["domain"] == "yuge":
             self.move_dashboard_yuge(driver, account["number"])
         self.select_date(driver, account["domain"])
         self.download_csv(driver, account["domain"])
-        self.logout(driver)
-        driver.delete_all_cookies()
+        self.flag = False
