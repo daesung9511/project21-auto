@@ -1,10 +1,11 @@
-#coding: utf-8
+# coding: utf-8
 
 import time
 import datetime
 import pyperclip
 import selenium
 from selenium import webdriver
+from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
@@ -15,10 +16,11 @@ from utils import Utils, DEFAULT_TIMEOUT_DELAY
 
 class Naver_GFA:
     flag = True
+
     def switch_popup(self, driver):
         windows = driver.window_handles
-        driver.switch_to.window(windows[-1])  
-        
+        driver.switch_to.window(windows[-1])
+
     def switch_main(self, driver):
         windows = driver.window_handles
         driver.switch_to.window(windows[0])
@@ -64,16 +66,17 @@ class Naver_GFA:
 
     def init(self, driver, url):
         driver.get(url)
-        
+
         # Wait for browser loading
         naver_login_button = """body > div > div.container.bg_white > div > div > div.login_box > ul > li.selected > a"""
         self.wait(driver, naver_login_button, 10)
-        
+
         return driver
 
     def login(self, driver, account):
         # get naver login button
-        naver_login_button = driver.find_element_by_css_selector("""body > div > div.container.bg_white > div > div > div.login_box > ul > li.selected > a > span.platform_name""")
+        naver_login_button = driver.find_element_by_css_selector(
+            """body > div > div.container.bg_white > div > div > div.login_box > ul > li.selected > a > span.platform_name""")
         naver_login_button.click()
 
         # wait for login popup
@@ -82,15 +85,11 @@ class Naver_GFA:
 
         # get naver id form
         id_form = driver.find_element_by_id("id")
-        clip_id = pyperclip.copy(account["id"])
-        id_form.click()
-        id_form.send_keys(Keys.CONTROL, "v")
+        Utils.send_keys_delayed(id_form, account["id"])
 
         # get naver pw form
         pw_form = driver.find_element_by_id("pw")
-        clip_pw = pyperclip.copy(account["pw"])
-        pw_form.click()
-        pw_form.send_keys(Keys.CONTROL, "v")
+        Utils.send_keys_delayed(pw_form, account["pw"])
 
         # get login button
         login_button = driver.find_element_by_id("log.login")
@@ -106,7 +105,7 @@ class Naver_GFA:
         except:
             pass
 
-    def switch_user(self, driver, domain):
+    def switch_user(self, driver: WebDriver, domain):
         # click user menu dropdown
         user_menu_dropdown = driver.find_element_by_css_selector("""#app > div > div.header > div > ul > li.user > a""")
         user_menu_dropdown.click()
@@ -123,19 +122,23 @@ class Naver_GFA:
         else:
             pattern = "더파운더즈"
 
-        user = """#app > div > div.header > div > ul > li.active.user > ul > li:nth-child(3) > div > div.account_list.active > div > div > div > ul > li:nth-child(1) > label > span.account_name"""
-        for i in range(1, 20+1):
-            try:
-                user_name = driver.find_element_by_css_selector(f"""#app > div > div.header > div > ul > li.active.user > ul > li:nth-child(3) > div > div.account_list.active > div > div > div > ul > li:nth-child({i}) > label > span.account_name""")
-                if pattern in user_name.text:
-                    user = f"""#app > div > div.header > div > ul > li.active.user > ul > li:nth-child(3) > div > div.account_list.active > div > div > div > ul > li:nth-child({i}) > label > span.account_name"""
-                    break
+        def get_user_query_selector(index: int) -> str:
+            return f"#app > div > div.header > div > ul > li.active.user > ul > li:nth-child(3) > div > div.account_list.active > div > div > div > ul > li:nth-child({index}) > label > span.account_name"
 
+        user_index = 1
+        for i in range(1, 20 + 1):
+            try:
+                user_name = driver.find_element_by_css_selector(get_user_query_selector(i))
+                if pattern in user_name.text:
+                    user_index = i  # found user
+                    break
             except:
                 pass
 
+        user_query_selector = get_user_query_selector(user_index)  # set default value
+
         # switch user
-        user = driver.find_element_by_css_selector(user)
+        user = driver.find_element_by_css_selector(user_query_selector)
         user.click()
 
     def move_page(self, driver, domain):
@@ -147,17 +150,18 @@ class Naver_GFA:
         # wait for report name
         report_name = """#app > div > div.container > div.content > div > div.panel_body > div > div > div > div.ad_content > div > div > div > div > div.table_box > div.table_body > div > table > tbody > tr:nth-child(1) > td:nth-child(1) > a"""
         self.wait(driver, report_name, DEFAULT_TIMEOUT_DELAY)
-        
+
         # find report name
         pattern = "광고비 리포트"
         if domain in ("lavena", "yuge"):
             pattern = "광고비 리포트"
         elif domain == "anua":
             pattern = "성과 리포트"
-        
+
         try:
-            for i in range(1, 20+1):
-                report_name = driver.find_element_by_css_selector(f"""#app > div > div.container > div.content > div > div.panel_body > div > div > div > div.ad_content > div > div > div > div > div.table_box > div.table_body > div > table > tbody > tr:nth-child({i}) > td:nth-child(1) > a""")
+            for i in range(1, 20 + 1):
+                report_name = driver.find_element_by_css_selector(
+                    f"""#app > div > div.container > div.content > div > div.panel_body > div > div > div > div.ad_content > div > div > div > div > div.table_box > div.table_body > div > table > tbody > tr:nth-child({i}) > td:nth-child(1) > a""")
                 if pattern in report_name.text:
                     # move to detail page
                     report_name.click()
@@ -180,12 +184,12 @@ class Naver_GFA:
             start = d3.day
             end = d1.day
             stat = 1
-        
+
         # 2 days ago : prev month
         elif d2.day < 0:
             start = d2.day
             stat = 2
-        
+
         # 3 days ago : prev month
         elif d3.day < 0:
             start = d1.day
@@ -208,7 +212,6 @@ class Naver_GFA:
         elif domain == "anua":
             yesterday_button = "#app > div > div.container > div.content > div > div.panel_body.report > div:nth-child(1) > div > div:nth-child(1) > div:nth-child(2) > div > div > div.mx-datepicker-popup > div > div.mx-calendar.mx-shortcuts-wrapper > ul > li:nth-child(2) > button"
             confirm_button = """#app > div > div.container > div.content > div > div.panel_body.report > div:nth-child(1) > div > div.center_button > button"""
-            
 
         # click date form
         self.wait(driver, date_form, DEFAULT_TIMEOUT_DELAY)
@@ -219,7 +222,7 @@ class Naver_GFA:
         self.wait(driver, yesterday_button, DEFAULT_TIMEOUT_DELAY)
 
         if Utils.get_weekday() == 0:
-        # if True:
+            # if True:
             stat = 0
             stat, start, end = self.calc_date()
 
@@ -262,7 +265,7 @@ class Naver_GFA:
                     start_day.click()
                     driver.implicitly_wait(1)
                     break
-            
+
             flag = False
             for end_day in end_days:
                 if end_day.text == "1" and flag == False:
@@ -287,13 +290,14 @@ class Naver_GFA:
             analysis_level = """#app > div > div.container > div.content > div > div.panel_body.report > div:nth-child(1) > div > div:nth-child(2) > div:nth-child(2) > label:nth-child(4) > span"""
             self.wait(driver, analysis_level, DEFAULT_TIMEOUT_DELAY)
             pattern = "캠페인"
-            for i in range(1, 20+1):
+            for i in range(1, 20 + 1):
                 try:
-                    analysis_level_name = driver.find_element_by_css_selector(f"""#app > div > div.container > div.content > div > div.panel_body.report > div:nth-child(1) > div > div:nth-child(2) > div:nth-child(2) > label:nth-child({i}) > span""")
+                    analysis_level_name = driver.find_element_by_css_selector(
+                        f"""#app > div > div.container > div.content > div > div.panel_body.report > div:nth-child(1) > div > div:nth-child(2) > div:nth-child(2) > label:nth-child({i}) > span""")
                     if pattern == analysis_level_name.text:
                         analysis_level_name.click()
                         break
-                        
+
                 except:
                     pass
 
@@ -316,7 +320,6 @@ class Naver_GFA:
     def logout(self, driver):
         logout_button = "li.logout > a"
         driver.find_element_by_css_selector(logout_button).click()
-        
 
     def clear_tabs(self, driver):
         windows = driver.window_handles
@@ -338,7 +341,7 @@ class Naver_GFA:
             self.init(driver, url)
             # self.close_popup(driver)
             self.login(driver, account)
-            
+
         self.press_ok(driver)
         self.switch_user(driver, account["domain"])
         self.press_ok(driver)

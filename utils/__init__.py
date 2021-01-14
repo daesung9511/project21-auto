@@ -1,10 +1,14 @@
 import os
+import random
+import time
 
 from selenium.webdriver.android.webdriver import WebDriver
 from selenium import webdriver
 import chromedriver_binary  # Adds chromedriver binary to path
 import datetime
 from pathlib import Path
+
+from selenium.webdriver.remote.webelement import WebElement
 
 DEFAULT_TIMEOUT_DELAY = 5
 
@@ -16,7 +20,7 @@ class Utils:
         options = webdriver.ChromeOptions()
         # https://www.python2.net/questions-80772.htm
         options.add_experimental_option("detach", True)
-        
+
         parent = os.path.dirname(os.path.abspath(Path(__file__).parent))
         path = parent + '\\raw_data'
 
@@ -49,3 +53,9 @@ class Utils:
     def get_weekday() -> str:
         # It's MONDAY when return value is 0
         return datetime.datetime.today().weekday()
+
+    @staticmethod
+    def send_keys_delayed(element: WebElement, input: str):
+        for char in input:
+            element.send_keys(char)
+            time.sleep(random.uniform(0.03, 0.2))
