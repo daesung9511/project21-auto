@@ -301,19 +301,37 @@ class Naver_shop:
         download_button.click()
         driver.implicitly_wait(1)
 
-    def run(self, account):
+    def logout(self, driver, uid):
+        logout_button = "#root > div > div:nth-child(1) > div > div:nth-child(1) > div:nth-child(1) > div:nth-child(2) > ul > li:nth-child(1) > span"
+        driver.find_element_by_css_selector(logout_button).click()
+        
+        if uid == "lavenakorea":
+            real_logout_button = "#container > div > div > div > div > div > button.mat-button-md.mat-raised-button.mat-button-base.mat-primary > span"
+            self.wait(driver, real_logout_button, DEFAULT_TIMEOUT_DELAY)
+            driver.find_element_by_css_selector(real_logout_button).click()
+
+    def clear_tabs(self, driver):
+        windows = driver.window_handles
+        main = windows[-1]
+        for window in windows:
+            if window != main:
+                driver.switch_to.window(window)
+                driver.close()
+
+        driver.switch_to.window(main)
+
+    def run(self, driver, account):
         # account list
         # lavena, yuge, anua, project21
 
         url = "https://searchad.naver.com/"
 
-        driver = Utils.get_chrome_driver()
-        driver.set_window_size(1980, 1080)
-
-        driver = self.init(driver, url)
+        self.init(driver, url)
         self.close_popup(driver)
         self.switch_main(driver)
         self.login(driver, account)
         self.move_page(driver, account["type"])
         self.select_date(driver, account["id"])
         self.download_csv(driver, account["id"])
+        self.logout(driver, account["id"])
+        self.clear_tabs(driver)

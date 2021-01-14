@@ -4,6 +4,7 @@ from crawlers.naver_shop import Naver_shop
 from crawlers.naver_gfa import Naver_GFA
 from crawlers.kakaomoment import Kakaomoment
 from crawlers.facebook import Facebook
+from utils import Utils
 from secrets import ANUA_EZADMIN_PW, ANUA_EZADMIN_ID, ANUA_EZADMIN_DOMAIN, PROJECT21_EZADMIN_DOMAIN, \
     PROJECT21_EZADMIN_PW, PROJECT21_EZADMIN_ID, PROJECT21_CAFE24_ID, PROJECT21_CAFE24_PW, \
     PROJECT21_EZADMIN_PW, PROJECT21_EZADMIN_ID, \
@@ -38,13 +39,19 @@ def run_cafe24(account):
         Cafe24.download_lacto_revenue(uid, upw)
 
 def run(platform, account):
+    driver = Utils.get_chrome_driver()
+    driver.set_window_size(1980, 1080)
+
     for brand in account["index"]:
-        platform.run(account[brand])
+        platform.run(driver, account[brand])
+        driver.delete_all_cookies()
+
+    driver.quit()
 
 def start():
     # run_ezadmin(ACCOUNTS["ezadmin"])
-    run_cafe24(ACCOUNTS["cafe24"])
-    # run(Naver_shop(), ACCOUNTS["naver_shop"])
+    # run_cafe24(ACCOUNTS["cafe24"])
+    run(Naver_shop(), ACCOUNTS["naver_shop"])
     # run(Naver_GFA(), ACCOUNTS["naver_gfa"])
     # run(Kakaomoment(), ACCOUNTS["kakaomoment"])
     # run(Facebook(), ACCOUNTS["facebook"]
