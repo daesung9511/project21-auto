@@ -58,4 +58,4 @@ class Utils:
     def send_keys_delayed(element: WebElement, input: str):
         for char in input:
             element.send_keys(char)
-            time.sleep(random.uniform(0.03, 0.2))
+            time.sleep(random.uniform(0.02, 0.1))
