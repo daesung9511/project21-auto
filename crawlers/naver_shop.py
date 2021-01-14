@@ -207,14 +207,10 @@ class Naver_shop:
         # wait yesterday button
         # self.wait(driver, yesterday_button, DEFAULT_TIMEOUT_DELAY)
 
-        # if Utils.get_weekday() == 0:
-        if True:
+        if Utils.get_weekday() == 0:
+        # if True:
             stat = 0
             stat, start, end = self.calc_date()
-
-            stat = 2
-            start = 28
-            end = 1
 
             if uid != "lavenakorea":
                 if uid == "yuge":
@@ -305,17 +301,11 @@ class Naver_shop:
         download_button.click()
         driver.implicitly_wait(1)
 
-    def run(self, uid, upw, utype):
+    def run(self, account):
         # account list
         # lavena, yuge, anua, project21
 
         url = "https://searchad.naver.com/"
-
-        account = {
-            "id": uid,
-            "pw": upw,
-            "type": utype
-        }
 
         driver = Utils.get_chrome_driver()
         driver.set_window_size(1980, 1080)
