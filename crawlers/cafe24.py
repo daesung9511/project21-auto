@@ -12,6 +12,7 @@ class Cafe24:
     @staticmethod
     def get_admin_page(id: str, password: str) -> WebDriver:
         driver = Utils.get_chrome_driver()
+        driver.set_window_size(1980, 1080)
         driver.get("https://eclogin.cafe24.com/Shop/")
         id_selector = "#mall_id"
         WebDriverWait(driver, 5).until(

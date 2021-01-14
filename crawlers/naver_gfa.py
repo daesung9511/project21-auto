@@ -215,7 +215,7 @@ class Naver_GFA:
         date_form = driver.find_element_by_css_selector(date_form)
         date_form.click()
 
-        # click yesterday button
+        # wait yesterday button
         self.wait(driver, yesterday_button, DEFAULT_TIMEOUT_DELAY)
 
         if Utils.get_weekday() == 0:
