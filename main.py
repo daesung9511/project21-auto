@@ -44,7 +44,6 @@ def run(platform, account):
 
     for brand in account["index"]:
         platform.run(driver, account[brand])
-        driver.delete_all_cookies()
 
     driver.quit()
 
@@ -52,9 +51,9 @@ def start():
     # run_ezadmin(ACCOUNTS["ezadmin"])
     # run_cafe24(ACCOUNTS["cafe24"])
     run(Naver_shop(), ACCOUNTS["naver_shop"])
-    # run(Naver_GFA(), ACCOUNTS["naver_gfa"])
-    # run(Kakaomoment(), ACCOUNTS["kakaomoment"])
-    # run(Facebook(), ACCOUNTS["facebook"]
+    run(Naver_GFA(), ACCOUNTS["naver_gfa"])
+    run(Kakaomoment(), ACCOUNTS["kakaomoment"])
+    run(Facebook(), ACCOUNTS["facebook"])
 
     # Ezadmin
     # Ezadmin.download_yesterday_revenue(ANUA_EZADMIN_DOMAIN, ANUA_EZADMIN_ID, ANUA_EZADMIN_PW)

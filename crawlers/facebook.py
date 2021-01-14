@@ -13,7 +13,7 @@ from utils import Utils, DEFAULT_TIMEOUT_DELAY
 
 
 class Facebook:
-
+    flag = True
     def switch_popup(self, driver):
         windows = driver.window_handles
         driver.switch_to.window(windows[-1])  
@@ -83,19 +83,13 @@ class Facebook:
         return driver
 
     def login(self, driver, account):
-        time.sleep(1)
-
         # get facebook id form
         id_form = driver.find_element_by_id("email")
         id_form.send_keys(account["id"])
 
-        time.sleep(1)
-
         # get facebook pw form
         pw_form = driver.find_element_by_id("pass")
         pw_form.send_keys(account["pw"])
-
-        time.sleep(1)
 
         # get facebook login button
         facebook_login_button = driver.find_element_by_css_selector("""#loginbutton""")
@@ -130,13 +124,10 @@ class Facebook:
             driver.find_element_by_css_selector(agree_button).click()
 
         for _ in range(2):
-            time.sleep(0.5)
+            time.sleep(0.2)
             accessible_elem = self.close_popup_facebook(driver)
             if accessible_elem:
                 accessible_elem.click()
-
-        # wait popup delay
-        time.sleep(1)
 
     def download_csv(self, driver):
         # click report button
@@ -148,7 +139,11 @@ class Facebook:
         time.sleep(1)
 
         # find with xpath
+        done = False
         for i in range(1, 20):
+            if done:
+                break
+
             download_button = f"""//*[@id="facebook"]/body/div[{i}]/div[1]/div[1]/div/div/div[1]/div[2]/div/div[1]/div/div/div/div/div/div"""
             try:
                 download_button = driver.find_element_by_xpath(download_button)
@@ -156,7 +151,7 @@ class Facebook:
                     print("Found download!")
                     download_button.click()
                     # wait for menu
-                    time.sleep(2)
+                    driver.implicitly_wait(5)
                     for j in range(1, 20):
                         export_button = f"""//*[@id="facebook"]/body/div[{j}]/div[2]/div/div/div/div/div[1]/div/div[3]/div[2]/div[3]/div[1]/span/div/div/div"""
                         try:
@@ -164,33 +159,27 @@ class Facebook:
                             if export_button.text == "내보내기":
                                 print("Found export!")
                                 export_button.click()
+                                done = True
                                 break
                         except:
                             pass
             except:
                 pass
 
-        
         # wait for download
-        driver.implicitly_wait(5)
-        time.sleep(10)
+        driver.implicitly_wait(3)
+        time.sleep(8)
 
 
-    def run(self, uid, upw, unumber):
+    def run(self, driver, account):
         # account list
         # lavena, yuge, anua, project21
-
         url = "https://business.facebook.com/login/?next=https://business.facebook.com"
 
-        account = {
-            "id": uid,
-            "pw": upw,
-            "number": unumber
-        }
-        
-        driver = Utils.get_chrome_driver()
-        driver.set_window_size(1980, 1080)
-        self.init(driver, url)
-        self.login(driver, account)
+        if self.flag:
+            self.init(driver, url)
+            self.login(driver, account)
+
         self.move_dashboard(driver, account["number"])
         self.download_csv(driver)
+        self.flag = False

@@ -249,23 +249,17 @@ class Kakaomoment:
         download_button.click()
 
         driver.implicitly_wait(1)
-        # time.sleep(5)
+        time.sleep(2)
 
-    def run(self, uid, upw, udomain, unumber):
+    def logout(self, driver):
+        driver.get("https://accounts.kakao.com/logout?continue=https://accounts.kakao.com/login/kakaoforbusiness?continue=https://business.kakao.com/dashboard/?sid=kmo&redirect=https://moment.kakao.com/dashboard")
+
+    def run(self, driver, account):
         # account list
         # lavena, yuge, anua, project21
 
         url = "https://accounts.kakao.com/login/kakaoforbusiness?continue=https://business.kakao.com/dashboard/?sid=kmo&redirect=https://moment.kakao.com/dashboard"
 
-        account = {
-            "id": uid,
-            "pw": upw,
-            "domain": udomain,
-            "number": unumber
-        }
-        
-        driver = Utils.get_chrome_driver()
-        driver.set_window_size(1980, 1080)
         self.init(driver, url)
         self.login(driver, account)
         if account["domain"] == "anua":
@@ -274,3 +268,5 @@ class Kakaomoment:
             self.move_dashboard_yuge(driver, account["number"])
         self.select_date(driver, account["domain"])
         self.download_csv(driver, account["domain"])
+        self.logout(driver)
+        driver.delete_all_cookies()

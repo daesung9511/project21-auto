@@ -299,7 +299,9 @@ class Naver_shop:
             download_button = driver.find_element_by_css_selector("#root > div > div:nth-child(2) > div > div > div:nth-child(1) > div:nth-child(3) > button")
 
         download_button.click()
+        
         driver.implicitly_wait(1)
+        time.sleep(2)
 
     def logout(self, driver, uid):
         logout_button = "#root > div > div:nth-child(1) > div > div:nth-child(1) > div:nth-child(1) > div:nth-child(2) > ul > li:nth-child(1) > span"
@@ -335,3 +337,4 @@ class Naver_shop:
         self.download_csv(driver, account["id"])
         self.logout(driver, account["id"])
         self.clear_tabs(driver)
+        driver.delete_all_cookies()
