@@ -33,10 +33,10 @@ def run(platform, account):
 def start():
     # run_ezadmin(ACCOUNTS["ezadmin"])
     # run_cafe24(ACCOUNTS["cafe24"])
-    run(Naver_shop(), ACCOUNTS["naver_shop"])
+    # run(Naver_shop(), ACCOUNTS["naver_shop"])
     run(Naver_GFA(), ACCOUNTS["naver_gfa"])
-    run(Kakaomoment(), ACCOUNTS["kakaomoment"])
-    run(Facebook(), ACCOUNTS["facebook"])
+    # run(Kakaomoment(), ACCOUNTS["kakaomoment"])
+    # run(Facebook(), ACCOUNTS["facebook"])
 
     # Ezadmin
     # Ezadmin.download_yesterday_revenue(ANUA_EZADMIN_DOMAIN, ANUA_EZADMIN_ID, ANUA_EZADMIN_PW)

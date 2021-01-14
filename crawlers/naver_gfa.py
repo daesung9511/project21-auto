@@ -14,7 +14,7 @@ from utils import Utils, DEFAULT_TIMEOUT_DELAY
 
 
 class Naver_GFA:
-
+    flag = True
     def switch_popup(self, driver):
         windows = driver.window_handles
         driver.switch_to.window(windows[-1])  
@@ -334,15 +334,16 @@ class Naver_GFA:
 
         url = "https://auth.glad.naver.com/login?destination=http://gfa.naver.com/adAccount"
 
-        self.init(driver, url)
-        # self.close_popup(driver)
-        self.login(driver, account)
+        if self.flag:
+            self.init(driver, url)
+            # self.close_popup(driver)
+            self.login(driver, account)
+            
         self.press_ok(driver)
         self.switch_user(driver, account["domain"])
         self.press_ok(driver)
         self.move_page(driver, account["domain"])
         self.select_date(driver, account["domain"])
         self.download_csv(driver, account["domain"])
-        self.logout(driver)
         self.clear_tabs(driver)
-        driver.delete_all_cookies()
+        self.flag = False
