@@ -15,6 +15,7 @@ from utils import Utils, DEFAULT_TIMEOUT_DELAY
 
 class Kakaomoment:
 
+    flag = True
     def switch_popup(self, driver):
         windows = driver.window_handles
         driver.switch_to.window(windows[-1])  
@@ -249,28 +250,25 @@ class Kakaomoment:
         download_button.click()
 
         driver.implicitly_wait(1)
-        # time.sleep(5)
+        time.sleep(2)
 
-    def run(self, uid, upw, udomain, unumber):
+    def logout(self, driver):
+        driver.get("https://accounts.kakao.com/logout?continue=https://accounts.kakao.com/login/kakaoforbusiness?continue=https://business.kakao.com/dashboard/?sid=kmo&redirect=https://moment.kakao.com/dashboard")
+
+    def run(self, driver, account):
         # account list
         # lavena, yuge, anua, project21
 
         url = "https://accounts.kakao.com/login/kakaoforbusiness?continue=https://business.kakao.com/dashboard/?sid=kmo&redirect=https://moment.kakao.com/dashboard"
 
-        account = {
-            "id": uid,
-            "pw": upw,
-            "domain": udomain,
-            "number": unumber
-        }
-        
-        driver = Utils.get_chrome_driver()
-        driver.set_window_size(1980, 1080)
-        self.init(driver, url)
-        self.login(driver, account)
+        if self.flag:
+            self.init(driver, url)
+            self.login(driver, account)
+
         if account["domain"] == "anua":
             self.move_dashboard_anua(driver, account["number"])
         elif account["domain"] == "yuge":
             self.move_dashboard_yuge(driver, account["number"])
         self.select_date(driver, account["domain"])
         self.download_csv(driver, account["domain"])
+        self.flag = False

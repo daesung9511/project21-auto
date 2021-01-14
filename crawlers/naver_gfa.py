@@ -14,7 +14,7 @@ from utils import Utils, DEFAULT_TIMEOUT_DELAY
 
 
 class Naver_GFA:
-
+    flag = True
     def switch_popup(self, driver):
         windows = driver.window_handles
         driver.switch_to.window(windows[-1])  
@@ -302,45 +302,48 @@ class Naver_GFA:
         confirm_button = driver.find_element_by_css_selector(confirm_button)
         confirm_button.click()
 
-        # wait for loading
-        time.sleep(2)
-        
-        #
-        # TODO : change 3 days if today is MONDAY
-        #
-
     def download_csv(self, driver, domain):
         if domain == "anua":
-            download_button = ("""#app > div > div.container > div.content > div > div.panel_body.report > div:nth-child(2) > div > div > div.ad_title > div > div.inner_right > a > button""")
+            download_button = "#app > div > div.container > div.content > div > div.panel_body.report > div:nth-child(2) > div > div > div.ad_title > div > div.inner_right > a > button"
         else:
             download_button = "#app > div > div.container > div.content > div > div.panel_body > div:nth-child(2) > div > div > div.ad_title > div > div.inner_right > a > button"
 
         driver.find_element_by_css_selector(download_button).click()
 
         driver.implicitly_wait(1)
+        time.sleep(2)
 
-    def run(self, uid, upw, udomain):
+    def logout(self, driver):
+        logout_button = "li.logout > a"
+        driver.find_element_by_css_selector(logout_button).click()
+        
+
+    def clear_tabs(self, driver):
+        windows = driver.window_handles
+        main = windows[-1]
+        for window in windows:
+            if window != main:
+                driver.switch_to.window(window)
+                driver.close()
+
+        driver.switch_to.window(main)
+
+    def run(self, driver, account):
         # account list
         # lavena, yuge, anua, project21
 
         url = "https://auth.glad.naver.com/login?destination=http://gfa.naver.com/adAccount"
-        download_path = "C:/Downloads"
 
-        account = {
-            "id": uid,
-            "pw": upw,
-            "domain": udomain
-        }
-        
-        driver = Utils.get_chrome_driver()
-        driver.set_window_size(1980, 1080)
-
-        driver = self.init(driver, url)
-        # self.close_popup(driver)
-        self.login(driver, account)
+        if self.flag:
+            self.init(driver, url)
+            # self.close_popup(driver)
+            self.login(driver, account)
+            
         self.press_ok(driver)
         self.switch_user(driver, account["domain"])
         self.press_ok(driver)
         self.move_page(driver, account["domain"])
         self.select_date(driver, account["domain"])
         self.download_csv(driver, account["domain"])
+        self.clear_tabs(driver)
+        self.flag = False

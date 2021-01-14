@@ -207,14 +207,10 @@ class Naver_shop:
         # wait yesterday button
         # self.wait(driver, yesterday_button, DEFAULT_TIMEOUT_DELAY)
 
-        # if Utils.get_weekday() == 0:
-        if True:
+        if Utils.get_weekday() == 0:
+        # if True:
             stat = 0
             stat, start, end = self.calc_date()
-
-            stat = 2
-            start = 28
-            end = 1
 
             if uid != "lavenakorea":
                 if uid == "yuge":
@@ -303,27 +299,42 @@ class Naver_shop:
             download_button = driver.find_element_by_css_selector("#root > div > div:nth-child(2) > div > div > div:nth-child(1) > div:nth-child(3) > button")
 
         download_button.click()
+        
         driver.implicitly_wait(1)
+        time.sleep(2)
 
-    def run(self, uid, upw, utype):
+    def logout(self, driver, uid):
+        logout_button = "#root > div > div:nth-child(1) > div > div:nth-child(1) > div:nth-child(1) > div:nth-child(2) > ul > li:nth-child(1) > span"
+        driver.find_element_by_css_selector(logout_button).click()
+        
+        if uid == "lavenakorea":
+            real_logout_button = "#container > div > div > div > div > div > button.mat-button-md.mat-raised-button.mat-button-base.mat-primary > span"
+            self.wait(driver, real_logout_button, DEFAULT_TIMEOUT_DELAY)
+            driver.find_element_by_css_selector(real_logout_button).click()
+
+    def clear_tabs(self, driver):
+        windows = driver.window_handles
+        main = windows[-1]
+        for window in windows:
+            if window != main:
+                driver.switch_to.window(window)
+                driver.close()
+
+        driver.switch_to.window(main)
+
+    def run(self, driver, account):
         # account list
         # lavena, yuge, anua, project21
 
         url = "https://searchad.naver.com/"
 
-        account = {
-            "id": uid,
-            "pw": upw,
-            "type": utype
-        }
-
-        driver = Utils.get_chrome_driver()
-        driver.set_window_size(1980, 1080)
-
-        driver = self.init(driver, url)
+        self.init(driver, url)
         self.close_popup(driver)
         self.switch_main(driver)
         self.login(driver, account)
         self.move_page(driver, account["type"])
         self.select_date(driver, account["id"])
         self.download_csv(driver, account["id"])
+        self.logout(driver, account["id"])
+        self.clear_tabs(driver)
+        driver.delete_all_cookies()
