@@ -8,6 +8,10 @@ from utils import Utils, DEFAULT_TIMEOUT_DELAY
 
 
 class Cafe24:
+    def run(self, account):
+        uid = account["id"]
+        upw = account["pw"]
+        Cafe24.download_lacto_revenue(uid, upw)
 
     @staticmethod
     def get_admin_page(id: str, password: str) -> WebDriver:

@@ -9,6 +9,13 @@ from utils import Utils, DEFAULT_TIMEOUT_DELAY
 
 class Ezadmin:
 
+    def run(self, account):
+        uid = account["id"]
+        upw = account["pw"]
+        udomain = account["domain"]
+
+        Ezadmin.download_yesterday_revenue(udomain, uid, upw)
+
     @staticmethod
     def get_admin_page(domain: str, id: str, password: str) -> WebDriver:
         driver = Utils.get_chrome_driver()
