@@ -82,15 +82,11 @@ class Naver_shop:
 
         # get naver id form
         id_form = driver.find_element_by_id("id")
-        clip_id = pyperclip.copy(account["id"])
-        id_form.click()
-        id_form.send_keys(Keys.CONTROL, "v")
+        Utils.send_keys_delayed(id_form, account["id"])
 
         # get naver pw form
         pw_form = driver.find_element_by_id("pw")
-        clip_pw = pyperclip.copy(account["pw"])
-        pw_form.click()
-        pw_form.send_keys(Keys.CONTROL, "v")
+        Utils.send_keys_delayed(pw_form, account["pw"])
 
         # get login button
         login_button = driver.find_element_by_id("log.login")
