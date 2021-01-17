@@ -6,36 +6,26 @@ from crawlers.kakaomoment import Kakaomoment
 from crawlers.facebook import Facebook
 from utils import Utils
 from secrets import ACCOUNTS
-def run_ezadmin(account):
-    for brand in account["index"]:
-        uid = account[brand]["id"]
-        upw = account[brand]["pw"]
-        udomain = account[brand]["domain"]
-
-        Ezadmin.download_yesterday_revenue(udomain, uid, upw)
-
-def run_cafe24(account):
-    for brand in account["index"]:
-        uid = account[brand]["id"]
-        upw = account[brand]["pw"]
-
-        Cafe24.download_lacto_revenue(uid, upw)
 
 def run(platform, account):
     driver = Utils.get_chrome_driver()
     driver.set_window_size(1980, 1080)
 
     for brand in account["index"]:
-        platform.run(driver, account[brand])
-
+        try:
+            platform.run(driver, account[brand])
+            print(f"{platform} {brand} success.")
+        except Exception as e:
+            print(e)
+            print(f"{platform} {brand} failed.")
     driver.quit()
 
 def start():
-    # run_ezadmin(ACCOUNTS["ezadmin"])
-    # run_cafe24(ACCOUNTS["cafe24"])
-    # run(Naver_shop(), ACCOUNTS["naver_shop"])
-    # run(Naver_GFA(), ACCOUNTS["naver_gfa"])
-    # run(Kakaomoment(), ACCOUNTS["kakaomoment"])
+    run(Cafe24, ACCOUNTS["cafe24"])
+    run(Ezadmin, ACCOUNTS["ezadmin"])
+    run(Naver_shop(), ACCOUNTS["naver_shop"])
+    run(Naver_GFA(), ACCOUNTS["naver_gfa"])
+    run(Kakaomoment(), ACCOUNTS["kakaomoment"])
     run(Facebook(), ACCOUNTS["facebook"])
 
     # Ezadmin
