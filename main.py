@@ -10,6 +10,7 @@ from crawlers.facebook import Facebook
 from utils import Utils
 from secrets import ACCOUNTS
 import logging
+import sys
 
 
 def setup_logger():
@@ -48,4 +49,23 @@ def start():
 
 if __name__ == '__main__':
     setup_logger()
-    start()
+
+    try:
+        command = sys.argv[1]
+    except IndexError:
+        command = "main"
+
+    if command == "":
+        start()
+    elif command == "main":
+        start()
+    elif command == "facebook":
+        run(Facebook(), ACCOUNTS["facebook"])
+    elif command == "naver_shop":
+        run(Naver_shop(), ACCOUNTS["naver_shop"])
+    elif command == "naver_gfa":
+        run(Naver_GFA(), ACCOUNTS["naver_gfa"])
+    elif command == "cafe24":
+        run(Cafe24, ACCOUNTS["cafe24"])
+    elif command == "ezadmin":
+        run(Ezadmin, ACCOUNTS["ezadmin"])

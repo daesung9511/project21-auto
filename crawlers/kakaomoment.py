@@ -1,9 +1,7 @@
 #coding: utf-8
 
-import time
-import pyperclip
-import selenium
 import datetime
+<<<<<<< HEAD
 import csv
 import os
 import fnmatch
@@ -12,11 +10,14 @@ from openpyxl import load_workbook
 from datetime import datetime
 
 from selenium import webdriver
+=======
+import time
+
+>>>>>>> feat: Remove unncessary dependencies
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions
-from selenium.common.exceptions import ElementNotVisibleException
+from selenium.webdriver.support.ui import WebDriverWait
+
 from utils import Utils, DEFAULT_TIMEOUT_DELAY
 
 

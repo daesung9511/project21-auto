@@ -53,7 +53,7 @@ class Utils:
             os.mkdir(path)
 
         # user_data_path
-        user_data_path = CHROME_USER_DATA_PATH if CHROME_USER_DATA_PATH != "" else "/Users/qualson/Library/Application Support/Google/Chrome/"
+        user_data_path = CHROME_USER_DATA_PATH if CHROME_USER_DATA_PATH != "" else "/Users/qualson/Library/Application Support/Google/Chrome/Profile 2"
         profile_name = CHROME_PROFILE_NAME if CHROME_PROFILE_NAME != "" else "Profile 2"
 
         return UserConfig(user_data_path=user_data_path, profile_name=profile_name, download_path=path)
