@@ -1,8 +1,8 @@
 from selenium.webdriver.android.webdriver import WebDriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions
-from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.wait import WebDriverWait
+import logging
 
 from openpyxl.styles import PatternFill, Color
 from openpyxl import Workbook
@@ -18,11 +18,10 @@ from utils import Utils, DEFAULT_TIMEOUT_DELAY
 
 
 class Cafe24:
-    def run(self, account):
+    def run(self, driver, account):
         uid = account["id"]
         upw = account["pw"]
-        Cafe24.download_lacto_revenue(uid, upw)
-        print(Cafe24.update_rd_data())
+        Cafe24.download_lacto_revenue(driver, uid, upw)
 
     @staticmethod
     def get_admin_page(id: str, password: str) -> WebDriver:
@@ -42,8 +41,7 @@ class Cafe24:
         return driver
 
     @staticmethod
-    def download_lacto_revenue(id: str, password: str) -> WebDriver:
-        driver = Cafe24.get_admin_page(id, password)
+    def download_lacto_revenue(driver:WebDriver, id: str, password: str) -> WebDriver:
         driver.get("https://project21.cafe24.com/disp/admin/shop1/report/ProductPrdchart")
 
         report_base_url = "https://project21.cafe24.com/disp/admin/shop1/report/ProductPrdchart"
@@ -85,19 +83,18 @@ class Cafe24:
 
             first_date = driver.find_element_by_css_selector("#eFileListBody > tr:nth-child(1) > td:nth-child(1)").text
             if first_date == f"{start_date} ~ {end_date}":
-
                 first_date_selector = "#eFileListBody > tr:nth-child(1) > td:nth-child(4)"
                 if driver.find_element_by_css_selector(first_date_selector).text == "엑셀다운로드":
                     driver.find_element_by_css_selector(
                         "#eFileListBody > tr:nth-child(1) > td:nth-child(4) > a > span").click()
                     download_done = True
                 else:
-                    print("File is not ready retry download")
+                    logging.debug("File is not ready retry download")
                     driver.implicitly_wait(1)  # wait for some delay
 
                 driver.close()
             else:
-                print("First excel sheet is not correct")
+                logging.debug("First excel sheet is not correct")
                 # Stop download loop because something wrong happend
                 download_done = True
             driver.switch_to.window(original_window)
@@ -108,7 +105,7 @@ class Cafe24:
     def update_rd_data() -> str:
 
         # RD 엑셀 파일 경로
-        # TODO: 임시로 초기 매칭데이터 있는 샘플파일을 하드코딩했습니다. 
+        # TODO: 임시로 초기 매칭데이터 있는 샘플파일을 하드코딩했습니다.
         xl_file_path = "sample.xlsx"
 
         # RD 엑셀 파일 로딩

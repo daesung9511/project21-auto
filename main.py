@@ -1,3 +1,6 @@
+import os
+from pathlib import Path
+
 from crawlers.cafe24 import Cafe24
 from crawlers.ezadmin import Ezadmin
 from crawlers.naver_shop import Naver_shop
@@ -6,6 +9,17 @@ from crawlers.kakaomoment import Kakaomoment
 from crawlers.facebook import Facebook
 from utils import Utils
 from secrets import ACCOUNTS
+import logging
+
+
+def setup_logger():
+    parent = os.path.dirname(os.path.abspath(Path(__file__)))
+    file_name = f'{Utils.get_today()}.log'
+    path = f'{parent}{os.sep}log'
+    if not os.path.isdir(path):
+        os.mkdir(path)
+    logging.basicConfig(filename=path + os.sep + file_name, level=logging.DEBUG)
+
 
 def run(platform, account):
     driver = Utils.get_chrome_driver()
@@ -14,48 +28,24 @@ def run(platform, account):
     for brand in account["index"]:
         try:
             platform.run(driver, account[brand])
-            print(f"{platform} {brand} success.")
+            message = f"{platform.__class__} {brand} success."
+            logging.info(message)
+            print(message)
         except Exception as e:
-            print(e)
-            print(f"{platform} {brand} failed.")
+            logging.error(e)
+            print(f"{platform.__class__} {brand} failed.")
     driver.quit()
 
+
 def start():
-    run(Cafe24, ACCOUNTS["cafe24"])
-    run(Ezadmin, ACCOUNTS["ezadmin"])
+    run(Facebook(), ACCOUNTS["facebook"])
     run(Naver_shop(), ACCOUNTS["naver_shop"])
     run(Naver_GFA(), ACCOUNTS["naver_gfa"])
     run(Kakaomoment(), ACCOUNTS["kakaomoment"])
-    run(Facebook(), ACCOUNTS["facebook"])
+    run(Cafe24, ACCOUNTS["cafe24"])
+    run(Ezadmin, ACCOUNTS["ezadmin"])
 
-    # Ezadmin
-    # Ezadmin.download_yesterday_revenue(ANUA_EZADMIN_DOMAIN, ANUA_EZADMIN_ID, ANUA_EZADMIN_PW)
-    # Ezadmin.download_yesterday_revenue(PROJECT21_EZADMIN_DOMAIN, PROJECT21_EZADMIN_ID, PROJECT21_EZADMIN_PW)
-
-    # Cafe24
-    # Cafe24.download_lacto_revenue(PROJECT21_CAFE24_ID, PROJECT21_CAFE24_PW)
-
-    # naver_shop
-    # naver_shop.run(LAVENA_NAVERSHOP_ID, LAVENA_NAVERSHOP_PW, LAVENA_NAVERSHOP_TYPE)
-    # naver_shop.run(ANUA_NAVERSHOP_ID, ANUA_NAVERSHOP_PW, ANUA_NAVERSHOP_TYPE)
-    # naver_shop.run(YUGE_NAVERSHOP_ID, YUGE_NAVERSHOP_PW, YUGE_NAVERSHOP_TYPE)
-    # naver_shop.run(PROJECT21_NAVERSHOP_ID, PROJECT21_NAVERSHOP_PW, PROJECT21_NAVERSHOP_TYPE)    
-    
-    # naver_gfa
-    # naver_gfa.run(LAVENA_NAVERGFA_ID, LAVENA_NAVERGFA_PW, LAVENA_NAVERGFA_DOMAIN)
-    # naver_gfa.run(ANUA_NAVERGFA_ID, ANUA_NAVERGFA_PW, ANUA_NAVERGFA_DOMAIN)
-    # naver_gfa.run(YUGE_NAVERGFA_ID, YUGE_NAVERGFA_PW, YUGE_NAVERGFA_DOMAIN)
-
-    # kakaomoment
-    # kakaomoment.run(ANUA_KAKAOMOMENT_ID, ANUA_KAKAOMOMENT_PW, ANUA_KAKAOMOMENT_DOMAIN, ANUA_KAKAOMOMENT_NUMBER)
-    # kakaomoment.run(YUGE_KAKAOMOMENT_ID, YUGE_KAKAOMOMENT_PW, YUGE_KAKAOMOMENT_DOMAIN, YUGE_KAKAOMOMENT_NUMBER)    
-
-    # facebook
-    # facebook.run(LAVENA_FACEBOOK_ID, LAVENA_FACEBOOK_PW, LAVENA_FACEBOOK_NUMBER)
-    # facebook.run(ANUA_FACEBOOK_ID, ANUA_FACEBOOK_PW, ANUA_FACEBOOK_NUMBER)
-    # facebook.run(YUGE_FACEBOOK_ID, YUGE_FACEBOOK_PW, YUGE_FACEBOOK_NUMBER)
-    # facebook.run(PROJECT21_FACEBOOK_ID, PROJECT21_FACEBOOK_PW, PROJECT21_FACEBOOK_NUMBER)
 
 if __name__ == '__main__':
+    setup_logger()
     start()
-    # git test

@@ -94,98 +94,27 @@ ACCOUNTS = {
     "facebook": {
         "index": ["lavena", "anua", "yuge", "project21"],
         "lavena": {
-            "id": "business@anua.kr",
-            "pw": "founders21!",
+            "id": "eungjin@awesomelabs.kr",
+            "pw": "kdssi1048!",
             "number": "1123300958087838"
         },
         "anua": {
-            "id": "business@anua.kr",
-            "pw": "founders21!",
+            "id": "eungjin@awesomelabs.kr",
+            "pw": "kdssi1048!",
             "number": "638503069927336"
         },
         "yuge": {
-            "id": "business@anua.kr",
-            "pw": "founders21!",
-            "number": "1526503294176709"        
+            "id": "eungjin@awesomelabs.kr",
+            "pw": "kdssi1048!",
+            "number": "1526503294176709"
         },
         "project21": {
-            "id": "business@anua.kr",
-            "pw": "founders21!",
-            "number": "346749609115152"         
+            "id": "eungjin@awesomelabs.kr",
+            "pw": "kdssi1048!",
+            "number": "346749609115152"
         }
     },
     "google": {
 
     }
 }
-
-#LAVENA
-LAVENA_NAVERSHOP_ID = "lavenakorea"
-LAVENA_NAVERSHOP_PW = "lavena21!"
-LAVENA_NAVERSHOP_TYPE = "naver"
-
-LAVENA_NAVERGFA_ID = "project21official"
-LAVENA_NAVERGFA_PW = "pista1004"
-LAVENA_NAVERGFA_DOMAIN = "lavena"
-
-LAVENA_FACEBOOK_ID = "business@anua.kr"
-LAVENA_FACEBOOK_PW = "founders21!"
-LAVENA_FACEBOOK_NUMBER = "1123300958087838"
-
-#ANUA
-ANUA_EZADMIN_ID = "anua"
-ANUA_EZADMIN_PW = "founders21!"
-ANUA_EZADMIN_DOMAIN = "anua"
-
-ANUA_NAVERSHOP_ID = "anua"
-ANUA_NAVERSHOP_PW = "pista1004!"
-ANUA_NAVERSHOP_TYPE = "general"
-
-ANUA_NAVERGFA_ID = "project21official"
-ANUA_NAVERGFA_PW = "pista1004"
-ANUA_NAVERGFA_DOMAIN = "anua"
-
-ANUA_KAKAOMOMENT_ID = "business@project21.kr"
-ANUA_KAKAOMOMENT_PW = "pista1004"
-ANUA_KAKAOMOMENT_DOMAIN = "anua"
-ANUA_KAKAOMOMENT_NUMBER = "47875"
-
-ANUA_GOOGLE_ID = "friends@anua.kr"
-ANUA_GOOGLE_PW = "founders21!!"
-
-ANUA_FACEBOOK_ID = "business@anua.kr"
-ANUA_FACEBOOK_PW = "founders21!"
-ANUA_FACEBOOK_NUMBER = "638503069927336"
-
-#YUGE
-YUGE_NAVERSHOP_ID = "yuge"
-YUGE_NAVERSHOP_PW = "founders21!"
-YUGE_NAVERSHOP_TYPE = "general"
-
-YUGE_NAVERGFA_ID = "project21official"
-YUGE_NAVERGFA_PW = "pista1004"
-YUGE_NAVERGFA_DOMAIN = "yuge"
-
-YUGE_KAKAOMOMENT_ID = "business@project21.kr"
-YUGE_KAKAOMOMENT_PW = "pista1004"
-YUGE_KAKAOMOMENT_DOMAIN = "yuge"
-YUGE_KAKAOMOMENT_NUMBER = "191246"
-
-YUGE_FACEBOOK_ID = "business@anua.kr"
-YUGE_FACEBOOK_PW = "founders21!"
-YUGE_FACEBOOK_NUMBER = "1526503294176709"
-
-#Project21
-PROJECT21_EZADMIN_ID = "pista1004"
-PROJECT21_EZADMIN_PW = "founders21!"
-PROJECT21_EZADMIN_DOMAIN = "pista1004"
-PROJECT21_CAFE24_ID = 'project21'
-PROJECT21_CAFE24_PW = 'pista1004!!'
-
-PROJECT21_NAVERSHOP_ID = "pista1004"
-PROJECT21_NAVERSHOP_PW = "pista1004!"
-PROJECT21_NAVERSHOP_TYPE = "general"
-
-PROJECT21_FACEBOOK_ID = "business@anua.kr"
-PROJECT21_FACEBOOK_PW = "founders21!"
-PROJECT21_FACEBOOK_NUMBER = "346749609115152"
