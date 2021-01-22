@@ -86,7 +86,7 @@ class Utils:
         for char in input:
             element.send_keys(char)
             time.sleep(random.uniform(0.02, 0.1))
-
+    
     @staticmethod
     def create_xl_sheet(wb:Workbook, sheet_name: str) -> worksheet:
         rd_ws_name = datetime.datetime.today().strftime("%Y-%m-%d") + sheet_name

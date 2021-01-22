@@ -1,5 +1,6 @@
 #coding: utf-8
 
+import csv
 import time
 import datetime
 from selenium.webdriver.common.by import By
@@ -8,6 +9,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions
 from utils import Utils, DEFAULT_TIMEOUT_DELAY
 
+from openpyxl import load_workbook
 
 class Naver_shop:
 
@@ -314,19 +316,94 @@ class Naver_shop:
 
         driver.switch_to.window(main)
 
+    def update_ad_costs(self): 
+        # 엑셀 샘플 파일 
+        xl_file_path = "kakaomoment_sample.xlsx" 
+ 
+        # RD 엑셀 파일 로딩 
+        sales_wb = load_workbook(xl_file_path, data_only=True, read_only=False)
+
+        ad_fee_ws = Utils.create_xl_sheet(sales_wb, "-광고비") 
+ 
+        # 시트 헤더 고정 
+        ad_fee_headings = ['','일자', '요일', '미디어', '상품1', '광고비'] 
+        for idx, header in enumerate(ad_fee_headings): 
+            ad_fee_ws.cell(row=1, column=idx + 1).value = header 
+        ad_fee_ws.freeze_panes = 'A2'
+
+        anua_path = Utils.get_recent_file("광고비,anua*.csv")
+
+        with open(anua_path, 'r', encoding='utf-8') as f: 
+            reader = csv.reader(f, delimiter = ",") 
+            next(reader) 
+            next(reader)
+            # 광고비 시트에 rd 대입 
+            for row in reader: 
+                print(row)
+                fee_max_row = str(ad_fee_ws.max_row+1) 
+                
+                ad_fee_ws.cell(row=int(fee_max_row),column=1).value = row[1] 
+                ad_fee_ws.cell(row=int(fee_max_row),column=2).value = datetime.datetime.today().strftime("%Y-%m-%d") 
+                ad_fee_ws.cell(row=int(fee_max_row),column=3).value = '=TEXT(B' + fee_max_row + ',"aaa")' 
+                ad_fee_ws.cell(row=int(fee_max_row),column=4).value = '네이버 ' + row[0] 
+                ad_fee_ws.cell(row=int(fee_max_row),column=5).value = '=VLOOKUP(A' + fee_max_row + ',매칭테이블!B:D,3,0)' 
+                ad_fee_ws.cell(row=int(fee_max_row),column=6).value = float(row[4].replace(",",""))/1.1
+
+        yuge_path = Utils.get_recent_file("광고비*,yuge*.csv")
+
+        with open(yuge_path, 'r', encoding='utf-8') as f: 
+            reader = csv.reader(f, delimiter = ",") 
+            next(reader) 
+            next(reader)
+            # 광고비 시트에 rd 대입 
+            for row in reader: 
+                print(row)
+                fee_max_row = str(ad_fee_ws.max_row+1) 
+                
+                ad_fee_ws.cell(row=int(fee_max_row),column=1).value = row[2] 
+                ad_fee_ws.cell(row=int(fee_max_row),column=2).value = datetime.datetime.today().strftime("%Y-%m-%d") 
+                ad_fee_ws.cell(row=int(fee_max_row),column=3).value = '=TEXT(B' + fee_max_row + ',"aaa")' 
+                ad_fee_ws.cell(row=int(fee_max_row),column=4).value = '네이버 ' + row[0] 
+                ad_fee_ws.cell(row=int(fee_max_row),column=5).value = '=VLOOKUP(A' + fee_max_row + ',매칭테이블!B:D,3,0)' 
+                ad_fee_ws.cell(row=int(fee_max_row),column=6).value = float(row[6].replace(",",""))/1.1
+
+        pista_path = Utils.get_recent_file("광고비매출보고서,pista*.csv")
+
+        with open(pista_path, 'r', encoding='utf-8') as f: 
+            reader = csv.reader(f, delimiter = ",") 
+            next(reader) 
+            next(reader)
+            # 광고비 시트에 rd 대입 
+            for row in reader: 
+                print(row)
+                fee_max_row = str(ad_fee_ws.max_row+1) 
+                
+                ad_fee_ws.cell(row=int(fee_max_row),column=1).value = row[2] 
+                ad_fee_ws.cell(row=int(fee_max_row),column=2).value = datetime.datetime.today().strftime("%Y-%m-%d") 
+                ad_fee_ws.cell(row=int(fee_max_row),column=3).value = '=TEXT(B' + fee_max_row + ',"aaa")' 
+                ad_fee_ws.cell(row=int(fee_max_row),column=4).value = '네이버 ' + row[1] 
+                ad_fee_ws.cell(row=int(fee_max_row),column=5).value = '=VLOOKUP(A' + fee_max_row + ',매칭테이블!B:D,3,0)' 
+                ad_fee_ws.cell(row=int(fee_max_row),column=6).value = float(row[3].replace(",",""))/1.1
+            
+         
+        download_path = 'ad_fee_data.xlsx' 
+        sales_wb.save(download_path) 
+
     def run(self, driver, account):
         # account list
         # lavena, yuge, anua, project21
 
         url = "https://searchad.naver.com/"
 
-        self.init(driver, url)
-        self.close_popup(driver)
-        self.switch_main(driver)
-        self.login(driver, account)
-        self.move_page(driver, account["type"])
-        self.select_date(driver, account["id"])
-        self.download_csv(driver, account["id"])
-        self.logout(driver, account["id"])
-        self.clear_tabs(driver)
-        driver.delete_all_cookies()
+        # self.init(driver, url)
+        # self.close_popup(driver)
+        # self.switch_main(driver)
+        # self.login(driver, account)
+        # self.move_page(driver, account["type"])
+        # self.select_date(driver, account["id"])
+        # self.download_csv(driver, account["id"])
+        # self.logout(driver, account["id"])
+        # self.clear_tabs(driver)
+        # driver.delete_all_cookies()
+
+        self.update_ad_costs()
