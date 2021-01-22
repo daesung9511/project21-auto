@@ -7,10 +7,11 @@ from selenium.webdriver.support.wait import WebDriverWait
 from openpyxl.styles import PatternFill, Color
 from openpyxl import Workbook
 from openpyxl import load_workbook
+
+from datetime import datetime
 import csv
 import os
 import fnmatch
-from datetime import datetime
 
 
 from utils import Utils, DEFAULT_TIMEOUT_DELAY
@@ -108,14 +109,13 @@ class Cafe24:
 
         # RD 엑셀 파일 경로
         # TODO: 임시로 초기 매칭데이터 있는 샘플파일을 하드코딩했습니다. 
-        xl_file_path = "./sample.xlsx"
+        xl_file_path = "sample.xlsx"
 
         # RD 엑셀 파일 로딩
         sales_wb = load_workbook(xl_file_path, data_only=True, read_only=False)
 
         # TODO: 해당 날짜 시트없을 시 처리해줘야함
-        rd_ws_name = datetime.today().strftime("%Y-%m-%d") + "-카페24 RD"
-        rd_ws = sales_wb.create_sheet(title=rd_ws_name)
+        rd_ws = Utils.create_xl_sheet(sales_wb, "-카페24 RD")
 
         # 시트 헤더 고정
         rd_headings = ['날짜', '매칭', '<분류>', '순위', '상품코드', '상품명',
@@ -125,8 +125,7 @@ class Cafe24:
         rd_ws.freeze_panes = 'A2'
 
         # TODO: 해당 날짜 시트겹치는 것 체크
-        sales_ws_name = datetime.today().strftime("%Y-%m-%d") + "-판매실적"
-        sales_ws = sales_wb.create_sheet(title=sales_ws_name)
+        sales_ws = Utils.create_xl_sheet(sales_wb, "-판매실적")
 
         # 시트 헤더 고정
         sales_headings = ['', '일자', '요일', '미디어', '상품1', '채널', '상품2', '판매수량',
@@ -136,7 +135,7 @@ class Cafe24:
         sales_ws.freeze_panes = 'A2'
 
         # Cafe24에서 받은 csv 파일 찾기
-        dir_path = "./raw_data/"
+        dir_path = "raw_data" + os.sep
         csv_path = ""
         ctime=0
         for file_name in os.listdir(dir_path):
@@ -180,7 +179,7 @@ class Cafe24:
                 sales_ws["L" + sales_max_row] = '=K' + sales_max_row + '-VLOOKUP($N' + sales_max_row + ',매칭테이블!$G:$J,3,0)*K' + sales_max_row
                 sales_ws["M" + sales_max_row] = '=VLOOKUP($N' + sales_max_row + ',매칭테이블!$G:$J,4,0)*H' + sales_max_row
                 sales_ws["N" + sales_max_row] = '=F' + sales_max_row + '&E' + sales_max_row + '&G' + sales_max_row + '&I' + sales_max_row
-                sales_ws["G" + sales_max_row] = "='" + rd_ws_name + "'!C" + rd_max_row
+                sales_ws["G" + sales_max_row] = "='" + datetime.today().strftime("%Y-%m-%d") + "-카페24 RD" + "'!C" + rd_max_row
                 sales_ws["H" + sales_max_row].value = rd_ws["L" + rd_max_row].value
 
                 # 셀 스타일 세팅
@@ -191,7 +190,7 @@ class Cafe24:
 
         # TODO: 하루에 두번해서 같은 시트에 동작할 시, 일부쉘 누락 오류
         # 파일 저장경로 매개변수로 받을지 확인
-        download_path = './sales_data.xlsx'
+        download_path = 'sales_data.xlsx'
         sales_wb.save(download_path)
 
         return download_path
