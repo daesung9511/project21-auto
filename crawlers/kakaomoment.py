@@ -295,7 +295,6 @@ class Kakaomoment:
             next(reader)
             # 광고비 시트에 rd 대입
             for row in reader:
-                print(row)
                 
                 # TODO: 파일에 아누아가 아닌 제품이 있을시 무시
                 # 해당 부분이 필요할지 조정
@@ -304,7 +303,6 @@ class Kakaomoment:
                 
                 fee_max_row = str(ad_fee_ws.max_row+1)
                 
-                print(fee_max_row)
                 ad_fee_ws.cell(row=int(fee_max_row),column=1).value = row[1]
                 ad_fee_ws.cell(row=int(fee_max_row),column=2).value = datetime.today().strftime("%Y-%m-%d")
                 ad_fee_ws.cell(row=int(fee_max_row),column=3).value = '=TEXT(B' + fee_max_row + ',"aaa")'
@@ -320,18 +318,18 @@ class Kakaomoment:
         # account list
         # lavena, yuge, anua, project21
 
-        # url = "https://accounts.kakao.com/login/kakaoforbusiness?continue=https://business.kakao.com/dashboard/?sid=kmo&redirect=https://moment.kakao.com/dashboard"
+        url = "https://accounts.kakao.com/login/kakaoforbusiness?continue=https://business.kakao.com/dashboard/?sid=kmo&redirect=https://moment.kakao.com/dashboard"
 
-        # if self.flag:
-        #     self.init(driver, url)
-        #     self.login(driver, account)
+        if self.flag:
+            self.init(driver, url)
+            self.login(driver, account)
 
-        # if account["domain"] == "anua":
-        #     self.move_dashboard_anua(driver, account["number"])
-        # elif account["domain"] == "yuge":
-        #     self.move_dashboard_yuge(driver, account["number"])
-        # self.select_date(driver, account["domain"])
-        # self.download_csv(driver, account["domain"])
-        # self.flag = False
+        if account["domain"] == "anua":
+            self.move_dashboard_anua(driver, account["number"])
+        elif account["domain"] == "yuge":
+            self.move_dashboard_yuge(driver, account["number"])
+        self.select_date(driver, account["domain"])
+        self.download_csv(driver, account["domain"])
+        self.flag = False
 
         self.update_ad_costs()
