@@ -309,10 +309,39 @@ class Kakaomoment:
                 ad_fee_ws.cell(row=int(fee_max_row),column=4).value = '카카오광고'
                 ad_fee_ws.cell(row=int(fee_max_row),column=5).value = '=VLOOKUP(A' + fee_max_row + ',매칭테이블!B:D,3,0)'
                 ad_fee_ws.cell(row=int(fee_max_row),column=6).value = float(row[4])/1.1
+
+        # TODO: 다른 모듈에서도 같은로직 반복시 Util 메소드로 변경
+        # 가장최근 yuge csv 파일
+        yuge_path = ""
+        ctime=0
+        for file_name in os.listdir(dir_path):
+            if fnmatch.fnmatch(file_name, "유즈_*.csv"):
+                if ctime < os.path.getmtime(dir_path + file_name):
+                    ctime = os.path.getmtime(dir_path + file_name)
+                    yuge_path = file_name
+        yuge_path = dir_path + yuge_path
+
+        with open(yuge_path, 'r', encoding='utf-16') as f:
+            reader = csv.reader(f, delimiter = "\t")
+            next(reader)
+            # 광고비 시트에 rd 대입
+            for row in reader:
+                
+                # "집행 중" 상태인 캠페인만 통계
+                if not row[1] == "집행 중":
+                    continue
+                
+                fee_max_row = str(ad_fee_ws.max_row+1)
+                
+                ad_fee_ws.cell(row=int(fee_max_row),column=1).value = row[0]
+                ad_fee_ws.cell(row=int(fee_max_row),column=2).value = datetime.today().strftime("%Y-%m-%d")
+                ad_fee_ws.cell(row=int(fee_max_row),column=3).value = '=TEXT(B' + fee_max_row + ',"aaa")'
+                ad_fee_ws.cell(row=int(fee_max_row),column=4).value = '카카오광고'
+                ad_fee_ws.cell(row=int(fee_max_row),column=5).value = '=VLOOKUP(A' + fee_max_row + ',매칭테이블!B:D,3,0)'
+                ad_fee_ws.cell(row=int(fee_max_row),column=6).value = float(row[3])/1.1
         
         download_path = 'ad_fee_data.xlsx'
         sales_wb.save(download_path)
-
 
     def run(self, driver, account):
         # account list
