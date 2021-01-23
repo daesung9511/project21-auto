@@ -4,6 +4,13 @@ import time
 import pyperclip
 import selenium
 import datetime
+import csv
+import os
+import fnmatch
+
+from openpyxl import load_workbook
+from datetime import datetime
+
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -255,6 +262,87 @@ class Kakaomoment:
     def logout(self, driver):
         driver.get("https://accounts.kakao.com/logout?continue=https://accounts.kakao.com/login/kakaoforbusiness?continue=https://business.kakao.com/dashboard/?sid=kmo&redirect=https://moment.kakao.com/dashboard")
 
+    def update_ad_costs(self):
+        
+        # 엑셀 샘플 파일
+        xl_file_path = "kakaomoment_sample.xlsx"
+
+        # RD 엑셀 파일 로딩
+        sales_wb = load_workbook(xl_file_path, data_only=True, read_only=False)
+
+        ad_fee_ws = Utils.create_xl_sheet(sales_wb, "-광고비")
+
+        # 시트 헤더 고정
+        ad_fee_headings = ['','일자', '요일', '미디어', '상품1', '광고비']
+        for idx, header in enumerate(ad_fee_headings):
+            ad_fee_ws.cell(row=1, column=idx + 1).value = header
+        ad_fee_ws.freeze_panes = 'A2'
+
+        # 카카오모먼트에서 받은 가장 최근 csv 파일 찾기
+        # TODO: 다른 모듈에서도 같은로직 반복시 Util 메소드로 변경
+        dir_path = "./raw_data/"
+        anua_path = ""
+        ctime=0
+        for file_name in os.listdir(dir_path):
+            if fnmatch.fnmatch(file_name, "프로젝트21_맞춤보고서_*.csv"):
+                if ctime < os.path.getmtime(dir_path + file_name):
+                    ctime = os.path.getmtime(dir_path + file_name)
+                    anua_path = file_name
+        anua_path = dir_path + anua_path
+
+        with open(anua_path, 'r', encoding='utf-16') as f:
+            reader = csv.reader(f, delimiter = "\t")
+            next(reader)
+            # 광고비 시트에 rd 대입
+            for row in reader:
+                
+                # TODO: 파일에 아누아가 아닌 제품이 있을시 무시
+                # 해당 부분이 필요할지 조정
+                if not fnmatch.fnmatch(row[1], "아누아_*"):
+                    continue
+                
+                fee_max_row = str(ad_fee_ws.max_row+1)
+                
+                ad_fee_ws.cell(row=int(fee_max_row),column=1).value = row[1]
+                ad_fee_ws.cell(row=int(fee_max_row),column=2).value = datetime.today().strftime("%Y-%m-%d")
+                ad_fee_ws.cell(row=int(fee_max_row),column=3).value = '=TEXT(B' + fee_max_row + ',"aaa")'
+                ad_fee_ws.cell(row=int(fee_max_row),column=4).value = '카카오광고'
+                ad_fee_ws.cell(row=int(fee_max_row),column=5).value = '=VLOOKUP(A' + fee_max_row + ',매칭테이블!B:D,3,0)'
+                ad_fee_ws.cell(row=int(fee_max_row),column=6).value = float(row[4])/1.1
+
+        # TODO: 다른 모듈에서도 같은로직 반복시 Util 메소드로 변경
+        # 가장최근 yuge csv 파일
+        yuge_path = ""
+        ctime=0
+        for file_name in os.listdir(dir_path):
+            if fnmatch.fnmatch(file_name, "유즈_*.csv"):
+                if ctime < os.path.getmtime(dir_path + file_name):
+                    ctime = os.path.getmtime(dir_path + file_name)
+                    yuge_path = file_name
+        yuge_path = dir_path + yuge_path
+
+        with open(yuge_path, 'r', encoding='utf-16') as f:
+            reader = csv.reader(f, delimiter = "\t")
+            next(reader)
+            # 광고비 시트에 rd 대입
+            for row in reader:
+                
+                # "집행 중" 상태인 캠페인만 통계
+                if not row[1] == "집행 중":
+                    continue
+                
+                fee_max_row = str(ad_fee_ws.max_row+1)
+                
+                ad_fee_ws.cell(row=int(fee_max_row),column=1).value = row[0]
+                ad_fee_ws.cell(row=int(fee_max_row),column=2).value = datetime.today().strftime("%Y-%m-%d")
+                ad_fee_ws.cell(row=int(fee_max_row),column=3).value = '=TEXT(B' + fee_max_row + ',"aaa")'
+                ad_fee_ws.cell(row=int(fee_max_row),column=4).value = '카카오광고'
+                ad_fee_ws.cell(row=int(fee_max_row),column=5).value = '=VLOOKUP(A' + fee_max_row + ',매칭테이블!B:D,3,0)'
+                ad_fee_ws.cell(row=int(fee_max_row),column=6).value = float(row[3])/1.1
+        
+        download_path = 'ad_fee_data.xlsx'
+        sales_wb.save(download_path)
+
     def run(self, driver, account):
         # account list
         # lavena, yuge, anua, project21
@@ -272,3 +360,5 @@ class Kakaomoment:
         self.select_date(driver, account["domain"])
         self.download_csv(driver, account["domain"])
         self.flag = False
+
+        self.update_ad_costs()
