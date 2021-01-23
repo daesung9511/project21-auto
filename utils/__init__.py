@@ -11,9 +11,13 @@ from pathlib import Path
 from selenium.webdriver.remote.webelement import WebElement
 
 from openpyxl import Workbook, worksheet
+import fnmatch
 
 DEFAULT_TIMEOUT_DELAY = 5
 
+# 매칭테이블 포함 데이터 엑셀 파일
+AD_FEE_FILE = "ad_fee_data.xlsx"
+SALES_FILE = "sales_data.xlsx"
 
 class Utils:
 
@@ -66,3 +70,15 @@ class Utils:
     def create_xl_sheet(wb:Workbook, sheet_name: str) -> worksheet:
         rd_ws_name = datetime.datetime.today().strftime("%Y-%m-%d") + sheet_name
         return wb.create_sheet(title=rd_ws_name)
+
+    @staticmethod
+    def get_recent_file(expression: str) -> str:
+        dir_path = "." + os.sep + "raw_data" + os.sep
+        file_path = "" 
+        ctime=0 
+        for file_name in os.listdir(dir_path): 
+            if fnmatch.fnmatch(file_name, expression): 
+                if ctime < os.path.getmtime(dir_path + file_name): 
+                    ctime = os.path.getmtime(dir_path + file_name) 
+                    file_path = file_name 
+        return dir_path + file_path

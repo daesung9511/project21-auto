@@ -14,7 +14,7 @@ import os
 import fnmatch
 
 
-from utils import Utils, DEFAULT_TIMEOUT_DELAY
+from utils import Utils, DEFAULT_TIMEOUT_DELAY, SALES_FILE
 
 
 class Cafe24:
@@ -22,7 +22,7 @@ class Cafe24:
         uid = account["id"]
         upw = account["pw"]
         Cafe24.download_lacto_revenue(uid, upw)
-        print(Cafe24.update_rd_data())
+        Cafe24.update_rd_data()
 
     @staticmethod
     def get_admin_page(id: str, password: str) -> WebDriver:
@@ -105,14 +105,10 @@ class Cafe24:
         return driver
 
     @staticmethod
-    def update_rd_data() -> str:
+    def update_rd_data():
 
-        # RD 엑셀 파일 경로
-        # TODO: 임시로 초기 매칭데이터 있는 샘플파일을 하드코딩했습니다. 
-        xl_file_path = "sample.xlsx"
-
-        # RD 엑셀 파일 로딩
-        sales_wb = load_workbook(xl_file_path, data_only=True, read_only=False)
+        # 매칭테이블 엑셀 파일 로딩 (sales 매칭테이블))
+        sales_wb = load_workbook(SALES_FILE, data_only=True, read_only=False)
 
         # TODO: 해당 날짜 시트없을 시 처리해줘야함
         rd_ws = Utils.create_xl_sheet(sales_wb, "-카페24 RD")
@@ -135,15 +131,7 @@ class Cafe24:
         sales_ws.freeze_panes = 'A2'
 
         # Cafe24에서 받은 csv 파일 찾기
-        dir_path = "raw_data" + os.sep
-        csv_path = ""
-        ctime=0
-        for file_name in os.listdir(dir_path):
-            if fnmatch.fnmatch(file_name, "*_ProductPrdchart.csv"):
-                if ctime < os.path.getmtime(dir_path + file_name):
-                    ctime = os.path.getmtime(dir_path + file_name)
-                    csv_path = file_name
-        csv_path = dir_path + csv_path
+        csv_path = Utils.get_recent_file("*_ProductPrdchart.csv") 
 
         with open(csv_path, 'r', encoding='UTF8') as f:
             reader = csv.reader(f)
@@ -190,7 +178,4 @@ class Cafe24:
 
         # TODO: 하루에 두번해서 같은 시트에 동작할 시, 일부쉘 누락 오류
         # 파일 저장경로 매개변수로 받을지 확인
-        download_path = 'sales_data.xlsx'
-        sales_wb.save(download_path)
-
-        return download_path
+        sales_wb.save(SALES_FILE)
