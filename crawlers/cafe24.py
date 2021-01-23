@@ -4,6 +4,16 @@ from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.wait import WebDriverWait
 
+from openpyxl.styles import PatternFill, Color
+from openpyxl import Workbook
+from openpyxl import load_workbook
+
+from datetime import datetime
+import csv
+import os
+import fnmatch
+
+
 from utils import Utils, DEFAULT_TIMEOUT_DELAY
 
 
@@ -12,6 +22,7 @@ class Cafe24:
         uid = account["id"]
         upw = account["pw"]
         Cafe24.download_lacto_revenue(uid, upw)
+        print(Cafe24.update_rd_data())
 
     @staticmethod
     def get_admin_page(id: str, password: str) -> WebDriver:
@@ -92,3 +103,94 @@ class Cafe24:
             driver.switch_to.window(original_window)
 
         return driver
+
+    @staticmethod
+    def update_rd_data() -> str:
+
+        # RD 엑셀 파일 경로
+        # TODO: 임시로 초기 매칭데이터 있는 샘플파일을 하드코딩했습니다. 
+        xl_file_path = "sample.xlsx"
+
+        # RD 엑셀 파일 로딩
+        sales_wb = load_workbook(xl_file_path, data_only=True, read_only=False)
+
+        # TODO: 해당 날짜 시트없을 시 처리해줘야함
+        rd_ws = Utils.create_xl_sheet(sales_wb, "-카페24 RD")
+
+        # 시트 헤더 고정
+        rd_headings = ['날짜', '매칭', '<분류>', '순위', '상품코드', '상품명',
+                       '옵션', '판매가', '재고', '결제수량', '환불수량', '판매수량', '판매합계']
+        for idx, header in enumerate(rd_headings):
+            rd_ws.cell(row=1, column=idx + 1).value = header
+        rd_ws.freeze_panes = 'A2'
+
+        # TODO: 해당 날짜 시트겹치는 것 체크
+        sales_ws = Utils.create_xl_sheet(sales_wb, "-판매실적")
+
+        # 시트 헤더 고정
+        sales_headings = ['', '일자', '요일', '미디어', '상품1', '채널', '상품2', '판매수량',
+                          '구분(판매가)', '광고비(VAT미포함)', '판매액', '판매액(수수료제외)', '원가', '구분값']
+        for idx, header in enumerate(sales_headings):
+            sales_ws.cell(row = 1, column = idx + 1).value = header
+        sales_ws.freeze_panes = 'A2'
+
+        # Cafe24에서 받은 csv 파일 찾기
+        dir_path = "raw_data" + os.sep
+        csv_path = ""
+        ctime=0
+        for file_name in os.listdir(dir_path):
+            if fnmatch.fnmatch(file_name, "*_ProductPrdchart.csv"):
+                if ctime < os.path.getmtime(dir_path + file_name):
+                    ctime = os.path.getmtime(dir_path + file_name)
+                    csv_path = file_name
+        csv_path = dir_path + csv_path
+
+        with open(csv_path, 'r', encoding='UTF8') as f:
+            reader = csv.reader(f)
+            next(reader)    # 첫행(헤더 셀) 무시
+
+            # 카페24 RD 피벗테이블 작성
+            for row in reader:
+
+                rd_max_row = str(rd_ws.max_row+1)
+                sales_max_row = str(sales_ws.max_row+1)
+
+                # B, C 열 함수 설정 및 A열 값 채우기
+                rd_ws["A" + rd_max_row].value = datetime.today().strftime("%Y-%m-%d")
+                rd_ws["B" + rd_max_row] = "=F" + rd_max_row + "&G" + rd_max_row
+                rd_ws["C" + rd_max_row] = "=VLOOKUP(B" + rd_max_row + ",'카페24 매칭'!B:C,2,0)"
+
+                # 셀 스타일 세팅
+                rd_ws["C" + rd_max_row].fill = rd_ws["B" + rd_max_row].fill = PatternFill(
+                    start_color='fff2cc', end_color='fff2cc', fill_type='solid')
+
+                for idx, data in enumerate(row):
+                    # 카페24 RD 피벗테이블에 데이터 대입
+                    rd_ws.cell(row=int(rd_max_row),
+                               column=idx + 4).value = data
+
+                # 피벗 테이블 결과를 통한 판매실적 시트 채우기
+                sales_ws["B" + sales_max_row].value = datetime.today().strftime("%Y-%m-%d")
+                sales_ws["C" + sales_max_row] = '=TEXT(B' + sales_max_row + ',"aaa")'
+                sales_ws["E" + sales_max_row] = '=VLOOKUP(G' + sales_max_row + ',매칭테이블!D:E,2,0)'
+                sales_ws["F" + sales_max_row].value = "프로젝트21 홈페이지"
+                sales_ws["I" + sales_max_row].value = '201207'
+                sales_ws["K" + sales_max_row] = '=VLOOKUP($N' + sales_max_row + ',매칭테이블!$G:$J,2,0)*H' + sales_max_row
+                sales_ws["L" + sales_max_row] = '=K' + sales_max_row + '-VLOOKUP($N' + sales_max_row + ',매칭테이블!$G:$J,3,0)*K' + sales_max_row
+                sales_ws["M" + sales_max_row] = '=VLOOKUP($N' + sales_max_row + ',매칭테이블!$G:$J,4,0)*H' + sales_max_row
+                sales_ws["N" + sales_max_row] = '=F' + sales_max_row + '&E' + sales_max_row + '&G' + sales_max_row + '&I' + sales_max_row
+                sales_ws["G" + sales_max_row] = "='" + datetime.today().strftime("%Y-%m-%d") + "-카페24 RD" + "'!C" + rd_max_row
+                sales_ws["H" + sales_max_row].value = rd_ws["L" + rd_max_row].value
+
+                # 셀 스타일 세팅
+                color_cells = ["C", "E", "I", "J", "K", "L", "M", "N"]
+                for cell in color_cells:
+                    sales_ws[cell + sales_max_row].fill = PatternFill(start_color='fff2cc', end_color='fff2cc', fill_type='solid')
+
+
+        # TODO: 하루에 두번해서 같은 시트에 동작할 시, 일부쉘 누락 오류
+        # 파일 저장경로 매개변수로 받을지 확인
+        download_path = 'sales_data.xlsx'
+        sales_wb.save(download_path)
+
+        return download_path
