@@ -14,9 +14,10 @@ import time
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions
+
 from selenium.webdriver.support.ui import WebDriverWait
 
-from utils import Utils, DEFAULT_TIMEOUT_DELAY
+from utils import Utils, DEFAULT_TIMEOUT_DELAY, AD_FEE_FILE
 
 
 class Kakaomoment:
@@ -262,12 +263,9 @@ class Kakaomoment:
         driver.get("https://accounts.kakao.com/logout?continue=https://accounts.kakao.com/login/kakaoforbusiness?continue=https://business.kakao.com/dashboard/?sid=kmo&redirect=https://moment.kakao.com/dashboard")
 
     def update_ad_costs(self):
-        
-        # 엑셀 샘플 파일
-        xl_file_path = "kakaomoment_sample.xlsx"
 
         # RD 엑셀 파일 로딩
-        sales_wb = load_workbook(xl_file_path, data_only=True, read_only=False)
+        sales_wb = load_workbook(AD_FEE_FILE, data_only=True, read_only=False)
 
         ad_fee_ws = Utils.create_xl_sheet(sales_wb, "-광고비")
 
@@ -278,16 +276,7 @@ class Kakaomoment:
         ad_fee_ws.freeze_panes = 'A2'
 
         # 카카오모먼트에서 받은 가장 최근 csv 파일 찾기
-        # TODO: 다른 모듈에서도 같은로직 반복시 Util 메소드로 변경
-        dir_path = "./raw_data/"
-        anua_path = ""
-        ctime=0
-        for file_name in os.listdir(dir_path):
-            if fnmatch.fnmatch(file_name, "프로젝트21_맞춤보고서_*.csv"):
-                if ctime < os.path.getmtime(dir_path + file_name):
-                    ctime = os.path.getmtime(dir_path + file_name)
-                    anua_path = file_name
-        anua_path = dir_path + anua_path
+        anua_path = Utils.get_recent_file("프로젝트21_맞춤보고서_*.csv")
 
         with open(anua_path, 'r', encoding='utf-16') as f:
             reader = csv.reader(f, delimiter = "\t")
@@ -309,16 +298,8 @@ class Kakaomoment:
                 ad_fee_ws.cell(row=int(fee_max_row),column=5).value = '=VLOOKUP(A' + fee_max_row + ',매칭테이블!B:D,3,0)'
                 ad_fee_ws.cell(row=int(fee_max_row),column=6).value = float(row[4])/1.1
 
-        # TODO: 다른 모듈에서도 같은로직 반복시 Util 메소드로 변경
         # 가장최근 yuge csv 파일
-        yuge_path = ""
-        ctime=0
-        for file_name in os.listdir(dir_path):
-            if fnmatch.fnmatch(file_name, "유즈_*.csv"):
-                if ctime < os.path.getmtime(dir_path + file_name):
-                    ctime = os.path.getmtime(dir_path + file_name)
-                    yuge_path = file_name
-        yuge_path = dir_path + yuge_path
+        yuge_path = Utils.get_recent_file("유즈_*.csv")
 
         with open(yuge_path, 'r', encoding='utf-16') as f:
             reader = csv.reader(f, delimiter = "\t")
@@ -339,11 +320,10 @@ class Kakaomoment:
                 ad_fee_ws.cell(row=int(fee_max_row),column=5).value = '=VLOOKUP(A' + fee_max_row + ',매칭테이블!B:D,3,0)'
                 ad_fee_ws.cell(row=int(fee_max_row),column=6).value = float(row[3])/1.1
         
-        download_path = 'ad_fee_data.xlsx'
-        sales_wb.save(download_path)
+        sales_wb.save(AD_FEE_FILE)
 
     def run(self, driver, account):
-        # account list
+        # account list\
         # lavena, yuge, anua, project21
 
         url = "https://accounts.kakao.com/login/kakaoforbusiness?continue=https://business.kakao.com/dashboard/?sid=kmo&redirect=https://moment.kakao.com/dashboard"
