@@ -7,12 +7,22 @@ from selenium import webdriver
 import chromedriver_binary  # Adds chromedriver binary to path
 import datetime
 from pathlib import Path
+from dataclasses import dataclass
 
 from selenium.webdriver.remote.webelement import WebElement
+
+from config import CHROME_USER_DATA_PATH, CHROME_PROFILE_NAME, KEY_SHEET_FILE_PATH, RAW_FILE_PATH
 
 from openpyxl import Workbook, worksheet
 
 DEFAULT_TIMEOUT_DELAY = 5
+
+
+@dataclass
+class UserConfig:
+    user_data_path: str
+    profile_name: str
+    download_path: str
 
 
 class Utils:
@@ -22,20 +32,31 @@ class Utils:
         options = webdriver.ChromeOptions()
         # https://www.python2.net/questions-80772.htm
         options.add_experimental_option("detach", True)
-
-        parent = os.path.dirname(os.path.abspath(Path(__file__).parent))
-        path = parent + '\\raw_data'
-
-        if os.path.isdir(path) == False:
-            os.mkdir(path)
+        user_config = Utils._get_config()
 
         prefs = {
             "profile.default_content_settings.popups": 0,
-            'download.default_directory': path,
+            f'download.default_directory': user_config.download_path,
             "directory_upgrade": True
         }
         options.add_experimental_option('prefs', prefs)
+        options.add_argument(f'--user-data-dir={user_config.user_data_path}')
+        options.add_argument(f'--profile-directory={user_config.profile_name}')
+
         return webdriver.Chrome(chrome_options=options)
+
+    @staticmethod
+    def _get_config() -> UserConfig:
+        # path
+        path = RAW_FILE_PATH if RAW_FILE_PATH != "" else f'{os.path.dirname(os.path.abspath(Path(__file__).parent))}{os.sep}raw_data'
+        if not os.path.isdir(path):
+            os.mkdir(path)
+
+        # user_data_path
+        user_data_path = CHROME_USER_DATA_PATH if CHROME_USER_DATA_PATH != "" else "/Users/qualson/Library/Application Support/Google/Chrome/Profile 2"
+        profile_name = CHROME_PROFILE_NAME if CHROME_PROFILE_NAME != "" else "Profile 2"
+
+        return UserConfig(user_data_path=user_data_path, profile_name=profile_name, download_path=path)
 
     @staticmethod
     def get_today() -> str:
@@ -52,7 +73,7 @@ class Utils:
         return date.isoformat()
 
     @staticmethod
-    def get_weekday() -> str:
+    def get_weekday() -> int:
         # It's MONDAY when return value is 0
         return datetime.datetime.today().weekday()
 
