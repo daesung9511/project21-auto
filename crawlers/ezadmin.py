@@ -3,23 +3,22 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.wait import WebDriverWait
+import logging
 
 from utils import Utils, DEFAULT_TIMEOUT_DELAY
 
 
 class Ezadmin:
 
-    def run(self, account):
+    def run(self, driver, account):
         uid = account["id"]
         upw = account["pw"]
         udomain = account["domain"]
 
-        Ezadmin.download_yesterday_revenue(udomain, uid, upw)
+        Ezadmin.download_yesterday_revenue(driver, udomain, uid, upw)
 
     @staticmethod
-    def get_admin_page(domain: str, id: str, password: str) -> WebDriver:
-        driver = Utils.get_chrome_driver()
-        driver.set_window_size(1980, 1080)
+    def get_admin_page(driver: WebDriver, domain: str, id: str, password: str) -> WebDriver:
         driver.get("https://www.ezadmin.co.kr/index.html#main")
         WebDriverWait(driver, 3).until(
             expected_conditions.presence_of_all_elements_located((By.ID, "login-popup"))
@@ -43,7 +42,7 @@ class Ezadmin:
             )
             driver.find_element_by_css_selector(keep_password_selector).click()
         except Exception as e:
-            print(e)
+            logging.warning(e)
 
         try:
             notice_selector = "#pop_top > span > a > img"
@@ -52,13 +51,13 @@ class Ezadmin:
             )
             driver.find_element_by_css_selector(notice_selector).click()
         except Exception as e:
-            print(e)
+            logging.warning(e)
 
         return driver
 
     @staticmethod
-    def download_yesterday_revenue(domain: str, id: str, password: str) -> WebDriver:
-        driver = Ezadmin.get_admin_page(domain, id, password)
+    def download_yesterday_revenue(driver: WebDriver, domain: str, id: str, password: str) -> WebDriver:
+        driver = Ezadmin.get_admin_page(driver, domain, id, password)
         menu_selector = "#mymenu > a"
         driver.find_element_by_css_selector(menu_selector).click()
 
@@ -90,6 +89,7 @@ class Ezadmin:
             )
             driver.switch_to.alert.accept()
         except Exception as e:
-            print("검색결과 없음")
+            logging.debug(f"검색결과 없음 {e}")
+            raise NameError("검색결과 없음") from e
 
         return driver

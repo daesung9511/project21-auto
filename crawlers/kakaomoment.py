@@ -1,8 +1,5 @@
 #coding: utf-8
 
-import time
-import pyperclip
-import selenium
 import datetime
 import csv
 import os
@@ -12,11 +9,14 @@ from openpyxl import load_workbook
 from datetime import datetime
 
 from selenium import webdriver
+
+import time
+
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions
-from selenium.common.exceptions import ElementNotVisibleException
+
+from selenium.webdriver.support.ui import WebDriverWait
+
 from utils import Utils, DEFAULT_TIMEOUT_DELAY, AD_FEE_FILE
 
 
@@ -323,7 +323,7 @@ class Kakaomoment:
         sales_wb.save(AD_FEE_FILE)
 
     def run(self, driver, account):
-        # account list
+        # account list\
         # lavena, yuge, anua, project21
 
         url = "https://accounts.kakao.com/login/kakaoforbusiness?continue=https://business.kakao.com/dashboard/?sid=kmo&redirect=https://moment.kakao.com/dashboard"
