@@ -1,7 +1,6 @@
 #coding: utf-8
 
 import datetime
-<<<<<<< HEAD
 import csv
 import os
 import fnmatch
@@ -10,10 +9,9 @@ from openpyxl import load_workbook
 from datetime import datetime
 
 from selenium import webdriver
-=======
+
 import time
 
->>>>>>> feat: Remove unncessary dependencies
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.ui import WebDriverWait
