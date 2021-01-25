@@ -90,7 +90,12 @@ class Utils:
     @staticmethod
     def create_xl_sheet(wb:Workbook, sheet_name: str) -> worksheet:
         rd_ws_name = datetime.datetime.today().strftime("%Y-%m-%d") + sheet_name
-        return wb.create_sheet(title=rd_ws_name)
+        ws = None
+        if rd_ws_name in wb.sheetnames:
+            ws = wb[rd_ws_name]
+        else:
+            ws = wb.create_sheet(rd_ws_name)
+        return ws
 
     @staticmethod
     def get_recent_file(expression: str) -> str:
