@@ -92,26 +92,11 @@ ACCOUNTS = {
         },
     },
     "facebook": {
-        "index": ["lavena", "anua", "yuge", "project21"],
-        "lavena": {
-            "id": "eungjin@awesomelabs.kr",
-            "pw": "kdssi1048!",
-            "number": "1123300958087838"
-        },
-        "anua": {
-            "id": "eungjin@awesomelabs.kr",
-            "pw": "kdssi1048!",
-            "number": "638503069927336"
-        },
-        "yuge": {
-            "id": "eungjin@awesomelabs.kr",
-            "pw": "kdssi1048!",
-            "number": "1526503294176709"
-        },
-        "project21": {
-            "id": "eungjin@awesomelabs.kr",
-            "pw": "kdssi1048!",
-            "number": "346749609115152"
+        "index": ["app"],
+        "app": {
+            "id": "1112299139212780",
+            "secret": "bea043e3210b7da93aa3316dca3c50a8",
+            "access_token": "EAAPzoVMTpewBAGVHL2CuqtZBw9f1M63OYtf0DaeFDbJuqLBpMWVLXTTcyR212voBnyZCwl5YLy0casqU76GSg2uoqNxAex2884zZB1r8M8tzBF5NTxK3JXRcC13GTAY7DRNZAu4mG9cwrZAskXHFYbiLyYsxY3711bOfdpZBRAPuyHcQsMcpqZC" 
         }
     },
     "google": {
