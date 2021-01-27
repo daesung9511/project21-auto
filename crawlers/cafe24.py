@@ -173,7 +173,4 @@ class Cafe24:
                 for cell in color_cells:
                     sales_ws[cell + sales_max_row].fill = PatternFill(start_color='fff2cc', end_color='fff2cc', fill_type='solid')
 
-
-        # TODO: 하루에 두번해서 같은 시트에 동작할 시, 일부쉘 누락 오류
-        # 파일 저장경로 매개변수로 받을지 확인
         sales_wb.save(SALES_FILE)

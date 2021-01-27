@@ -8,8 +8,13 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.ui import WebDriverWait
 
-from utils import Utils, DEFAULT_TIMEOUT_DELAY
+from openpyxl import load_workbook
+from datetime import datetime
+import os
+import fnmatch
+import csv
 
+from utils import Utils, DEFAULT_TIMEOUT_DELAY, AD_FEE_FILE
 
 class Naver_GFA:
     flag = True
@@ -328,6 +333,74 @@ class Naver_GFA:
 
         driver.switch_to.window(main)
 
+    def update_ad_costs(self):
+    
+        # RD 엑셀 파일 로딩
+        sales_wb = load_workbook(AD_FEE_FILE, data_only=True, read_only=False)
+
+        ad_fee_ws = Utils.create_xl_sheet(sales_wb, "-광고비")
+
+        # 시트 헤더 고정
+        ad_fee_headings = ['','일자', '요일', '미디어', '상품1', '광고비(VAT미포함)']
+        for idx, header in enumerate(ad_fee_headings):
+            ad_fee_ws.cell(row=1, column=idx + 1).value = header
+        ad_fee_ws.freeze_panes = 'A2'
+
+        # 유즈 csv 파일 찾기
+        yuge_path = Utils.get_recent_file("유즈_광고비리포트_*.csv")
+
+        with open(yuge_path, 'r', encoding='utf-8') as f:
+            reader = csv.reader(f, delimiter = ",")
+            next(reader)
+            # 광고비 시트에 rd 대입
+            for row in reader:
+                
+                fee_max_row = str(ad_fee_ws.max_row+1)
+                
+                ad_fee_ws.cell(row=int(fee_max_row),column=1).value = row[0]
+                ad_fee_ws.cell(row=int(fee_max_row),column=2).value = datetime.today().strftime("%Y-%m-%d")
+                ad_fee_ws.cell(row=int(fee_max_row),column=3).value = '=TEXT(B' + fee_max_row + ',"aaa")'
+                ad_fee_ws.cell(row=int(fee_max_row),column=4).value = '네이버 GFA'
+                ad_fee_ws.cell(row=int(fee_max_row),column=5).value = '=VLOOKUP(A' + fee_max_row + ',매칭테이블!B:D,3,0)'
+                ad_fee_ws.cell(row=int(fee_max_row),column=6).value = float(row[3])/1.1
+        
+        anua_path = Utils.get_recent_file("더파운더즈_성과리포트_*.csv")
+
+        with open(anua_path, 'r', encoding='utf-8') as f:
+            reader = csv.reader(f, delimiter = ",")
+            next(reader)
+            # 광고비 시트에 rd 대입
+            for row in reader:
+                
+                fee_max_row = str(ad_fee_ws.max_row+1)
+                
+                ad_fee_ws.cell(row=int(fee_max_row),column=1).value = row[0]
+                ad_fee_ws.cell(row=int(fee_max_row),column=2).value = datetime.today().strftime("%Y-%m-%d")
+                ad_fee_ws.cell(row=int(fee_max_row),column=3).value = '=TEXT(B' + fee_max_row + ',"aaa")'
+                ad_fee_ws.cell(row=int(fee_max_row),column=4).value = '네이버 GFA'
+                ad_fee_ws.cell(row=int(fee_max_row),column=5).value = '=VLOOKUP(A' + fee_max_row + ',매칭테이블!B:D,3,0)'
+                ad_fee_ws.cell(row=int(fee_max_row),column=6).value = float(row[12])/1.1
+        
+        lavena_path = Utils.get_recent_file("라베나코리아_광고비리포트_*.csv")
+
+        with open(lavena_path, 'r', encoding='utf-8') as f:
+            reader = csv.reader(f, delimiter = ",")
+            next(reader)
+            # 광고비 시트에 rd 대입
+            for row in reader:
+                
+                fee_max_row = str(ad_fee_ws.max_row+1)
+                
+                ad_fee_ws.cell(row=int(fee_max_row),column=1).value = row[0]
+                ad_fee_ws.cell(row=int(fee_max_row),column=2).value = datetime.today().strftime("%Y-%m-%d")
+                ad_fee_ws.cell(row=int(fee_max_row),column=3).value = '=TEXT(B' + fee_max_row + ',"aaa")'
+                ad_fee_ws.cell(row=int(fee_max_row),column=4).value = '네이버 GFA'
+                ad_fee_ws.cell(row=int(fee_max_row),column=5).value = '=VLOOKUP(A' + fee_max_row + ',매칭테이블!B:D,3,0)'
+                ad_fee_ws.cell(row=int(fee_max_row),column=6).value = float(row[3])/1.1
+        
+        sales_wb.save(AD_FEE_FILE)
+
+
     def run(self, driver, account):
         # account list
         # lavena, yuge, anua, project21
@@ -347,3 +420,4 @@ class Naver_GFA:
         self.download_csv(driver, account["domain"])
         self.clear_tabs(driver)
         self.flag = False
+        self.update_ad_costs()
