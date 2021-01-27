@@ -395,15 +395,15 @@ class Naver_shop:
 
         url = "https://searchad.naver.com/"
 
-        # self.init(driver, url)
-        # self.close_popup(driver)
-        # self.switch_main(driver)
-        # self.login(driver, account)
-        # self.move_page(driver, account["type"])
-        # self.select_date(driver, account["id"])
-        # self.download_csv(driver, account["id"])
-        # self.logout(driver, account["id"])
-        # self.clear_tabs(driver)
-        # driver.delete_all_cookies()
+        self.init(driver, url)
+        self.close_popup(driver)
+        self.switch_main(driver)
+        self.login(driver, account)
+        self.move_page(driver, account["type"])
+        self.select_date(driver, account["id"])
+        self.download_csv(driver, account["id"])
+        self.logout(driver, account["id"])
+        self.clear_tabs(driver)
+        driver.delete_all_cookies()
 
         self.update_ad_costs()
