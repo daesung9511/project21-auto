@@ -7,7 +7,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions
-from utils import Utils, DEFAULT_TIMEOUT_DELAY
+
+from utils import Utils, DEFAULT_TIMEOUT_DELAY, AD_FEE_FILE
 
 from openpyxl import load_workbook
 
@@ -317,13 +318,11 @@ class Naver_shop:
         driver.switch_to.window(main)
 
     def update_ad_costs(self): 
-        # 엑셀 샘플 파일 
-        xl_file_path = "kakaomoment_sample.xlsx" 
- 
-        # RD 엑셀 파일 로딩 
-        sales_wb = load_workbook(xl_file_path, data_only=True, read_only=False)
 
-        ad_fee_ws = Utils.create_xl_sheet(sales_wb, "-광고비") 
+        # RD 엑셀 파일 로딩 
+        ad_fee_wb = load_workbook(AD_FEE_FILE, data_only=True, read_only=False)
+
+        ad_fee_ws = Utils.create_xl_sheet(ad_fee_wb, "-광고비") 
  
         # 시트 헤더 고정 
         ad_fee_headings = ['','일자', '요일', '미디어', '상품1', '광고비'] 
@@ -385,9 +384,8 @@ class Naver_shop:
                 ad_fee_ws.cell(row=int(fee_max_row),column=5).value = '=VLOOKUP(A' + fee_max_row + ',매칭테이블!B:D,3,0)' 
                 ad_fee_ws.cell(row=int(fee_max_row),column=6).value = float(row[3].replace(",",""))/1.1
             
-         
-        download_path = 'ad_fee_data.xlsx' 
-        sales_wb.save(download_path) 
+        
+        ad_fee_wb.save(AD_FEE_FILE) 
 
     def run(self, driver, account):
         # account list
