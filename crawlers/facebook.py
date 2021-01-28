@@ -21,7 +21,7 @@ class Facebook:
         ad_fee_ws = Utils.create_xl_sheet(sales_wb, "-광고비")
 
         # 시트 헤더 고정
-        ad_fee_headings = ['','일자', '요일', '미디어', '상품1', '광고비']
+        ad_fee_headings = ['','일자', '요일', '미디어', '상품1', '광고비(VAT미포함)']
         for idx, header in enumerate(ad_fee_headings):
             ad_fee_ws.cell(row=1, column=idx + 1).value = header
         ad_fee_ws.freeze_panes = 'A2'
