@@ -1,6 +1,7 @@
 import os
 import random
 import time
+import psutil
 
 from selenium.webdriver.android.webdriver import WebDriver
 from selenium import webdriver
@@ -33,14 +34,16 @@ class Utils:
 
     @staticmethod
     def get_chrome_driver() -> WebDriver:
+        
         options = webdriver.ChromeOptions()
         # https://www.python2.net/questions-80772.htm
         options.add_experimental_option("detach", True)
         user_config = Utils._get_config()
 
+        print(user_config.download_path)
         prefs = {
             "profile.default_content_settings.popups": 0,
-            f'download.default_directory': user_config.download_path,
+            'download.default_directory': user_config.download_path,
             "directory_upgrade": True
         }
         options.add_experimental_option('prefs', prefs)
@@ -86,6 +89,12 @@ class Utils:
         for char in input:
             element.send_keys(char)
             time.sleep(random.uniform(0.02, 0.1))
+
+    @staticmethod
+    def kill_proc(proc_exp: str):
+        for proc in psutil.process_iter():
+            if fnmatch.fnmatch(proc.name(), proc_exp):
+                proc.kill()
     
     @staticmethod
     def create_xl_sheet(wb:Workbook, sheet_name: str) -> worksheet:
