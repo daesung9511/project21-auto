@@ -7,7 +7,7 @@ from crawlers.naver_shop import Naver_shop
 from crawlers.naver_gfa import Naver_GFA
 from crawlers.kakaomoment import Kakaomoment
 from crawlers.facebook import Facebook
-from utils import Utils
+from utils import Utils, AD_FEE_FILE, SALES_FILE
 from secrets import ACCOUNTS
 import logging
 import sys
@@ -23,6 +23,7 @@ def setup_logger():
 
 
 def run(platform, account):
+    Utils.kill_proc("chrome*")
     driver = Utils.get_chrome_driver()
     driver.set_window_size(1980, 1080)
 
@@ -43,12 +44,14 @@ def start():
     run(Naver_shop(), ACCOUNTS["naver_shop"])
     run(Naver_GFA(), ACCOUNTS["naver_gfa"])
     run(Kakaomoment(), ACCOUNTS["kakaomoment"])
-    run(Cafe24, ACCOUNTS["cafe24"])
-    run(Ezadmin, ACCOUNTS["ezadmin"])
+    # run(Cafe24(), ACCOUNTS["cafe24"])
+    # run(Ezadmin(), ACCOUNTS["ezadmin"])
 
+    Utils.set_ad_xl_formula()
+    Utils.set_sales_xl_formula()
 
 if __name__ == '__main__':
-    setup_logger()
+    # setup_logger()
 
     try:
         command = sys.argv[1]
@@ -59,13 +62,17 @@ if __name__ == '__main__':
         start()
     elif command == "main":
         start()
+    elif command == "kakaomoment":
+        run(Kakaomoment(), ACCOUNTS["kakaomoment"])
     elif command == "facebook":
         run(Facebook(), ACCOUNTS["facebook"])
     elif command == "naver_shop":
         run(Naver_shop(), ACCOUNTS["naver_shop"])
     elif command == "naver_gfa":
         run(Naver_GFA(), ACCOUNTS["naver_gfa"])
+        
+        Utils.set_ad_xl_formula()
     elif command == "cafe24":
-        run(Cafe24, ACCOUNTS["cafe24"])
+        run(Cafe24(), ACCOUNTS["cafe24"])
     elif command == "ezadmin":
-        run(Ezadmin, ACCOUNTS["ezadmin"])
+        run(Ezadmin(), ACCOUNTS["ezadmin"])
