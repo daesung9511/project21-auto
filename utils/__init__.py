@@ -14,7 +14,7 @@ from selenium.webdriver.remote.webelement import WebElement
 
 from config import CHROME_USER_DATA_PATH, CHROME_PROFILE_NAME, KEY_SHEET_FILE_PATH, RAW_FILE_PATH
 
-from openpyxl import Workbook, worksheet
+from openpyxl import Workbook, worksheet, load_workbook
 import fnmatch
 
 DEFAULT_TIMEOUT_DELAY = 5
@@ -117,3 +117,40 @@ class Utils:
                     ctime = os.path.getmtime(dir_path + file_name) 
                     file_path = file_name 
         return dir_path + file_path
+
+
+    # TODO: 다형성 문제로 추후 수정
+    @staticmethod
+    def set_ad_xl_formula() -> str:
+
+        ad_fee_wb = load_workbook(AD_FEE_FILE, data_only=True, read_only=False)
+
+        ad_fee_ws = Utils.create_xl_sheet(ad_fee_wb, "-광고비")
+
+        fee_max_row = ad_fee_ws.max_row
+        for fee_row in range(2, fee_max_row + 1):
+            ad_fee_ws.cell(row=int(fee_row),column=3).value = '=TEXT(B' + str(fee_row) + ',"aaa")'
+            ad_fee_ws.cell(row=int(fee_row),column=5).value = '=VLOOKUP(A' + str(fee_row) + ',매칭테이블!B:D,3,0)'
+
+        ad_fee_wb.save(AD_FEE_FILE)
+
+    # TODO: 다형성 문제로 추후 수정
+    @staticmethod
+    def set_sales_xl_formula() -> str:
+
+        sales_wb = load_workbook(SALES_FILE, data_only=True, read_only=False)
+
+        sales_ws = Utils.create_xl_sheet(sales_wb, "-판매실적")
+
+        sales_max_row = sales_ws.max_row
+        for row in range(2, sales_max_row + 1):
+            sales_row = str(row)
+            sales_ws["C" + sales_row] = '=TEXT(B' + sales_row + ',"aaa")'
+            sales_ws["E" + sales_row] = '=VLOOKUP(G' + sales_row + ',매칭테이블!D:E,2,0)'    
+            sales_ws["K" + sales_row] = '=VLOOKUP($N' + sales_row + ',매칭테이블!$G:$J,2,0)*H' + sales_row
+            sales_ws["L" + sales_row] = '=K' + sales_row + '-VLOOKUP($N' + sales_row + ',매칭테이블!$G:$J,3,0)*K' + sales_row
+            sales_ws["M" + sales_row] = '=VLOOKUP($N' + sales_max_row + ',매칭테이블!$G:$J,4,0)*H' + sales_row
+            sales_ws["N" + sales_row] = '=F' + sales_row + '&E' + sales_row + '&G' + sales_row + '&I' + sales_row
+
+        sales_wb.save(SALES_FILE)
+

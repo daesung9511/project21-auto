@@ -317,7 +317,7 @@ class Naver_shop:
 
         driver.switch_to.window(main)
 
-    def update_ad_costs(self): 
+    def update_ad_costs(self, domain): 
 
         # RD 엑셀 파일 로딩 
         ad_fee_wb = load_workbook(AD_FEE_FILE, data_only=True, read_only=False)
@@ -330,61 +330,57 @@ class Naver_shop:
             ad_fee_ws.cell(row=1, column=idx + 1).value = header 
         ad_fee_ws.freeze_panes = 'A2'
 
-        anua_path = Utils.get_recent_file("광고비,anua*.csv")
+        if domain == "anua":
 
-        with open(anua_path, 'r', encoding='utf-8') as f: 
-            reader = csv.reader(f, delimiter = ",") 
-            next(reader) 
-            next(reader)
-            # 광고비 시트에 rd 대입 
-            for row in reader: 
-                print(row)
-                fee_max_row = str(ad_fee_ws.max_row+1) 
-                
-                ad_fee_ws.cell(row=int(fee_max_row),column=1).value = row[1] 
-                ad_fee_ws.cell(row=int(fee_max_row),column=2).value = datetime.datetime.today().strftime("%Y-%m-%d") 
-                ad_fee_ws.cell(row=int(fee_max_row),column=3).value = '=TEXT(B' + fee_max_row + ',"aaa")' 
-                ad_fee_ws.cell(row=int(fee_max_row),column=4).value = '네이버 ' + row[0] 
-                ad_fee_ws.cell(row=int(fee_max_row),column=5).value = '=VLOOKUP(A' + fee_max_row + ',매칭테이블!B:D,3,0)' 
-                ad_fee_ws.cell(row=int(fee_max_row),column=6).value = float(row[4].replace(",",""))/1.1
+            anua_path = Utils.get_recent_file("광고비,anua*.csv")
 
-        yuge_path = Utils.get_recent_file("광고비*,yuge*.csv")
-
-        with open(yuge_path, 'r', encoding='utf-8') as f: 
-            reader = csv.reader(f, delimiter = ",") 
-            next(reader) 
-            next(reader)
-            # 광고비 시트에 rd 대입 
-            for row in reader: 
-                print(row)
-                fee_max_row = str(ad_fee_ws.max_row+1) 
-                
-                ad_fee_ws.cell(row=int(fee_max_row),column=1).value = row[2] 
-                ad_fee_ws.cell(row=int(fee_max_row),column=2).value = datetime.datetime.today().strftime("%Y-%m-%d") 
-                ad_fee_ws.cell(row=int(fee_max_row),column=3).value = '=TEXT(B' + fee_max_row + ',"aaa")' 
-                ad_fee_ws.cell(row=int(fee_max_row),column=4).value = '네이버 ' + row[0] 
-                ad_fee_ws.cell(row=int(fee_max_row),column=5).value = '=VLOOKUP(A' + fee_max_row + ',매칭테이블!B:D,3,0)' 
-                ad_fee_ws.cell(row=int(fee_max_row),column=6).value = float(row[6].replace(",",""))/1.1
-
-        pista_path = Utils.get_recent_file("광고비매출보고서,pista*.csv")
-
-        with open(pista_path, 'r', encoding='utf-8') as f: 
-            reader = csv.reader(f, delimiter = ",") 
-            next(reader) 
-            next(reader)
-            # 광고비 시트에 rd 대입 
-            for row in reader: 
-                print(row)
-                fee_max_row = str(ad_fee_ws.max_row+1) 
-                
-                ad_fee_ws.cell(row=int(fee_max_row),column=1).value = row[2] 
-                ad_fee_ws.cell(row=int(fee_max_row),column=2).value = datetime.datetime.today().strftime("%Y-%m-%d") 
-                ad_fee_ws.cell(row=int(fee_max_row),column=3).value = '=TEXT(B' + fee_max_row + ',"aaa")' 
-                ad_fee_ws.cell(row=int(fee_max_row),column=4).value = '네이버 ' + row[1] 
-                ad_fee_ws.cell(row=int(fee_max_row),column=5).value = '=VLOOKUP(A' + fee_max_row + ',매칭테이블!B:D,3,0)' 
-                ad_fee_ws.cell(row=int(fee_max_row),column=6).value = float(row[3].replace(",",""))/1.1
-            
+            with open(anua_path, 'r', encoding='utf-8') as f: 
+                reader = csv.reader(f, delimiter = ",") 
+                next(reader) 
+                next(reader)
+                # 광고비 시트에 rd 대입 
+                for row in reader: 
+                    fee_max_row = str(ad_fee_ws.max_row+1) 
+                    
+                    ad_fee_ws.cell(row=int(fee_max_row),column=1).value = row[1] 
+                    ad_fee_ws.cell(row=int(fee_max_row),column=2).value = datetime.datetime.today().strftime("%Y-%m-%d") 
+                    ad_fee_ws.cell(row=int(fee_max_row),column=4).value = '네이버 ' + row[0] 
+                    ad_fee_ws.cell(row=int(fee_max_row),column=6).value = float(row[4].replace(",",""))/1.1
+   
+        elif domain == "yuge":
         
+            yuge_path = Utils.get_recent_file("광고비*,yuge*.csv")
+
+            with open(yuge_path, 'r', encoding='utf-8') as f: 
+                reader = csv.reader(f, delimiter = ",") 
+                next(reader) 
+                next(reader)
+                # 광고비 시트에 rd 대입 
+                for row in reader: 
+                    fee_max_row = str(ad_fee_ws.max_row+1) 
+                    
+                    ad_fee_ws.cell(row=int(fee_max_row),column=1).value = row[2] 
+                    ad_fee_ws.cell(row=int(fee_max_row),column=2).value = datetime.datetime.today().strftime("%Y-%m-%d") 
+                    ad_fee_ws.cell(row=int(fee_max_row),column=4).value = '네이버 ' + row[0] 
+                    ad_fee_ws.cell(row=int(fee_max_row),column=6).value = float(row[6].replace(",",""))/1.1
+        
+        elif domain == "pista1004":
+                
+            pista_path = Utils.get_recent_file("광고비매출보고서,pista*.csv")
+
+            with open(pista_path, 'r', encoding='utf-8') as f: 
+                reader = csv.reader(f, delimiter = ",") 
+                next(reader) 
+                next(reader)
+                # 광고비 시트에 rd 대입 
+                for row in reader: 
+                    fee_max_row = str(ad_fee_ws.max_row+1) 
+                    
+                    ad_fee_ws.cell(row=int(fee_max_row),column=1).value = row[2] 
+                    ad_fee_ws.cell(row=int(fee_max_row),column=2).value = datetime.datetime.today().strftime("%Y-%m-%d") 
+                    ad_fee_ws.cell(row=int(fee_max_row),column=4).value = '네이버 ' + row[1] 
+                    ad_fee_ws.cell(row=int(fee_max_row),column=6).value = float(row[3].replace(",",""))/1.1
+            
         ad_fee_wb.save(AD_FEE_FILE) 
 
     def run(self, driver, account):
@@ -393,15 +389,15 @@ class Naver_shop:
 
         url = "https://searchad.naver.com/"
 
-        self.init(driver, url)
-        self.close_popup(driver)
-        self.switch_main(driver)
-        self.login(driver, account)
-        self.move_page(driver, account["type"])
-        self.select_date(driver, account["id"])
-        self.download_csv(driver, account["id"])
-        self.logout(driver, account["id"])
-        self.clear_tabs(driver)
-        driver.delete_all_cookies()
+        # self.init(driver, url)
+        # self.close_popup(driver)
+        # self.switch_main(driver)
+        # self.login(driver, account)
+        # self.move_page(driver, account["type"])
+        # self.select_date(driver, account["id"])
+        # self.download_csv(driver, account["id"])
+        # self.logout(driver, account["id"])
+        # self.clear_tabs(driver)
+        # driver.delete_all_cookies()
 
-        self.update_ad_costs()
+        self.update_ad_costs(account["id"])
