@@ -317,7 +317,7 @@ class Naver_shop:
 
         driver.switch_to.window(main)
 
-    def update_ad_costs(self, domain): 
+    def update_ad_costs(self, id): 
 
         # RD 엑셀 파일 로딩 
         ad_fee_wb = load_workbook(AD_FEE_FILE, data_only=True, read_only=False)
@@ -330,7 +330,7 @@ class Naver_shop:
             ad_fee_ws.cell(row=1, column=idx + 1).value = header 
         ad_fee_ws.freeze_panes = 'A2'
 
-        if domain == "anua":
+        if id == "anua":
 
             anua_path = Utils.get_recent_file("광고비,anua*.csv")
 
@@ -347,7 +347,7 @@ class Naver_shop:
                     ad_fee_ws.cell(row=int(fee_max_row),column=4).value = '네이버 ' + row[0] 
                     ad_fee_ws.cell(row=int(fee_max_row),column=6).value = float(row[4].replace(",",""))/1.1
    
-        elif domain == "yuge":
+        elif id == "yuge":
         
             yuge_path = Utils.get_recent_file("광고비*,yuge*.csv")
 
@@ -364,7 +364,7 @@ class Naver_shop:
                     ad_fee_ws.cell(row=int(fee_max_row),column=4).value = '네이버 ' + row[0] 
                     ad_fee_ws.cell(row=int(fee_max_row),column=6).value = float(row[6].replace(",",""))/1.1
         
-        elif domain == "pista1004":
+        elif id == "pista1004":
                 
             pista_path = Utils.get_recent_file("광고비매출보고서,pista*.csv")
 
@@ -373,7 +373,7 @@ class Naver_shop:
                 next(reader) 
                 next(reader)
                 # 광고비 시트에 rd 대입 
-                for row in reader: 
+                for row in reader:
                     fee_max_row = str(ad_fee_ws.max_row+1) 
                     
                     ad_fee_ws.cell(row=int(fee_max_row),column=1).value = row[2] 
@@ -389,15 +389,15 @@ class Naver_shop:
 
         url = "https://searchad.naver.com/"
 
-        # self.init(driver, url)
-        # self.close_popup(driver)
-        # self.switch_main(driver)
-        # self.login(driver, account)
-        # self.move_page(driver, account["type"])
-        # self.select_date(driver, account["id"])
-        # self.download_csv(driver, account["id"])
-        # self.logout(driver, account["id"])
-        # self.clear_tabs(driver)
-        # driver.delete_all_cookies()
+        self.init(driver, url)
+        self.close_popup(driver)
+        self.switch_main(driver)
+        self.login(driver, account)
+        self.move_page(driver, account["type"])
+        self.select_date(driver, account["id"])
+        self.download_csv(driver, account["id"])
+        self.logout(driver, account["id"])
+        self.clear_tabs(driver)
+        driver.delete_all_cookies()
 
         self.update_ad_costs(account["id"])
