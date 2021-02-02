@@ -36,7 +36,7 @@ class Cafe24:
         driver.find_element_by_css_selector(id_selector).send_keys(id)
         driver.find_element_by_css_selector("#userpasswd").send_keys(password)
         driver.find_element_by_css_selector(
-            "#tabAdmin > div > fieldset > p.gButton > a").click()
+            "#frm_user > div.tabCont > div.mButton > button").click()
 
         # Login complete
         return driver

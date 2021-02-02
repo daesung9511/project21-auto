@@ -416,6 +416,10 @@ class Naver_GFA:
         #     # self.close_popup(driver)
         #     self.login(driver, account)
         
+        Utils.kill_proc("chrome*")
+        driver = Utils.get_chrome_driver_gfa()
+        driver.set_window_size(1980, 1080)
+        
         self.init(driver, url)
         naver_login_button = driver.find_element_by_css_selector(
             """body > div > div.container.bg_white > div > div > div.login_box > ul > li.selected > a > span.platform_name""")
@@ -429,4 +433,4 @@ class Naver_GFA:
         self.download_csv(driver, account["domain"])
         self.clear_tabs(driver)
         self.flag = False
-        self.update_ad_costs()
+        self.update_ad_costs(account["domain"])

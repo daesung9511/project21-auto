@@ -326,6 +326,10 @@ class Kakaomoment:
         # account list\
         # lavena, yuge, anua, project21
 
+        Utils.kill_proc("chrome*")
+        driver = Utils.get_chrome_driver_gfa()
+        driver.set_window_size(1980, 1080)
+
         url = "https://accounts.kakao.com/login/kakaoforbusiness?continue=https://business.kakao.com/dashboard/?sid=kmo&redirect=https://moment.kakao.com/dashboard"
 
         if self.flag:
