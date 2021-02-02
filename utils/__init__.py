@@ -12,7 +12,7 @@ from dataclasses import dataclass
 
 from selenium.webdriver.remote.webelement import WebElement
 
-from config import CHROME_USER_DATA_PATH, CHROME_PROFILE_NAME, KEY_SHEET_FILE_PATH, RAW_FILE_PATH
+from config import CHROME_USER_DATA_PATH, CHROME_PROFILE_NAME, CHROME_GFA_PROFILE_NAME, KEY_SHEET_FILE_PATH, RAW_FILE_PATH
 
 from openpyxl import Workbook, worksheet, load_workbook
 import fnmatch
@@ -27,7 +27,9 @@ SALES_FILE = "sales_data.xlsx"
 class UserConfig:
     user_data_path: str
     profile_name: str
+    gfa_profile_name: str
     download_path: str
+    
 
 
 class Utils:
@@ -39,11 +41,11 @@ class Utils:
         # https://www.python2.net/questions-80772.htm
         options.add_experimental_option("detach", True)
         user_config = Utils._get_config()
-
+        print("down")
         print(user_config.download_path)
         prefs = {
             "profile.default_content_settings.popups": 0,
-            'download.default_directory': user_config.download_path,
+            f'download.default_directory': user_config.download_path,
             "directory_upgrade": True
         }
         options.add_experimental_option('prefs', prefs)
@@ -51,6 +53,27 @@ class Utils:
         options.add_argument(f'--profile-directory={user_config.profile_name}')
 
         return webdriver.Chrome(chrome_options=options)
+    
+    @staticmethod
+    def get_chrome_driver_gfa() -> WebDriver:
+        
+        options = webdriver.ChromeOptions()
+        # https://www.python2.net/questions-80772.htm
+        options.add_experimental_option("detach", True)
+        user_config = Utils._get_config()
+        print("down")
+        print(user_config.download_path)
+        prefs = {
+            "profile.default_content_settings.popups": 0,
+            f'download.default_directory': user_config.download_path,
+            "directory_upgrade": True
+        }
+        options.add_experimental_option('prefs', prefs)
+        options.add_argument(f'--user-data-dir={user_config.user_data_path}')
+        options.add_argument(f'--profile-directory={user_config.gfa_profile_name}')
+
+        return webdriver.Chrome(chrome_options=options)
+        
 
     @staticmethod
     def _get_config() -> UserConfig:
@@ -62,8 +85,9 @@ class Utils:
         # user_data_path
         user_data_path = CHROME_USER_DATA_PATH if CHROME_USER_DATA_PATH != "" else "/Users/qualson/Library/Application Support/Google/Chrome/Profile 2"
         profile_name = CHROME_PROFILE_NAME if CHROME_PROFILE_NAME != "" else "Profile 2"
+        gfa_profile_name = CHROME_GFA_PROFILE_NAME if CHROME_GFA_PROFILE_NAME != "" else "Profile 3"
 
-        return UserConfig(user_data_path=user_data_path, profile_name=profile_name, download_path=path)
+        return UserConfig(user_data_path=user_data_path, profile_name=profile_name, gfa_profile_name=gfa_profile_name, download_path=path)
 
     @staticmethod
     def get_today() -> str:

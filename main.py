@@ -50,6 +50,16 @@ def start():
     Utils.set_ad_xl_formula()
     Utils.set_sales_xl_formula()
 
+    # run(driver, Facebook(), ACCOUNTS["facebook"])
+    run(driver, Naver_shop(), ACCOUNTS["naver_shop"])
+    # run(driver, Kakaomoment(), ACCOUNTS["kakaomoment"])
+    # run(driver, Cafe24, ACCOUNTS["cafe24"])
+    # run(driver, Ezadmin, ACCOUNTS["ezadmin"])
+
+    driver = Utils.get_chrome_driver_gfa()
+    driver.set_window_size(1980, 1080)
+    run(driver, Naver_GFA(), ACCOUNTS["naver_gfa"])
+
 if __name__ == '__main__':
     # setup_logger()
 

@@ -77,7 +77,7 @@ class Kakaomoment:
         # get kakao pw form
         pw_form = driver.find_element_by_id("id_password_3")
         pw_form.send_keys(account["pw"])
-
+        
         # get kakao login button
         kakao_login_button = driver.find_element_by_css_selector("""#login-form > fieldset > div.wrap_btn > button.btn_g.btn_confirm.submit""")
         kakao_login_button.click()

@@ -415,13 +415,18 @@ class Naver_GFA:
         #     self.init(driver, url)
         #     # self.close_popup(driver)
         #     self.login(driver, account)
-
-        # self.press_ok(driver)
-        # self.switch_user(driver, account["domain"])
-        # self.press_ok(driver)
-        # self.move_page(driver, account["domain"])
-        # self.select_date(driver, account["domain"])
-        # self.download_csv(driver, account["domain"])
-        # self.clear_tabs(driver)
-        # self.flag = False
-        self.update_ad_costs(account["domain"])
+        
+        self.init(driver, url)
+        naver_login_button = driver.find_element_by_css_selector(
+            """body > div > div.container.bg_white > div > div > div.login_box > ul > li.selected > a > span.platform_name""")
+        
+        naver_login_button.click()
+        time.sleep(5)
+        self.switch_user(driver, account["domain"])
+        self.press_ok(driver)
+        self.move_page(driver, account["domain"])
+        self.select_date(driver, account["domain"])
+        self.download_csv(driver, account["domain"])
+        self.clear_tabs(driver)
+        self.flag = False
+        self.update_ad_costs()
