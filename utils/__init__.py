@@ -173,7 +173,7 @@ class Utils:
             sales_ws["E" + sales_row] = '=VLOOKUP(G' + sales_row + ',매칭테이블!D:E,2,0)'    
             sales_ws["K" + sales_row] = '=VLOOKUP($N' + sales_row + ',매칭테이블!$G:$J,2,0)*H' + sales_row
             sales_ws["L" + sales_row] = '=K' + sales_row + '-VLOOKUP($N' + sales_row + ',매칭테이블!$G:$J,3,0)*K' + sales_row
-            sales_ws["M" + sales_row] = '=VLOOKUP($N' + sales_max_row + ',매칭테이블!$G:$J,4,0)*H' + sales_row
+            sales_ws["M" + sales_row] = '=VLOOKUP($N' + sales_row + ',매칭테이블!$G:$J,4,0)*H' + sales_row
             sales_ws["N" + sales_row] = '=F' + sales_row + '&E' + sales_row + '&G' + sales_row + '&I' + sales_row
 
         sales_wb.save(SALES_FILE)

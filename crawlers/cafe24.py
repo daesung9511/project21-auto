@@ -28,7 +28,6 @@ class Cafe24:
     def get_admin_page(driver: WebDriver, id: str, password: str) -> WebDriver:
         
         driver.get("https://eclogin.cafe24.com/Shop/")
-        print("dld")
         id_selector = "#mall_id"
         WebDriverWait(driver, 5).until(
             expected_conditions.presence_of_all_elements_located((By.CSS_SELECTOR, id_selector))

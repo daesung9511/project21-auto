@@ -5,6 +5,9 @@ from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.wait import WebDriverWait
 import logging
 
+from bs4 import BeautifulSoup
+import re
+
 from utils import Utils, DEFAULT_TIMEOUT_DELAY
 
 
@@ -93,3 +96,19 @@ class Ezadmin:
             raise NameError("검색결과 없음") from e
 
         return driver
+
+    @staticmethod
+    def parse_html_data():
+
+        file = Utils.get_recent_file("*.xls")
+
+        f = open(file, "r", encoding='UTF8')
+
+        soup = BeautifulSoup(f,'html.parser')
+        list = soup.find_all('td', class_='str_item')
+        n=6
+        sub_list = [list[i * n:(i + 1) * n] for i in range((len(list) + n - 1) // n )] 
+        for items in sub_list:
+            for item in items:
+                res = re.sub('(<([^>]+)>)', '', str(item))
+                print(res)
