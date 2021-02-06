@@ -25,9 +25,8 @@ class Cafe24:
         Cafe24.update_rd_data()
 
     @staticmethod
-    def get_admin_page(id: str, password: str) -> WebDriver:
-        driver = Utils.get_chrome_driver()
-        driver.set_window_size(1980, 1080)
+    def get_admin_page(driver: WebDriver, id: str, password: str) -> WebDriver:
+        
         driver.get("https://eclogin.cafe24.com/Shop/")
         id_selector = "#mall_id"
         WebDriverWait(driver, 5).until(
@@ -36,13 +35,15 @@ class Cafe24:
         driver.find_element_by_css_selector(id_selector).send_keys(id)
         driver.find_element_by_css_selector("#userpasswd").send_keys(password)
         driver.find_element_by_css_selector(
-            "#tabAdmin > div > fieldset > p.gButton > a").click()
+            "#frm_user > div.tabCont > div.mButton > button").click()
 
         # Login complete
         return driver
 
     @staticmethod
     def download_lacto_revenue(driver:WebDriver, id: str, password: str) -> WebDriver:
+        
+        driver = Cafe24.get_admin_page(driver, id, password)
         driver.get("https://project21.cafe24.com/disp/admin/shop1/report/ProductPrdchart")
 
         report_base_url = "https://project21.cafe24.com/disp/admin/shop1/report/ProductPrdchart"

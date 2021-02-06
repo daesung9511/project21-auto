@@ -77,7 +77,7 @@ class Kakaomoment:
         # get kakao pw form
         pw_form = driver.find_element_by_id("id_password_3")
         pw_form.send_keys(account["pw"])
-
+        
         # get kakao login button
         kakao_login_button = driver.find_element_by_css_selector("""#login-form > fieldset > div.wrap_btn > button.btn_g.btn_confirm.submit""")
         kakao_login_button.click()
@@ -262,7 +262,7 @@ class Kakaomoment:
     def logout(self, driver):
         driver.get("https://accounts.kakao.com/logout?continue=https://accounts.kakao.com/login/kakaoforbusiness?continue=https://business.kakao.com/dashboard/?sid=kmo&redirect=https://moment.kakao.com/dashboard")
 
-    def update_ad_costs(self):
+    def update_ad_costs(self, domain):
 
         # RD 엑셀 파일 로딩
         sales_wb = load_workbook(AD_FEE_FILE, data_only=True, read_only=False)
@@ -275,56 +275,60 @@ class Kakaomoment:
             ad_fee_ws.cell(row=1, column=idx + 1).value = header
         ad_fee_ws.freeze_panes = 'A2'
 
-        # 카카오모먼트에서 받은 가장 최근 csv 파일 찾기
-        anua_path = Utils.get_recent_file("프로젝트21_맞춤보고서_*.csv")
+        if domain == "anua":
 
-        with open(anua_path, 'r', encoding='utf-16') as f:
-            reader = csv.reader(f, delimiter = "\t")
-            next(reader)
-            # 광고비 시트에 rd 대입
-            for row in reader:
-                
-                # TODO: 파일에 아누아가 아닌 제품이 있을시 무시
-                # 해당 부분이 필요할지 조정
-                if not fnmatch.fnmatch(row[1], "아누아_*"):
-                    continue
-                
-                fee_max_row = str(ad_fee_ws.max_row+1)
-                
-                ad_fee_ws.cell(row=int(fee_max_row),column=1).value = row[1]
-                ad_fee_ws.cell(row=int(fee_max_row),column=2).value = datetime.today().strftime("%Y-%m-%d")
-                ad_fee_ws.cell(row=int(fee_max_row),column=3).value = '=TEXT(B' + fee_max_row + ',"aaa")'
-                ad_fee_ws.cell(row=int(fee_max_row),column=4).value = '카카오광고'
-                ad_fee_ws.cell(row=int(fee_max_row),column=5).value = '=VLOOKUP(A' + fee_max_row + ',매칭테이블!B:D,3,0)'
-                ad_fee_ws.cell(row=int(fee_max_row),column=6).value = float(row[4])/1.1
+            # 카카오모먼트에서 받은 가장 최근 csv 파일 찾기
+            anua_path = Utils.get_recent_file("프로젝트21_맞춤보고서_*.csv")
 
-        # 가장최근 yuge csv 파일
-        yuge_path = Utils.get_recent_file("유즈_*.csv")
+            with open(anua_path, 'r', encoding='utf-16') as f:
+                reader = csv.reader(f, delimiter = "\t")
+                next(reader)
+                # 광고비 시트에 rd 대입
+                for row in reader:
+                    
+                    # TODO: 파일에 아누아가 아닌 제품이 있을시 무시
+                    # 해당 부분이 필요할지 조정
+                    if not fnmatch.fnmatch(row[1], "아누아_*"):
+                        continue
+                    
+                    fee_max_row = str(ad_fee_ws.max_row+1)
+                    
+                    ad_fee_ws.cell(row=int(fee_max_row),column=1).value = row[1]
+                    ad_fee_ws.cell(row=int(fee_max_row),column=2).value = datetime.today().strftime("%Y-%m-%d")
+                    ad_fee_ws.cell(row=int(fee_max_row),column=4).value = '카카오광고'
+                    ad_fee_ws.cell(row=int(fee_max_row),column=6).value = float(row[4])/1.1
 
-        with open(yuge_path, 'r', encoding='utf-16') as f:
-            reader = csv.reader(f, delimiter = "\t")
-            next(reader)
-            # 광고비 시트에 rd 대입
-            for row in reader:
-                
-                # "집행 중" 상태인 캠페인만 통계
-                if not row[1] == "집행 중":
-                    continue
-                
-                fee_max_row = str(ad_fee_ws.max_row+1)
-                
-                ad_fee_ws.cell(row=int(fee_max_row),column=1).value = row[0]
-                ad_fee_ws.cell(row=int(fee_max_row),column=2).value = datetime.today().strftime("%Y-%m-%d")
-                ad_fee_ws.cell(row=int(fee_max_row),column=3).value = '=TEXT(B' + fee_max_row + ',"aaa")'
-                ad_fee_ws.cell(row=int(fee_max_row),column=4).value = '카카오광고'
-                ad_fee_ws.cell(row=int(fee_max_row),column=5).value = '=VLOOKUP(A' + fee_max_row + ',매칭테이블!B:D,3,0)'
-                ad_fee_ws.cell(row=int(fee_max_row),column=6).value = float(row[3])/1.1
+        if domain == "yuge":
+        
+            # 가장최근 yuge csv 파일
+            yuge_path = Utils.get_recent_file("유즈_*.csv")
+
+            with open(yuge_path, 'r', encoding='utf-16') as f:
+                reader = csv.reader(f, delimiter = "\t")
+                next(reader)
+                # 광고비 시트에 rd 대입
+                for row in reader:
+                    
+                    # "집행 중" 상태인 캠페인만 통계
+                    if not row[1] == "집행 중":
+                        continue
+                    
+                    fee_max_row = str(ad_fee_ws.max_row+1)
+                    
+                    ad_fee_ws.cell(row=int(fee_max_row),column=1).value = row[0]
+                    ad_fee_ws.cell(row=int(fee_max_row),column=2).value = datetime.today().strftime("%Y-%m-%d")
+                    ad_fee_ws.cell(row=int(fee_max_row),column=4).value = '카카오광고'
+                    ad_fee_ws.cell(row=int(fee_max_row),column=6).value = float(row[3])/1.1
         
         sales_wb.save(AD_FEE_FILE)
 
     def run(self, driver, account):
         # account list\
         # lavena, yuge, anua, project21
+
+        Utils.kill_proc("chrome*")
+        driver = Utils.get_chrome_driver_gfa()
+        driver.set_window_size(1980, 1080)
 
         url = "https://accounts.kakao.com/login/kakaoforbusiness?continue=https://business.kakao.com/dashboard/?sid=kmo&redirect=https://moment.kakao.com/dashboard"
 
@@ -340,4 +344,4 @@ class Kakaomoment:
         self.download_csv(driver, account["domain"])
         self.flag = False
 
-        self.update_ad_costs()
+        self.update_ad_costs(account["domain"])
