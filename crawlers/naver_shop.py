@@ -383,7 +383,7 @@ class Naver_shop:
             
         ad_fee_wb.save(RD_FILE[domain]) 
 
-    def run(self, driver, account):
+    def run(self, driver, account, days):
         # account list
         # lavena, yuge, anua, project21
 

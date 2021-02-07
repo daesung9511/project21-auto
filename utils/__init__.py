@@ -28,13 +28,13 @@ class UserConfig:
     profile_name: str
     gfa_profile_name: str
     download_path: str
-    
+
 
 class Utils:
 
     @staticmethod
     def get_chrome_driver() -> WebDriver:
-        
+
         options = webdriver.ChromeOptions()
         # https://www.python2.net/questions-80772.htm
         options.add_experimental_option("detach", True)
@@ -51,10 +51,10 @@ class Utils:
         options.add_argument(f'--profile-directory={user_config.profile_name}')
 
         return webdriver.Chrome(chrome_options=options)
-    
+
     @staticmethod
     def get_chrome_driver_gfa() -> WebDriver:
-        
+
         options = webdriver.ChromeOptions()
         # https://www.python2.net/questions-80772.htm
         options.add_experimental_option("detach", True)
@@ -71,7 +71,6 @@ class Utils:
         options.add_argument(f'--profile-directory={user_config.gfa_profile_name}')
 
         return webdriver.Chrome(chrome_options=options)
-        
 
     @staticmethod
     def _get_config() -> UserConfig:
@@ -85,7 +84,8 @@ class Utils:
         profile_name = CHROME_PROFILE_NAME if CHROME_PROFILE_NAME != "" else "Profile 2"
         gfa_profile_name = CHROME_GFA_PROFILE_NAME if CHROME_GFA_PROFILE_NAME != "" else "Profile 3"
 
-        return UserConfig(user_data_path=user_data_path, profile_name=profile_name, gfa_profile_name=gfa_profile_name, download_path=path)
+        return UserConfig(user_data_path=user_data_path, profile_name=profile_name, gfa_profile_name=gfa_profile_name,
+                          download_path=path)
 
     @staticmethod
     def get_day(ago: float) -> str:
@@ -122,7 +122,7 @@ class Utils:
         for proc in psutil.process_iter():
             if fnmatch.fnmatch(proc.name(), proc_exp):
                 proc.kill()
-    
+
     @staticmethod
     def create_xl_sheet(wb: Workbook, sheet_name: str) -> worksheet:
         rd_ws_name = sheet_name
@@ -148,7 +148,7 @@ class Utils:
     @staticmethod
     def set_xl_formula():
         for domain, file in RD_FILE.items():
-            wb = load_workbook(file, data_only=True, read_only=False)
+            wb = load_workbook(Utils._get_raw_file_path(file), data_only=True, read_only=False)
 
             ws = Utils.create_xl_sheet(wb, "RD")
 
@@ -168,6 +168,14 @@ class Utils:
     @staticmethod
     def backup_original_files():
         for domain, file in RD_FILE.items():
-            copyfile(file, f"/backup/{domain}/{file}")
+            domain_backup_path =f"{RAW_FILE_PATH}/backup/{domain}"
+            Path(domain_backup_path).mkdir(parents=True, exist_ok=True)
+            copyfile(Utils._get_raw_file_path(file), Utils._get_backup_file_path(domain, file))
 
+    @staticmethod
+    def _get_raw_file_path(file: str) -> str:
+        return f"{RAW_FILE_PATH}/{file}"
 
+    @staticmethod
+    def _get_backup_file_path(domain: str, file: str) -> str:
+        return f"{RAW_FILE_PATH}/backup/{domain}/{file}"

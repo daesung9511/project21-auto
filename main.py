@@ -42,9 +42,9 @@ def run(platform, account, days):
 def start(days: int):
     Utils.backup_original_files()
     # run(Facebook(), ACCOUNTS["facebook"], days)
-    # run(Naver_shop(), ACCOUNTS["naver_shop"], days)
+    run(Naver_shop(), ACCOUNTS["naver_shop"], days)
     # run(Kakaomoment(), ACCOUNTS["kakaomoment"], days)
-    run(Cafe24(), ACCOUNTS["cafe24"], days)
+    # run(Cafe24(), ACCOUNTS["cafe24"], days)
     # run(Ezadmin(), ACCOUNTS["ezadmin"], days)
     # run(Naver_GFA(), ACCOUNTS["naver_gfa"], days)
 
