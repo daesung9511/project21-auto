@@ -6,7 +6,6 @@ import os
 import fnmatch
 
 from openpyxl import load_workbook
-from datetime import datetime
 
 from selenium import webdriver
 
@@ -17,7 +16,7 @@ from selenium.webdriver.support import expected_conditions
 
 from selenium.webdriver.support.ui import WebDriverWait
 
-from utils import Utils, DEFAULT_TIMEOUT_DELAY, AD_FEE_FILE
+from utils import Utils, DEFAULT_TIMEOUT_DELAY, RD_FILE
 
 
 class Kakaomoment:
@@ -133,39 +132,22 @@ class Kakaomoment:
         date_form = """#mArticle > div > div.dashboard_check > div.f_right > div:nth-child(1) > div > div.btn_gm.gm_calendar > a"""
         self.wait(driver, date_form, DEFAULT_TIMEOUT_DELAY)
 
-    def calc_date(self):
+    def calc_date(self, day):
         today = datetime.date.today()
-        token = datetime.timedelta(1)
+        token = datetime.timedelta(day)
 
-        d1 = today - token
-        d2 = d1 - token
-        d3 = d2 - token
+        day_obj = today - token
 
         stat = 0
-        # 1 days ago : prev month
-        if d1.day < 0:
-            start = d3.day
-            end = d1.day
+        # prev month
+        if day_obj.day > today.day:
             stat = 1
-        
-        # 2 days ago : prev month
-        elif d2.day < 0:
-            start = d2.day
-            stat = 2
-        
-        # 3 days ago : prev month
-        elif d3.day < 0:
-            start = d1.day
-            stat = 3
-
         else:
             stat = 0
-            start = d3.day
-            end = d1.day
+ 
+        return stat, day_obj
 
-        return stat, start, end
-
-    def select_date(self, driver, domain):
+    def select_date(self, driver, domain, day):
         if domain == "anua":
             date_form = """#mArticle > div > div.set_table > div.set_head > div.f_right > div:nth-child(3) > div > div.btn_gm.gm_calendar > a"""
             yesterday_button = """#mArticle > div > div.set_table > div.set_head > div.f_right > div:nth-child(3) > div > div.btn_gm.gm_calendar.open > div > div > div.layer_body > ul > li.on > a"""
@@ -182,61 +164,37 @@ class Kakaomoment:
 
         self.wait(driver, yesterday_button, DEFAULT_TIMEOUT_DELAY)
 
-        if Utils.get_weekday() == 0:
-            stat = 0
-            stat, start, end = self.calc_date()
+        stat = 0
+        stat, day_obj = self.calc_date(day)
 
-            # get calendar elements
-            calendar = driver.find_elements_by_css_selector("div.area_calendar")
-            left = calendar[0]
-            right = calendar[1]
+        # get calendar elements
+        calendar = driver.find_elements_by_css_selector("div.area_calendar")
+        left = calendar[0]
+        right = calendar[1]
 
-            days = ".inner_link_day"
-            prev_days = left.find_elements_by_css_selector(days)
-            current_days = right.find_elements_by_css_selector(days)
+        days = ".inner_link_day"
+        prev_days = left.find_elements_by_css_selector(days)
+        current_days = right.find_elements_by_css_selector(days)
 
-            # stat 0 : start-right, end-right
-            if stat == 0:
-                cnt = 0
-                for current_day in current_days:
-                    if current_day.text in (str(start), str(end)):
-                        current_day.click()
-                        cnt += 1
-                        if cnt == 2:
-                            break
+        # stat 0 : start-right, end-right
+        if stat == 0:
+            for current_day in current_days:
+                if current_day.text == str(day_obj.day):
+                    current_day.click()
+                    current_day.click()
+                    break
 
-                        driver.implicitly_wait(1)
+            driver.implicitly_wait(1)
 
-            # stat 1 : start-left, end-left
-            elif stat == 1:
-                cnt = 0
-                for prev_day in prev_days:
-                    if prev_day.text in (str(start), str(end)):
-                        prev_day.click()
-                        cnt += 1
-                        if cnt == 2:
-                            break
+        # stat 1 : start-left, end-left
+        elif stat == 1:
+            for prev_day in prev_days:
+                if prev_day.text == str(day_obj.day):
+                    prev_day.click()
+                    prev_day.click()
+                    break
 
-                        driver.implicitly_wait(1)
-
-            # stat 2 : start-left, end-right
-            # stat 3 : start-left, end-right
-            else:
-                for prev_day in prev_days:
-                    if prev_day.text == str(start):
-                        prev_day.click()
-                        driver.implicitly_wait(1)
-                        break
-
-                for current_day in current_days:
-                    if current_day.text == str(end):
-                        current_day.click()
-                        break
-
-        else:
-            # click yesterday button
-            yesterday_button = driver.find_element_by_css_selector(yesterday_button)
-            yesterday_button.click()
+            driver.implicitly_wait(1)
 
         # click ok button
         self.wait(driver, ok_button, DEFAULT_TIMEOUT_DELAY)
@@ -262,18 +220,14 @@ class Kakaomoment:
     def logout(self, driver):
         driver.get("https://accounts.kakao.com/logout?continue=https://accounts.kakao.com/login/kakaoforbusiness?continue=https://business.kakao.com/dashboard/?sid=kmo&redirect=https://moment.kakao.com/dashboard")
 
-    def update_ad_costs(self, domain):
+    def update_ad_costs(self, domain, day):
 
         # RD 엑셀 파일 로딩
-        sales_wb = load_workbook(AD_FEE_FILE, data_only=True, read_only=False)
+        wb = load_workbook(RD_FILE[domain], data_only=True, read_only=False)
 
-        ad_fee_ws = Utils.create_xl_sheet(sales_wb, "-광고비")
+        ws = Utils.create_xl_sheet(wb, "RD")
 
-        # 시트 헤더 고정
-        ad_fee_headings = ['','일자', '요일', '미디어', '상품1', '광고비(VAT미포함)']
-        for idx, header in enumerate(ad_fee_headings):
-            ad_fee_ws.cell(row=1, column=idx + 1).value = header
-        ad_fee_ws.freeze_panes = 'A2'
+        date = (datetime.datetime.now() + datetime.timedelta(days=-day)).strftime('%Y-%m-%d')
 
         if domain == "anua":
 
@@ -291,12 +245,12 @@ class Kakaomoment:
                     if not fnmatch.fnmatch(row[1], "아누아_*"):
                         continue
                     
-                    fee_max_row = str(ad_fee_ws.max_row+1)
+                    max_row = str(ws.max_row+1)
                     
-                    ad_fee_ws.cell(row=int(fee_max_row),column=1).value = row[1]
-                    ad_fee_ws.cell(row=int(fee_max_row),column=2).value = datetime.today().strftime("%Y-%m-%d")
-                    ad_fee_ws.cell(row=int(fee_max_row),column=4).value = '카카오광고'
-                    ad_fee_ws.cell(row=int(fee_max_row),column=6).value = float(row[4])/1.1
+                    ws.cell(row=int(max_row),column=1).value = row[1]
+                    ws.cell(row=int(max_row),column=2).value = date
+                    ws.cell(row=int(max_row),column=4).value = '카카오광고'
+                    ws.cell(row=int(max_row),column=6).value = float(row[4])/1.1
 
         if domain == "yuge":
         
@@ -313,16 +267,16 @@ class Kakaomoment:
                     if not row[1] == "집행 중":
                         continue
                     
-                    fee_max_row = str(ad_fee_ws.max_row+1)
+                    max_row = str(ws.max_row+1)
                     
-                    ad_fee_ws.cell(row=int(fee_max_row),column=1).value = row[0]
-                    ad_fee_ws.cell(row=int(fee_max_row),column=2).value = datetime.today().strftime("%Y-%m-%d")
-                    ad_fee_ws.cell(row=int(fee_max_row),column=4).value = '카카오광고'
-                    ad_fee_ws.cell(row=int(fee_max_row),column=6).value = float(row[3])/1.1
+                    ws.cell(row=int(max_row),column=1).value = row[0]
+                    ws.cell(row=int(max_row),column=2).value = date
+                    ws.cell(row=int(max_row),column=4).value = '카카오광고'
+                    ws.cell(row=int(max_row),column=10).value = float(row[3])/1.1
         
-        sales_wb.save(AD_FEE_FILE)
+        wb.save(RD_FILE[domain])
 
-    def run(self, driver, account):
+    def run(self, driver, account, term):
         # account list\
         # lavena, yuge, anua, project21
 
@@ -336,12 +290,14 @@ class Kakaomoment:
             self.init(driver, url)
             self.login(driver, account)
 
-        if account["domain"] == "anua":
-            self.move_dashboard_anua(driver, account["number"])
-        elif account["domain"] == "yuge":
-            self.move_dashboard_yuge(driver, account["number"])
-        self.select_date(driver, account["domain"])
-        self.download_csv(driver, account["domain"])
+        for day in range(term, 0, -1):
+            if account["domain"] == "anua":
+                self.move_dashboard_anua(driver, account["number"])
+            elif account["domain"] == "yuge":
+                self.move_dashboard_yuge(driver, account["number"])
+            self.select_date(driver, account["domain"], day)
+            self.download_csv(driver, account["domain"])
+            self.update_ad_costs(account["domain"], day)
+
         self.flag = False
 
-        self.update_ad_costs(account["domain"])

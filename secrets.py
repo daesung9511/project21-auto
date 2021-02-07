@@ -63,17 +63,20 @@ ACCOUNTS = {
         "lavena": {
             "id": "project21official",
             "pw": "pista1004",
-            "domain": "lavena"
+            "domain": "lavena",
+            "account_id": "20928"
         },
         "anua": {
             "id": "project21official",
             "pw": "pista1004",
-            "domain": "anua"
+            "domain": "anua",
+            "account_id": "2021"
         },
         "yuge": {
             "id": "project21official",
             "pw": "pista1004",
-            "domain": "yuge"      
+            "domain": "yuge",
+            "account_id": "9762"      
         },
     },
     "kakaomoment": {

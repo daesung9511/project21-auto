@@ -13,7 +13,7 @@ import os
 import fnmatch
 import csv
 
-from utils import Utils, DEFAULT_TIMEOUT_DELAY, AD_FEE_FILE
+from utils import Utils, DEFAULT_TIMEOUT_DELAY, RD_FILE
 
 class Naver_GFA:
     flag = True
@@ -204,7 +204,7 @@ class Naver_GFA:
 
         return stat, start, end
 
-    def select_date(self, driver, domain):
+    def select_date_legacy(self, driver, domain):
         date_form = """#app > div > div.container > div.content > div > div.panel_body > div:nth-child(1) > div > div:nth-child(1) > div:nth-child(2) > div > div > div.mx-input-wrapper.calendar_box > button.button.button_data"""
         ok_button = """#app > div > div.container > div.content > div > div.panel_body > div:nth-child(1) > div > div:nth-child(1) > div:nth-child(2) > div > div > div.mx-datepicker-popup > div > div.mx-calendar-division > div.mx-datepicker-footer > div > button.mx-datepicker-btn.mx-datepicker-btn-confirm"""
         confirm_button = """#app > div > div.container > div.content > div > div.panel_body > div:nth-child(1) > div > div.center_button > button"""
@@ -215,13 +215,15 @@ class Naver_GFA:
             yesterday_button = "#app > div > div.container > div.content > div > div.panel_body.report > div:nth-child(1) > div > div:nth-child(1) > div:nth-child(2) > div > div > div.mx-datepicker-popup > div > div.mx-calendar.mx-shortcuts-wrapper > ul > li:nth-child(2) > button"
             confirm_button = """#app > div > div.container > div.content > div > div.panel_body.report > div:nth-child(1) > div > div.center_button > button"""
 
+        prev_button = """button.button.calendar_prev"""
+        next_button = """button.button.calendar_next"""
         # click date form
         self.wait(driver, date_form, DEFAULT_TIMEOUT_DELAY)
         date_form = driver.find_element_by_css_selector(date_form)
         date_form.click()
 
         # wait yesterday button
-        self.wait(driver, yesterday_button, DEFAULT_TIMEOUT_DELAY)
+        self.wait(driver, prev_button, DEFAULT_TIMEOUT_DELAY)
 
         if Utils.get_weekday() == 0:
             # if True:
@@ -308,6 +310,15 @@ class Naver_GFA:
         confirm_button = driver.find_element_by_css_selector(confirm_button)
         confirm_button.click()
 
+    def select_date_prev(self, driver, account, day):
+        query_url = "https://gfa.naver.com/adAccount/accounts/" + 9762/report/performance?dateFirst=2021-02-09&dateSecond=2021-02-09&adUnit=CAMPAIGN&dateUnit=DAY&placeUnit=TOTAL&dimension=TOTAL&filterList=%5B%5D&showColList=%5B%22col_result%22,%22col_sales_per_result%22,%22col_sales%22,%22col_schedule%22,%22col_imp_count%22,%22col_cpm%22,%22col_click_count%22,%22col_cpc%22,%22col_ctr%22%5D&currentPage=1&pageSize=10&accessAdAccountNo=9762"
+
+        # click confirm button
+        self.wait(driver, confirm_button, DEFAULT_TIMEOUT_DELAY)
+        confirm_button = driver.find_element_by_css_selector(confirm_button)
+        confirm_button.click()
+
+
     def download_csv(self, driver, domain):
         if domain == "anua":
             download_button = "#app > div > div.container > div.content > div > div.panel_body.report > div:nth-child(2) > div > div > div.ad_title > div > div.inner_right > a > button"
@@ -336,15 +347,11 @@ class Naver_GFA:
     def update_ad_costs(self, domain):
     
         # RD 엑셀 파일 로딩
-        sales_wb = load_workbook(AD_FEE_FILE, data_only=True, read_only=False)
+        wb = load_workbook(RD_FILE[domain], data_only=True, read_only=False)
 
-        ad_fee_ws = Utils.create_xl_sheet(sales_wb, "-광고비")
+        ws = Utils.create_xl_sheet(wb, "RD")
 
-        # 시트 헤더 고정
-        ad_fee_headings = ['','일자', '요일', '미디어', '상품1', '광고비(VAT미포함)']
-        for idx, header in enumerate(ad_fee_headings):
-            ad_fee_ws.cell(row=1, column=idx + 1).value = header
-        ad_fee_ws.freeze_panes = 'A2'
+        date = (datetime.datetime.now() + datetime.timedelta(days=-day)).strftime('%Y-%m-%d')
 
         if domain == "yuge":
 
@@ -360,7 +367,7 @@ class Naver_GFA:
                     fee_max_row = str(ad_fee_ws.max_row+1)
                     
                     ad_fee_ws.cell(row=int(fee_max_row),column=1).value = row[0]
-                    ad_fee_ws.cell(row=int(fee_max_row),column=2).value = datetime.datetime.today().strftime("%Y-%m-%d")
+                    ad_fee_ws.cell(row=int(fee_max_row),column=2).value = date
                     ad_fee_ws.cell(row=int(fee_max_row),column=3).value = '=TEXT(B' + fee_max_row + ',"aaa")'
                     ad_fee_ws.cell(row=int(fee_max_row),column=4).value = '네이버 GFA'
                     ad_fee_ws.cell(row=int(fee_max_row),column=5).value = '=VLOOKUP(A' + fee_max_row + ',매칭테이블!B:D,3,0)'
@@ -379,7 +386,7 @@ class Naver_GFA:
                     fee_max_row = str(ad_fee_ws.max_row+1)
                     
                     ad_fee_ws.cell(row=int(fee_max_row),column=1).value = row[0]
-                    ad_fee_ws.cell(row=int(fee_max_row),column=2).value = datetime.datetime.today().strftime("%Y-%m-%d")
+                    ad_fee_ws.cell(row=int(fee_max_row),column=2).value = date
                     ad_fee_ws.cell(row=int(fee_max_row),column=3).value = '=TEXT(B' + fee_max_row + ',"aaa")'
                     ad_fee_ws.cell(row=int(fee_max_row),column=4).value = '네이버 GFA'
                     ad_fee_ws.cell(row=int(fee_max_row),column=5).value = '=VLOOKUP(A' + fee_max_row + ',매칭테이블!B:D,3,0)'
@@ -402,10 +409,10 @@ class Naver_GFA:
                     ad_fee_ws.cell(row=int(fee_max_row),column=4).value = '네이버 GFA'
                     ad_fee_ws.cell(row=int(fee_max_row),column=6).value = float(row[3])/1.1
             
-        sales_wb.save(AD_FEE_FILE)
+        sales_wb.save(RD_FILE[domain])
 
 
-    def run(self, driver, account):
+    def run(self, driver, account, term):
         # account list
         # lavena, yuge, anua, project21
 
@@ -429,8 +436,11 @@ class Naver_GFA:
         self.switch_user(driver, account["domain"])
         self.press_ok(driver)
         self.move_page(driver, account["domain"])
-        self.select_date(driver, account["domain"])
-        self.download_csv(driver, account["domain"])
-        self.clear_tabs(driver)
-        self.flag = False
-        self.update_ad_costs(account["domain"])
+        # for day in range(term, 0, -1):
+        #     self.select_date(driver, account, day)
+        #     self.download_csv(driver, account["domain"])
+        #     self.clear_tabs(driver)
+            # self.update_ad_costs(account["domain"])
+        # self.flag = False
+
+        self.select_date_legacy(driver, account["domain"])

@@ -8,7 +8,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions
 
-from utils import Utils, DEFAULT_TIMEOUT_DELAY, AD_FEE_FILE
+from utils import Utils, DEFAULT_TIMEOUT_DELAY, RD_FILE
 
 from openpyxl import load_workbook
 
@@ -317,10 +317,10 @@ class Naver_shop:
 
         driver.switch_to.window(main)
 
-    def update_ad_costs(self, id): 
+    def update_ad_costs(self, id, domain): 
 
         # RD 엑셀 파일 로딩 
-        ad_fee_wb = load_workbook(AD_FEE_FILE, data_only=True, read_only=False)
+        ad_fee_wb = load_workbook(RD_FILE[domain], data_only=True, read_only=False)
 
         ad_fee_ws = Utils.create_xl_sheet(ad_fee_wb, "-광고비") 
  
@@ -381,7 +381,7 @@ class Naver_shop:
                     ad_fee_ws.cell(row=int(fee_max_row),column=4).value = '네이버 ' + row[1] 
                     ad_fee_ws.cell(row=int(fee_max_row),column=6).value = float(row[3].replace(",",""))/1.1
             
-        ad_fee_wb.save(AD_FEE_FILE) 
+        ad_fee_wb.save(RD_FILE[domain]) 
 
     def run(self, driver, account):
         # account list
