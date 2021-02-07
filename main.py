@@ -39,13 +39,13 @@ def run(platform, account, days):
     driver.quit()
 
 
-def start():
-    # run(Facebook(), ACCOUNTS["facebook"])
-    # run(Naver_shop(), ACCOUNTS["naver_shop"])
-    # run(Kakaomoment(), ACCOUNTS["kakaomoment"])
-    run(Cafe24(), ACCOUNTS["cafe24"], 1)
-    # run(Ezadmin(), ACCOUNTS["ezadmin"])
-    # run(Naver_GFA(), ACCOUNTS["naver_gfa"])
+def start(days: int):
+    # run(Facebook(), ACCOUNTS["facebook"], days)
+    # run(Naver_shop(), ACCOUNTS["naver_shop"], days)
+    # run(Kakaomoment(), ACCOUNTS["kakaomoment"], days)
+    run(Cafe24(), ACCOUNTS["cafe24"], days)
+    # run(Ezadmin(), ACCOUNTS["ezadmin"], days)
+    # run(Naver_GFA(), ACCOUNTS["naver_gfa"], days)
 
     Utils.set_xl_formula()
 
@@ -61,9 +61,9 @@ if __name__ == '__main__':
         days = 1
 
     if command == "":
-        start()
+        start(days)
     elif command == "main":
-        start()
+        start(days)
     elif command == "kakaomoment":
         run(Kakaomoment(), ACCOUNTS["kakaomoment"], days)
     elif command == "facebook":
