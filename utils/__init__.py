@@ -20,8 +20,12 @@ import fnmatch
 DEFAULT_TIMEOUT_DELAY = 5
 
 # 매칭테이블 포함 데이터 엑셀 파일
-AD_FEE_FILE = "ad_fee_data.xlsx"
-SALES_FILE = "sales_data.xlsx"
+RD_FILE = {  "lavena": "lavena_rd_data.xlsx",
+                "anua": "anua_rd_data.xlsx",
+                "yuge": "yuge_rd_data.xlsx",
+                "project21": "project21_rd_data.xlsx", 
+            }
+
 
 @dataclass
 class UserConfig:
@@ -90,6 +94,11 @@ class Utils:
         return UserConfig(user_data_path=user_data_path, profile_name=profile_name, gfa_profile_name=gfa_profile_name, download_path=path)
 
     @staticmethod
+    def get_day(ago: float) -> str:
+        date = datetime.date.today() - datetime.timedelta(ago)
+        return date.isoformat()
+
+    @staticmethod
     def get_today() -> str:
         return datetime.date.today().isoformat()
 
@@ -121,8 +130,8 @@ class Utils:
                 proc.kill()
     
     @staticmethod
-    def create_xl_sheet(wb:Workbook, sheet_name: str) -> worksheet:
-        rd_ws_name = datetime.datetime.today().strftime("%Y-%m-%d") + sheet_name
+    def create_xl_sheet(wb: Workbook, sheet_name: str) -> worksheet:
+        rd_ws_name = sheet_name
         ws = None
         if rd_ws_name in wb.sheetnames:
             ws = wb[rd_ws_name]
@@ -133,48 +142,32 @@ class Utils:
     @staticmethod
     def get_recent_file(expression: str) -> str:
         dir_path = "." + os.sep + "raw_data" + os.sep
-        file_path = "" 
-        ctime=0 
-        for file_name in os.listdir(dir_path): 
-            if fnmatch.fnmatch(file_name, expression): 
-                if ctime < os.path.getmtime(dir_path + file_name): 
-                    ctime = os.path.getmtime(dir_path + file_name) 
-                    file_path = file_name 
+        file_path = ""
+        ctime = 0
+        for file_name in os.listdir(dir_path):
+            if fnmatch.fnmatch(file_name, expression):
+                if ctime < os.path.getmtime(dir_path + file_name):
+                    ctime = os.path.getmtime(dir_path + file_name)
+                    file_path = file_name
         return dir_path + file_path
 
-
-    # TODO: 다형성 문제로 추후 수정
     @staticmethod
-    def set_ad_xl_formula() -> str:
+    def set_xl_formula() -> str:
+        for domain, file in RD_FILE.items():
+            wb = load_workbook(file, data_only=True, read_only=False)
 
-        ad_fee_wb = load_workbook(AD_FEE_FILE, data_only=True, read_only=False)
+            ws = Utils.create_xl_sheet(wb, "RD")
 
-        ad_fee_ws = Utils.create_xl_sheet(ad_fee_wb, "-광고비")
+            max_row = ws.max_row
+            for rd_row in range(2, max_row + 1):
+                rd_row = str(rd_row)
+                ws["C" + rd_row] = '=TEXT(B' + rd_row + ',"aaa")'
+                ws["E" + rd_row] = '=VLOOKUP(G' + rd_row + ',매칭테이블!D:E,2,0)'
+                ws["K" + rd_row] = '=VLOOKUP($N' + rd_row + ',매칭테이블!$G:$J,2,0)*H' + rd_row
+                ws["L" + rd_row] = '=K' + rd_row + '-VLOOKUP($N' + rd_row + ',매칭테이블!$G:$J,3,0)*K' + rd_row
+                ws["M" + rd_row] = '=VLOOKUP($N' + rd_row + ',매칭테이블!$G:$J,4,0)*H' + rd_row
+                ws["N" + rd_row] = '=F' + rd_row + '&E' + rd_row + '&G' + rd_row + '&I' + rd_row
+                ws["G" + rd_row] = "=VLOOKUP(A" + rd_row + ",'카페24 매칭'!B:C,2,0)"
 
-        fee_max_row = ad_fee_ws.max_row
-        for fee_row in range(2, fee_max_row + 1):
-            ad_fee_ws.cell(row=int(fee_row),column=3).value = '=TEXT(B' + str(fee_row) + ',"aaa")'
-            ad_fee_ws.cell(row=int(fee_row),column=5).value = '=VLOOKUP(A' + str(fee_row) + ',매칭테이블!B:D,3,0)'
-
-        ad_fee_wb.save(AD_FEE_FILE)
-
-    # TODO: 다형성 문제로 추후 수정
-    @staticmethod
-    def set_sales_xl_formula() -> str:
-
-        sales_wb = load_workbook(SALES_FILE, data_only=True, read_only=False)
-
-        sales_ws = Utils.create_xl_sheet(sales_wb, "-판매실적")
-
-        sales_max_row = sales_ws.max_row
-        for row in range(2, sales_max_row + 1):
-            sales_row = str(row)
-            sales_ws["C" + sales_row] = '=TEXT(B' + sales_row + ',"aaa")'
-            sales_ws["E" + sales_row] = '=VLOOKUP(G' + sales_row + ',매칭테이블!D:E,2,0)'    
-            sales_ws["K" + sales_row] = '=VLOOKUP($N' + sales_row + ',매칭테이블!$G:$J,2,0)*H' + sales_row
-            sales_ws["L" + sales_row] = '=K' + sales_row + '-VLOOKUP($N' + sales_row + ',매칭테이블!$G:$J,3,0)*K' + sales_row
-            sales_ws["M" + sales_row] = '=VLOOKUP($N' + sales_row + ',매칭테이블!$G:$J,4,0)*H' + sales_row
-            sales_ws["N" + sales_row] = '=F' + sales_row + '&E' + sales_row + '&G' + sales_row + '&I' + sales_row
-
-        sales_wb.save(SALES_FILE)
+            wb.save(file)
 

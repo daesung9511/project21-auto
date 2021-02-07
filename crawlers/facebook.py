@@ -5,55 +5,60 @@ from facebook_business.adobjects.adaccount import AdAccount
 from facebook_business.adobjects.adaccountuser import AdAccountUser
 
 from openpyxl import load_workbook
-from datetime import datetime
+from datetime import datetime, timedelta
 
-from utils import Utils, AD_FEE_FILE
+from utils import Utils, RD_FILE
+from secrets import ACCOUNTS
 
 class Facebook:
-    def update_ad_fee_data(self, account):
-   
-        FacebookAdsApi.init(account["id"], account["secret"], account["access_token"])
+    def update_ad_fee_data(self, account, term):
 
-        me = AdAccountUser('me')
-        
-        ad_accounts = me.get_ad_accounts()
-        
-        sales_wb = load_workbook(AD_FEE_FILE, data_only=True, read_only=False)
+        domain = account["domain"]
 
-        ad_fee_ws = Utils.create_xl_sheet(sales_wb, "-광고비")
-        # 시트 헤더 고정
-        ad_fee_headings = ['','일자', '요일', '미디어', '상품1', '광고비(VAT미포함)']
-        for idx, header in enumerate(ad_fee_headings):
-            ad_fee_ws.cell(row=1, column=idx + 1).value = header
-        ad_fee_ws.freeze_panes = 'A2'
-        for ad_account in ad_accounts:
-            campaigns = AdAccount(ad_account["id"]).get_campaigns(
-                fields=[
-                        'id',
-                        'name'
-                    ]   ,
-                params={
-                        'effective_status': ['ACTIVE'],
-                    },
-                )
+        app = ACCOUNTS["facebook"]["app"]
+
+        FacebookAdsApi.init(app["id"], app["secret"], app["access_token"])
+
+        wb = load_workbook(RD_FILE[domain], data_only=True, read_only=False)
+
+        ws = Utils.create_xl_sheet(wb, "RD")
+            
+        campaigns = list(AdAccount(account["id"]).get_campaigns(
+        fields=[
+                'id',
+                'name'
+            ]   ,
+        params={
+                'effective_status': ['ACTIVE'],
+            },
+        ))
+
+        for day in range(term, 0, -1):
+            
+            date = (datetime.now() + timedelta(days=-day)).strftime('%Y-%m-%d')
+            time_range = { 
+                    'since' : date,
+                    'until' : date
+                }
+            
             for campaign in campaigns:
                 insights = Campaign(campaign["id"]).get_insights(
                     params={
-                        'date_preset': Campaign.DatePreset.yesterday,
+                        'time_range': time_range
                     }
                 )
                 
                 if not len(insights) == 0:
                     insight = insights[0] 
-                    fee_max_row = str(ad_fee_ws.max_row+1)
-                    ad_fee_ws.cell(row=int(fee_max_row),column=1).value = campaign["name"]
-                    ad_fee_ws.cell(row=int(fee_max_row),column=2).value = datetime.today().strftime("%Y-%m-%d")
-                    ad_fee_ws.cell(row=int(fee_max_row),column=4).value = '페이스북'
-                    ad_fee_ws.cell(row=int(fee_max_row),column=6).value = insight["spend"]
+                    max_row = str(ws.max_row+1)
+                    ws.cell(row=int(max_row),column=1).value = campaign["name"]
+                    ws.cell(row=int(max_row),column=2).value = date
+                    ws.cell(row=int(max_row),column=4).value = '페이스북'
+                    ws.cell(row=int(max_row),column=10).value = insight["spend"]
 
-        sales_wb.save(AD_FEE_FILE)
+        wb.save(RD_FILE[domain])
         
-    def run(self, driver, account):
+    def run(self, driver, account, term):
         print(account)
-        self.update_ad_fee_data(account)
+        self.update_ad_fee_data(account, term)
 
