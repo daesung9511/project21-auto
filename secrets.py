@@ -92,7 +92,23 @@ ACCOUNTS = {
         },
     },
     "facebook": {
-        "index": ["app"],
+        "index": ["lavena", "anua", "yuge", "project21"],
+        "lavena": {
+            "id": "act_1123300958087838",
+            "domain": "lavena"
+        },
+        "anua": {
+            "id": "act_638503069927336",
+            "domain": "anua"
+        },
+        "yuge": {
+            "id": "act_1526503294176709",
+            "domain": "yuge"
+        },
+        "project21": {
+            "id": "act_346749609115152",
+            "domain": "project21"        
+        },
         "app": {
             "id": "1112299139212780",
             "secret": "bea043e3210b7da93aa3316dca3c50a8",

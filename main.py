@@ -22,7 +22,7 @@ def setup_logger():
     logging.basicConfig(filename=path + os.sep + file_name, level=logging.DEBUG)
 
 
-def run(platform, account):
+def run(platform, account, days):
 
     Utils.kill_proc("chrome*")
     driver = Utils.get_chrome_driver()
@@ -30,7 +30,7 @@ def run(platform, account):
 
     for brand in account["index"]:
         try:
-            platform.run(driver, account[brand])
+            platform.run(driver, account[brand], days)
             message = f"{platform.__class__} {brand} success."
             logging.info(message)
             print(message)
@@ -42,18 +42,17 @@ def run(platform, account):
 
 def start():
 
-    run(Facebook(), ACCOUNTS["facebook"])
-    run(Naver_shop(), ACCOUNTS["naver_shop"])
-    run(Kakaomoment(), ACCOUNTS["kakaomoment"])
-    run(Cafe24(), ACCOUNTS["cafe24"])
-    run(Ezadmin(), ACCOUNTS["ezadmin"])
-    run(Naver_GFA(), ACCOUNTS["naver_gfa"])
+    # run(Facebook(), ACCOUNTS["facebook"])
+    # run(Naver_shop(), ACCOUNTS["naver_shop"])
+    # run(Kakaomoment(), ACCOUNTS["kakaomoment"])
+    run(Cafe24(), ACCOUNTS["cafe24"], 1)
+    # run(Ezadmin(), ACCOUNTS["ezadmin"])
+    # run(Naver_GFA(), ACCOUNTS["naver_gfa"])
 
-    Utils.set_ad_xl_formula()
-    Utils.set_sales_xl_formula()
+    Utils.set_xl_formula()
     
 if __name__ == '__main__':
-    setup_logger()
+    # setup_logger()
 
     try:
         command = sys.argv[1]
@@ -65,14 +64,14 @@ if __name__ == '__main__':
     elif command == "main":
         start()
     elif command == "kakaomoment":
-        run(Kakaomoment(), ACCOUNTS["kakaomoment"])
+        run(Kakaomoment(), ACCOUNTS["kakaomoment"], 3)
     elif command == "facebook":
-        run(Facebook(), ACCOUNTS["facebook"])
+        run(Facebook(), ACCOUNTS["facebook"], 3)
     elif command == "naver_shop":
-        run(Naver_shop(), ACCOUNTS["naver_shop"])
+        run(Naver_shop(), ACCOUNTS["naver_shop"], 1)
     elif command == "naver_gfa":
-        run(Naver_GFA(), ACCOUNTS["naver_gfa"])
+        run(Naver_GFA(), ACCOUNTS["naver_gfa"], 3)
     elif command == "cafe24":
-        run(Cafe24(), ACCOUNTS["cafe24"])
+        run(Cafe24(), ACCOUNTS["cafe24"], 3)
     elif command == "ezadmin":
-        run(Ezadmin(), ACCOUNTS["ezadmin"])
+        run(Ezadmin(), ACCOUNTS["ezadmin"], 1)
