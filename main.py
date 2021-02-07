@@ -23,7 +23,6 @@ def setup_logger():
 
 
 def run(platform, account, days):
-
     Utils.kill_proc("chrome*")
     driver = Utils.get_chrome_driver()
     driver.set_window_size(1980, 1080)
@@ -41,7 +40,6 @@ def run(platform, account, days):
 
 
 def start():
-
     # run(Facebook(), ACCOUNTS["facebook"])
     # run(Naver_shop(), ACCOUNTS["naver_shop"])
     # run(Kakaomoment(), ACCOUNTS["kakaomoment"])
@@ -50,28 +48,31 @@ def start():
     # run(Naver_GFA(), ACCOUNTS["naver_gfa"])
 
     Utils.set_xl_formula()
-    
+
+
 if __name__ == '__main__':
     # setup_logger()
 
     try:
         command = sys.argv[1]
-    except IndexError:
+        days: int = int(sys.argv[2])
+    except IndexError or ValueError:
         command = "main"
+        days = 1
 
     if command == "":
         start()
     elif command == "main":
         start()
     elif command == "kakaomoment":
-        run(Kakaomoment(), ACCOUNTS["kakaomoment"], 3)
+        run(Kakaomoment(), ACCOUNTS["kakaomoment"], days)
     elif command == "facebook":
-        run(Facebook(), ACCOUNTS["facebook"], 3)
+        run(Facebook(), ACCOUNTS["facebook"], days)
     elif command == "naver_shop":
-        run(Naver_shop(), ACCOUNTS["naver_shop"], 1)
+        run(Naver_shop(), ACCOUNTS["naver_shop"], days)
     elif command == "naver_gfa":
-        run(Naver_GFA(), ACCOUNTS["naver_gfa"], 3)
+        run(Naver_GFA(), ACCOUNTS["naver_gfa"], days)
     elif command == "cafe24":
-        run(Cafe24(), ACCOUNTS["cafe24"], 3)
+        run(Cafe24(), ACCOUNTS["cafe24"], days)
     elif command == "ezadmin":
-        run(Ezadmin(), ACCOUNTS["ezadmin"], 1)
+        run(Ezadmin(), ACCOUNTS["ezadmin"], days)
