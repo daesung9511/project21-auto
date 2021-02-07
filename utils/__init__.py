@@ -173,15 +173,15 @@ class Utils:
     @staticmethod
     def backup_original_files():
         for domain, file in RD_FILE.items():
-            domain_backup_path =f"{RAW_FILE_PATH}/backup/{domain}"
+            domain_backup_path = f"{RAW_FILE_PATH}/backup/{domain}"
             Path(domain_backup_path).mkdir(parents=True, exist_ok=True)
             copyfile(Utils._get_raw_file_path(file), Utils._get_backup_file_path(domain, file))
 
     @staticmethod
     def remove_old_backup_files():
         for domain, file in RD_FILE.items():
-            domain_backup_path =f"{RAW_FILE_PATH}/backup/{domain}"
-            Utils._get_remove_old_backup_files(domain)
+            domain_backup_path = f"{RAW_FILE_PATH}/backup/{domain}"
+            Utils._remove_old_backup_files(domain_backup_path)
 
     @staticmethod
     def _get_raw_file_path(file: str) -> str:
@@ -189,17 +189,14 @@ class Utils:
 
     @staticmethod
     def _get_backup_file_path(domain: str, file: str) -> str:
-        now = datetime.now().strftime("%Y-%m-%d-%H:%M:%S")
-        return f"{RAW_FILE_PATH}/backup/{domain}/{file}-{now}"
+        now = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+        return f"{RAW_FILE_PATH}/backup/{domain}/{now}-{file}"
 
     @staticmethod
-    def _get_remove_old_backup_files(domain: str):
-        folder = f"{RAW_FILE_PATH}/backup/{domain}"
-        files = [f for f in listdir(folder) if isfile(join(folder, f))]
-        for file_path in files:
-            file = Path(file_path)
-            modified_time = datetime.datetime.fromtimestamp(file.stat().st_mtime)
-            current_time = datetime.now()
+    def _remove_old_backup_files(domain_folder: str):
+        files = [join(domain_folder, f) for f in listdir(domain_folder) if isfile(join(domain_folder, f))]
+        for file in files:
+            modified_time = datetime.datetime.fromtimestamp(Path(file).stat().st_mtime)
+            current_time = datetime.datetime.now()
             if current_time.day - modified_time.day > 7:
-                os.remove(file_path)
-
+                os.remove(file)
