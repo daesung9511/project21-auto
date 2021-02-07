@@ -2,6 +2,7 @@ import os
 import random
 import time
 import psutil
+from shutil import copyfile
 
 from selenium.webdriver.android.webdriver import WebDriver
 from selenium import webdriver
@@ -12,19 +13,13 @@ from dataclasses import dataclass
 
 from selenium.webdriver.remote.webelement import WebElement
 
-from config import CHROME_USER_DATA_PATH, CHROME_PROFILE_NAME, CHROME_GFA_PROFILE_NAME, KEY_SHEET_FILE_PATH, RAW_FILE_PATH
+from config import CHROME_USER_DATA_PATH, CHROME_PROFILE_NAME, CHROME_GFA_PROFILE_NAME, KEY_SHEET_FILE_PATH, \
+    RAW_FILE_PATH, RD_FILE
 
 from openpyxl import Workbook, worksheet, load_workbook
 import fnmatch
 
 DEFAULT_TIMEOUT_DELAY = 5
-
-# 매칭테이블 포함 데이터 엑셀 파일
-RD_FILE = {  "lavena": "lavena_rd_data.xlsx",
-                "anua": "anua_rd_data.xlsx",
-                "yuge": "yuge_rd_data.xlsx",
-                "project21": "project21_rd_data.xlsx", 
-            }
 
 
 @dataclass
@@ -34,7 +29,6 @@ class UserConfig:
     gfa_profile_name: str
     download_path: str
     
-
 
 class Utils:
 
@@ -152,7 +146,7 @@ class Utils:
         return dir_path + file_path
 
     @staticmethod
-    def set_xl_formula() -> str:
+    def set_xl_formula():
         for domain, file in RD_FILE.items():
             wb = load_workbook(file, data_only=True, read_only=False)
 
@@ -170,4 +164,10 @@ class Utils:
                 ws["G" + rd_row] = "=VLOOKUP(A" + rd_row + ",'카페24 매칭'!B:C,2,0)"
 
             wb.save(file)
+
+    @staticmethod
+    def backup_original_files():
+        for domain, file in RD_FILE.items():
+            copyfile(file, f"/backup/{domain}/{file}")
+
 

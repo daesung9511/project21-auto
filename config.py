@@ -1,4 +1,3 @@
-
 # 정산시트 파일 경로
 KEY_SHEET_FILE_PATH = ""
 
@@ -12,3 +11,11 @@ CHROME_GFA_PROFILE_NAME = "Profile 3"
 
 # 파일들 저장 경로
 RAW_FILE_PATH = ""
+
+# 매칭테이블 포함 데이터 엑셀 파일
+RD_FILE = {
+    "lavena": "lavena_rd_data.xlsx",
+    "anua": "anua_rd_data.xlsx",
+    "yuge": "yuge_rd_data.xlsx",
+    "project21": "project21_rd_data.xlsx",
+}
