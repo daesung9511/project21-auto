@@ -3,6 +3,11 @@ import random
 import time
 import psutil
 from shutil import copyfile
+from datetime import datetime
+from pathlib import Path
+
+from os import listdir
+from os.path import isfile, join
 
 from selenium.webdriver.android.webdriver import WebDriver
 from selenium import webdriver
@@ -173,9 +178,28 @@ class Utils:
             copyfile(Utils._get_raw_file_path(file), Utils._get_backup_file_path(domain, file))
 
     @staticmethod
+    def remove_old_backup_files():
+        for domain, file in RD_FILE.items():
+            domain_backup_path =f"{RAW_FILE_PATH}/backup/{domain}"
+            Utils._get_remove_old_backup_files(domain)
+
+    @staticmethod
     def _get_raw_file_path(file: str) -> str:
         return f"{RAW_FILE_PATH}/{file}"
 
     @staticmethod
     def _get_backup_file_path(domain: str, file: str) -> str:
-        return f"{RAW_FILE_PATH}/backup/{domain}/{file}"
+        now = datetime.now().strftime("%Y-%m-%d-%H:%M:%S")
+        return f"{RAW_FILE_PATH}/backup/{domain}/{file}-{now}"
+
+    @staticmethod
+    def _get_remove_old_backup_files(domain: str):
+        folder = f"{RAW_FILE_PATH}/backup/{domain}"
+        files = [f for f in listdir(folder) if isfile(join(folder, f))]
+        for file_path in files:
+            file = Path(file_path)
+            modified_time = datetime.datetime.fromtimestamp(file.stat().st_mtime)
+            current_time = datetime.now()
+            if current_time.day - modified_time.day > 7:
+                os.remove(file_path)
+
