@@ -250,7 +250,7 @@ class Kakaomoment:
                     ws.cell(row=int(max_row),column=1).value = row[1]
                     ws.cell(row=int(max_row),column=2).value = date
                     ws.cell(row=int(max_row),column=4).value = '카카오광고'
-                    ws.cell(row=int(max_row),column=6).value = float(row[4])/1.1
+                    ws.cell(row=int(max_row),column=10).value = float(row[4])/1.1
 
         if domain == "yuge":
         
