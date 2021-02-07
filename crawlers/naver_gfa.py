@@ -311,13 +311,15 @@ class Naver_GFA:
         confirm_button.click()
 
     def select_date_prev(self, driver, account, day):
-        query_url = "https://gfa.naver.com/adAccount/accounts/" + 9762/report/performance?dateFirst=2021-02-09&dateSecond=2021-02-09&adUnit=CAMPAIGN&dateUnit=DAY&placeUnit=TOTAL&dimension=TOTAL&filterList=%5B%5D&showColList=%5B%22col_result%22,%22col_sales_per_result%22,%22col_sales%22,%22col_schedule%22,%22col_imp_count%22,%22col_cpm%22,%22col_click_count%22,%22col_cpc%22,%22col_ctr%22%5D&currentPage=1&pageSize=10&accessAdAccountNo=9762"
 
-        # click confirm button
-        self.wait(driver, confirm_button, DEFAULT_TIMEOUT_DELAY)
-        confirm_button = driver.find_element_by_css_selector(confirm_button)
-        confirm_button.click()
+        date = datetime.date.today() - datetime.timedelta(day)
 
+        query_url = "https://gfa.naver.com/adAccount/accounts/" + account["account_id"] + \
+            "/report/performance?dateFirst=" + str(date) + "&dateSecond=" + str(date) + \
+            "&adUnit=CAMPAIGN&dateUnit=DAY&placeUnit=TOTAL&dimension=TOTAL&filterList=%5B%5D&showColList=%5B%22col_result%22,%22col_sales_per_result%22,%22col_sales%22,%22col_schedule%22,%22col_imp_count%22,%22col_cpm%22,%22col_click_count%22,%22col_cpc%22,%22col_ctr%22%5D" + \
+            "&currentPage=1&pageSize=10&accessAdAccountNo=" + account["account_id"]
+
+        driver.get(query_url)
 
     def download_csv(self, driver, domain):
         if domain == "anua":
@@ -443,4 +445,4 @@ class Naver_GFA:
             # self.update_ad_costs(account["domain"])
         # self.flag = False
 
-        self.select_date_legacy(driver, account["domain"])
+        self.select_date_prev(driver, account, 3)
