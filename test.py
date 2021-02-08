@@ -1,16 +1,22 @@
+import ast
+from pprint import pprint
+
+from powernad.API.AdGroup import AdGroup
+from powernad.API.Campaign import Campaign, CampaignList
+from powernad.API.Stat import Stat
+from powernad.Object.Campaign.CampaignObject import CampaignObject
+from powernad.Object.AdGroup.AdgroupObject import AdgroupObject
 from selenium import webdriver
+from datetime import datetime, timedelta
 
 import time
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions
-from utils import Utils
 
-if __name__ == '__main__':
-    url = "https://accounts.kakao.com/login/kakaoforbusiness?continue=https://business.kakao.com/dashboard/?sid=kmo&redirect=https://moment.kakao.com/dashboard"
-    driver = Utils.get_chrome_driver()
-    driver.set_window_size(1980, 1080)
-    driver.get(url)
-    time.sleep(5)
-    el = driver.find_element_by_id("wrap_captcha")
-    el.click()
+from crawlers.naver_shop import Naver_shop
+from utils import Utils
+from utils.naverShop import AsCampaign, AsStat
+
+# if __name__ == '__main__':
+    # print(Naver_shop.calc_date())

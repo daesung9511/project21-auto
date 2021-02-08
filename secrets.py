@@ -1,9 +1,9 @@
-#아이디, 비밀번호 입력
+# 아이디, 비밀번호 입력
 
 SAMPLE_ID = "1111"
 SAMPLE_SECRET = "1111"
 
-#dict
+# dict
 ACCOUNTS = {
     "ezadmin": {
         "index": ["lavena", "anua", "yuge", "project21"],
@@ -20,12 +20,12 @@ ACCOUNTS = {
         "yuge": {
             "id": "yuge",
             "pw": "founders21!",
-            "domain": "yuge"            
+            "domain": "yuge"
         },
         "project21": {
             "id": "pista1004",
             "pw": "founders21!",
-            "domain": "pista1004"            
+            "domain": "pista1004"
         }
     },
     "cafe24": {
@@ -38,28 +38,40 @@ ACCOUNTS = {
     "naver_shop": {
         "index": ["lavena", "anua", "yuge", "project21"],
         "lavena": {
-            "id": "lavenakorea",
-            "pw": "lavena21!",
-            "type": "naver"
+            "id": "pista1004",
+            "pw": "pista1004!",
+            "type": "naver",
+            "account_id": 2027480,
+            "license": "0100000000279e9b62c03c168ab8fcd16caa07dbf84f4c7d29e781db4005ca8677611f5f1c",
+            "secret": "AQAAAAAnnptiwDwWirj80WyqB9v4C0G9m6Fw5kcRPdPTcrvU+w=="
         },
         "anua": {
-            "id": "anua",
+            "id": "pista1004",
             "pw": "pista1004!",
-            "type": "general"
+            "type": "general",
+            "account_id": 1625878,
+            "license": "0100000000279e9b62c03c168ab8fcd16caa07dbf84f4c7d29e781db4005ca8677611f5f1c",
+            "secret": "AQAAAAAnnptiwDwWirj80WyqB9v4C0G9m6Fw5kcRPdPTcrvU+w=="
         },
         "yuge": {
-            "id": "yuge",
-            "pw": "founders21!",
-            "type": "general"            
+            "id": "pista1004",
+            "pw": "pista1004!",
+            "type": "general",
+            "account_id": 1913315,
+            "license": "0100000000279e9b62c03c168ab8fcd16caa07dbf84f4c7d29e781db4005ca8677611f5f1c",
+            "secret": "AQAAAAAnnptiwDwWirj80WyqB9v4C0G9m6Fw5kcRPdPTcrvU+w=="
         },
         "project21": {
             "id": "pista1004",
             "pw": "pista1004!",
-            "type": "general"            
+            "type": "general",
+            "account_id": 1154389,
+            "license": "0100000000279e9b62c03c168ab8fcd16caa07dbf84f4c7d29e781db4005ca8677611f5f1c",
+            "secret": "AQAAAAAnnptiwDwWirj80WyqB9v4C0G9m6Fw5kcRPdPTcrvU+w=="
         }
     },
     "naver_gfa": {
-        "index": ["lavena", "anua", "yuge"],
+        "index": ["lavena", "anua", "yuge", "project21"],
         "lavena": {
             "id": "project21official",
             "pw": "pista1004",
@@ -76,7 +88,13 @@ ACCOUNTS = {
             "id": "project21official",
             "pw": "pista1004",
             "domain": "yuge",
-            "account_id": "9762"      
+            "account_id": "9762"
+        },
+        "project21": {
+            "id": "project21official",
+            "pw": "pista1004",
+            "domain": "yuge",
+            "account_id": "9762"
         },
     },
     "kakaomoment": {
@@ -110,12 +128,12 @@ ACCOUNTS = {
         },
         "project21": {
             "id": "act_346749609115152",
-            "domain": "project21"        
+            "domain": "project21"
         },
         "app": {
             "id": "1112299139212780",
             "secret": "bea043e3210b7da93aa3316dca3c50a8",
-            "access_token": "EAAPzoVMTpewBAGVHL2CuqtZBw9f1M63OYtf0DaeFDbJuqLBpMWVLXTTcyR212voBnyZCwl5YLy0casqU76GSg2uoqNxAex2884zZB1r8M8tzBF5NTxK3JXRcC13GTAY7DRNZAu4mG9cwrZAskXHFYbiLyYsxY3711bOfdpZBRAPuyHcQsMcpqZC" 
+            "access_token": "EAAPzoVMTpewBAGVHL2CuqtZBw9f1M63OYtf0DaeFDbJuqLBpMWVLXTTcyR212voBnyZCwl5YLy0casqU76GSg2uoqNxAex2884zZB1r8M8tzBF5NTxK3JXRcC13GTAY7DRNZAu4mG9cwrZAskXHFYbiLyYsxY3711bOfdpZBRAPuyHcQsMcpqZC"
         }
     },
     "google": {
