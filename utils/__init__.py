@@ -44,7 +44,6 @@ class Utils:
         # https://www.python2.net/questions-80772.htm
         options.add_experimental_option("detach", True)
         user_config = Utils._get_config()
-        print(user_config.download_path)
         prefs = {
             "profile.default_content_settings.popups": 0,
             f'download.default_directory': user_config.download_path,

@@ -43,7 +43,8 @@ ACCOUNTS = {
             "type": "naver",
             "account_id": 2027480,
             "license": "0100000000279e9b62c03c168ab8fcd16caa07dbf84f4c7d29e781db4005ca8677611f5f1c",
-            "secret": "AQAAAAAnnptiwDwWirj80WyqB9v4C0G9m6Fw5kcRPdPTcrvU+w=="
+            "secret": "AQAAAAAnnptiwDwWirj80WyqB9v4C0G9m6Fw5kcRPdPTcrvU+w==",
+            "domain": "lavena"
         },
         "anua": {
             "id": "pista1004",
@@ -51,7 +52,8 @@ ACCOUNTS = {
             "type": "general",
             "account_id": 1625878,
             "license": "0100000000279e9b62c03c168ab8fcd16caa07dbf84f4c7d29e781db4005ca8677611f5f1c",
-            "secret": "AQAAAAAnnptiwDwWirj80WyqB9v4C0G9m6Fw5kcRPdPTcrvU+w=="
+            "secret": "AQAAAAAnnptiwDwWirj80WyqB9v4C0G9m6Fw5kcRPdPTcrvU+w==",
+            "domain": "anua"
         },
         "yuge": {
             "id": "pista1004",
@@ -59,7 +61,8 @@ ACCOUNTS = {
             "type": "general",
             "account_id": 1913315,
             "license": "0100000000279e9b62c03c168ab8fcd16caa07dbf84f4c7d29e781db4005ca8677611f5f1c",
-            "secret": "AQAAAAAnnptiwDwWirj80WyqB9v4C0G9m6Fw5kcRPdPTcrvU+w=="
+            "secret": "AQAAAAAnnptiwDwWirj80WyqB9v4C0G9m6Fw5kcRPdPTcrvU+w==",
+            "domain": "yuge"
         },
         "project21": {
             "id": "pista1004",
@@ -67,7 +70,8 @@ ACCOUNTS = {
             "type": "general",
             "account_id": 1154389,
             "license": "0100000000279e9b62c03c168ab8fcd16caa07dbf84f4c7d29e781db4005ca8677611f5f1c",
-            "secret": "AQAAAAAnnptiwDwWirj80WyqB9v4C0G9m6Fw5kcRPdPTcrvU+w=="
+            "secret": "AQAAAAAnnptiwDwWirj80WyqB9v4C0G9m6Fw5kcRPdPTcrvU+w==",
+            "domain": "project21"
         }
     },
     "naver_gfa": {

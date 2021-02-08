@@ -25,3 +25,5 @@ selenium==3.141.0
 six==1.15.0
 soupsieve==2.1
 urllib3==1.26.2
+powernad==0.8.0
+sonpickle==2.0.0

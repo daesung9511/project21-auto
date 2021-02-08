@@ -60,6 +60,5 @@ class Facebook:
         wb.save(RD_FILE[domain])
         
     def run(self, driver, account, term):
-        print(account)
         self.update_ad_fee_data(account, term)
 

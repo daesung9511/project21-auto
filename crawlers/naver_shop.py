@@ -53,7 +53,7 @@ class Naver_shop:
             for x in sales_info_list:
                 sales_info = dict(x)
                 if sales_info["id"] == c.nccCampaignId:
-                    result = dict({"id": sales_info["id"], "name": c.name, "cost": sales_info["salesAmt"]})
+                    result = dict({"id": sales_info["id"], "name": c.name, "cost": sales_info["salesAmt"], "date": start_date})
                     info.append(result)
                     break
         return info
@@ -63,11 +63,29 @@ class Naver_shop:
             info = self.get_n_days_past_data(n, account)
             print(info)
 
+    def update_ad_costs(self, domain, datas):
+
+        # RD 엑셀 파일 로딩
+        wb = load_workbook(RD_FILE[domain], data_only=True, read_only=False)
+
+        ws = Utils.create_xl_sheet(wb, "RD")
+
+        for data in datas:
+            max_row = str(ws.max_row+1)
+            
+            ws.cell(row=int(max_row),column=1).value = data["name"]
+            ws.cell(row=int(max_row),column=2).value = data["date"]
+            ws.cell(row=int(max_row),column=4).value = '네이버 검색'
+            ws.cell(row=int(max_row),column=5).value = Utils.vlookup(wb["매칭테이블"], data["name"], "상품1")
+            ws.cell(row=int(max_row),column=10).value = float(data["cost"])/1.1
+
+        wb.save(RD_FILE[domain])
+
     def run(self, driver, account, days):
         # account list
         # lavena, yuge, anua, project21
+        
+        for n in range(1, days + 1):
+            datas = self.get_n_days_past_data(n, account)
+            self.update_ad_costs(account["domain"], datas)
 
-        self.get_data(account, days)
-
-        # file loading
-        # self.update_ad_costs(account["id"])

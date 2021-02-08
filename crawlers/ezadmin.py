@@ -153,8 +153,8 @@ class Ezadmin:
                 sales_ws["M" + sales_max_row].value = (100-int(Utils.vlookup(sales_wb["매칭테이블"], matching, "수수료").strip("%"))) / 100 * float(Utils.vlookup(sales_wb["매칭테이블"], matching, "판매가")) * data[6]
                 sales_ws["N" + sales_max_row].value = int(Utils.vlookup(sales_wb["매칭테이블"], matching, "원가")) * data[6]
                 sales_ws["O" + sales_max_row].value = int(Utils.vlookup(sales_wb["매칭테이블"], matching, "판매가")) * data[6] / 1.1
-            except Exception:
-                print("erre")
+            except Exception as e:
+                print(e)
         sales_wb.save(RD_FILE[domain])
 
     @staticmethod
