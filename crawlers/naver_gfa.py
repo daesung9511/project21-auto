@@ -173,6 +173,7 @@ class Naver_GFA:
                     ws.cell(row=int(fee_max_row),column=1).value = row[0]
                     ws.cell(row=int(fee_max_row),column=2).value = date
                     ws.cell(row=int(fee_max_row),column=4).value = '네이버 GFA'
+                    ws.cell(row=int(fee_max_row),column=5).value = Utils.vlookup(wb["매칭테이블"], row[0], "상품1")
                     ws.cell(row=int(fee_max_row),column=10).value = float(row[3])/1.1
         
         elif domain == "anua":

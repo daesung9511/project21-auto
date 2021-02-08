@@ -79,3 +79,4 @@ if __name__ == '__main__':
         run(Cafe24(), ACCOUNTS["cafe24"], days)
     elif command == "ezadmin":
         run(Ezadmin(), ACCOUNTS["ezadmin"], days)
+

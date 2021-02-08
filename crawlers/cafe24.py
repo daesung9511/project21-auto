@@ -10,7 +10,7 @@ from openpyxl import load_workbook
 
 import time
 
-from datetime import datetime
+import datetime
 import csv
 import os
 import fnmatch
@@ -108,7 +108,7 @@ class Cafe24:
         return driver
 
     @staticmethod
-    def update_rd_data(domain: str, day: float):
+    def update_rd_data_prev(domain: str, day: float):
 
         # 매칭테이블 엑셀 파일 로딩 (sales 매칭테이블))
         sales_wb = load_workbook(RD_FILE[domain], data_only=True, read_only=False)
@@ -123,21 +123,81 @@ class Cafe24:
             reader = csv.reader(f)
             next(reader)    # 첫행(헤더 셀) 무시
 
+            date = (datetime.datetime.now() + datetime.timedelta(days=-day)).strftime('%Y-%m-%d')
             # 카페24 RD 피벗테이블 작성
+
+            dict = {}
+
             for row in reader:
-    
+
+
+                key = row[2] + row[3]
+                key = Utils.vlookup_cafe24(sales_wb["카페24 매칭"], key)
+                if key not in dict.keys():
+                    dict[key] = int(row[8])
+                else:
+                    dict[key] += int(row[8]) 
+            
+            for matching, value in dict.items():
                 sales_max_row = str(sales_ws.max_row+1)
                 
-                # 피벗 테이블 결과를 통한 판매실적 시트 채우기
-                sales_ws["A" + sales_max_row].value = row[2] + row[3]
-                sales_ws["B" + sales_max_row].value = Utils.get_day(day)
+                sales_ws["B" + sales_max_row].value = date
+                sales_ws["E" + sales_max_row].value = Utils.vlookup(sales_wb["매칭테이블"], matching, "상품1")
                 sales_ws["F" + sales_max_row].value = "프로젝트21 홈페이지"
-                sales_ws["I" + sales_max_row].value = '201207'
-                sales_ws["H" + sales_max_row].value = row[8]
+                sales_ws["G" + sales_max_row].value = matching
+                sales_ws["H" + sales_max_row].value = value
+                sales_ws["I" + sales_max_row].value = Utils.vlookup(sales_wb["매칭테이블"], matching, "상품2")
+                sales_ws["K" + sales_max_row].value = Utils.vlookup(sales_wb["매칭테이블"], matching, "구분(판매가)")
+                sales_ws["L" + sales_max_row].value = int(Utils.vlookup(sales_wb["매칭테이블"], matching, "판매가")) * value
+                sales_ws["M" + sales_max_row].value = (100-int(Utils.vlookup(sales_wb["매칭테이블"], matching, "수수료").strip("%"))) / 100 * float(Utils.vlookup(sales_wb["매칭테이블"], matching, "판매가")) * value
+                sales_ws["N" + sales_max_row].value = int(Utils.vlookup(sales_wb["매칭테이블"], matching, "원가")) * value
+                sales_ws["O" + sales_max_row].value = int(Utils.vlookup(sales_wb["매칭테이블"], matching, "판매가")) * value / 1.1
 
-                # 셀 스타일 세팅
-                color_cells = ["C", "E", "I", "J", "K", "L", "M", "N"]
-                for cell in color_cells:
-                    sales_ws[cell + sales_max_row].fill = PatternFill(start_color='fff2cc', end_color='fff2cc', fill_type='solid')
+        @staticmethod
+        def update_rd_data(domain: str, day: float):
             
-        sales_wb.save(RD_FILE[domain])
+            # 매칭테이블 엑셀 파일 로딩 (sales 매칭테이블))
+            sales_wb = load_workbook(RD_FILE[domain], data_only=True, read_only=False)
+
+            # TODO: 해당 날짜 시트겹치는 것 체크
+            sales_ws = Utils.create_xl_sheet(sales_wb, "RD")
+
+            cafe24_ws = Utils.create_xl_sheet(sales_wb, "카페24 RD")
+
+            # Cafe24에서 받은 csv 파일 찾기
+            csv_path = Utils.get_recent_file("*_ProductPrdchart.csv") 
+
+            with open(csv_path, 'r', encoding='UTF8') as f:
+                reader = csv.reader(f)
+                next(reader)    # 첫행(헤더 셀) 무시
+
+                date = (datetime.datetime.now() + datetime.timedelta(days=-day)).strftime('%Y-%m-%d')
+                # 카페24 RD 피벗테이블 작성
+
+                dict = {}
+
+                for row in reader:
+                    
+                    matching = row[2] + row[3]
+                    cafe24_max_row = cafe24_ws.max_row + 1
+                    sales_max_row = str(sales_ws.max_row+1)
+
+                    for idx, data in enumerate(row):
+                        cafe24_ws.cell(row=cafe24_max_row, column=1).value = date
+                        cafe24_ws.cell(row=cafe24_max_row, column=2).value = matching
+                        cafe24_ws.cell(row=cafe24_max_row, column=3).value = Utils.vlookup_cafe24(sales_wb["카페24 매칭"], matching)
+                        cafe24_ws.cell(row=cafe24_max_row, column=idx + 4).value = data
+
+                    sales_ws["B" + sales_max_row].value = date
+                    sales_ws["E" + sales_max_row].value = Utils.vlookup(sales_wb["매칭테이블"], matching, "상품1")
+                    sales_ws["F" + sales_max_row].value = row[1]
+                    sales_ws["G" + sales_max_row].value = matching
+                    sales_ws["H" + sales_max_row].value = row[8]
+                    sales_ws["I" + sales_max_row].value = Utils.vlookup(sales_wb["매칭테이블"], matching, "상품2")
+                    sales_ws["K" + sales_max_row].value = Utils.vlookup(sales_wb["매칭테이블"], matching, "구분(판매가)")
+                    sales_ws["L" + sales_max_row].value = int(Utils.vlookup(sales_wb["매칭테이블"], matching, "판매가")) * row[6]
+                    sales_ws["M" + sales_max_row].value = (100-int(Utils.vlookup(sales_wb["매칭테이블"], matching, "수수료").strip("%"))) / 100 * float(Utils.vlookup(sales_wb["매칭테이블"], matching, "판매가")) * row[6]
+                    sales_ws["N" + sales_max_row].value = int(Utils.vlookup(sales_wb["매칭테이블"], matching, "원가")) * row[6]
+                    sales_ws["O" + sales_max_row].value = int(Utils.vlookup(sales_wb["매칭테이블"], matching, "판매가")) * row[6] / 1.1
+
+            sales_wb.save(RD_FILE[domain])

@@ -44,7 +44,6 @@ class Utils:
         # https://www.python2.net/questions-80772.htm
         options.add_experimental_option("detach", True)
         user_config = Utils._get_config()
-        print("down")
         print(user_config.download_path)
         prefs = {
             "profile.default_content_settings.popups": 0,
@@ -64,8 +63,6 @@ class Utils:
         # https://www.python2.net/questions-80772.htm
         options.add_experimental_option("detach", True)
         user_config = Utils._get_config()
-        print("down")
-        print(user_config.download_path)
         prefs = {
             "profile.default_content_settings.popups": 0,
             f'download.default_directory': user_config.download_path,
@@ -166,7 +163,6 @@ class Utils:
                 ws["L" + rd_row] = '=K' + rd_row + '-VLOOKUP($N' + rd_row + ',매칭테이블!$G:$J,3,0)*K' + rd_row
                 ws["M" + rd_row] = '=VLOOKUP($N' + rd_row + ',매칭테이블!$G:$J,4,0)*H' + rd_row
                 ws["N" + rd_row] = '=F' + rd_row + '&E' + rd_row + '&G' + rd_row + '&I' + rd_row
-                ws["G" + rd_row] = "=VLOOKUP(A" + rd_row + ",'카페24 매칭'!B:C,2,0)"
 
             wb.save(file)
 
@@ -200,3 +196,35 @@ class Utils:
             current_time = datetime.datetime.now()
             if current_time.day - modified_time.day > 7:
                 os.remove(file)
+
+
+    @staticmethod
+    def vlookup(ws: worksheet, matching: str, content: str):
+        res = "0"
+        content_map = {
+            "채널": 2,
+            "상품1": 3,
+            "상품2": 4,
+            "상품1(vlookup용)": 5,
+            "구분(판매가)": 6,
+            "판매가": 8,
+            "수수료": 9,
+            "원가": 10
+            }
+        
+        max_row = ws.max_row + 1
+        for row in range(1, max_row):
+            if ws.cell(row = row, column = 6).value == matching:
+                res = ws.cell(row = row, column = content_map[content]).value
+                break
+        return res
+
+    @staticmethod
+    def vlookup_cafe24(ws: worksheet, matching: str):
+        res = "0"
+        max_row = ws.max_row + 1
+        for row in range(1, max_row):
+            if ws.cell(row = row, column = 2).value == matching:
+                res = ws.cell(row = row, column = 3).value
+                break
+        return res

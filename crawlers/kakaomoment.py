@@ -240,16 +240,12 @@ class Kakaomoment:
                 # 광고비 시트에 rd 대입
                 for row in reader:
                     
-                    # TODO: 파일에 아누아가 아닌 제품이 있을시 무시
-                    # 해당 부분이 필요할지 조정
-                    if not fnmatch.fnmatch(row[1], "아누아_*"):
-                        continue
-                    
                     max_row = str(ws.max_row+1)
                     
                     ws.cell(row=int(max_row),column=1).value = row[1]
-                    ws.cell(row=int(max_row),column=2).value = date
+                    ws.cell(row=int(max_row),column=2).value = row[2]
                     ws.cell(row=int(max_row),column=4).value = '카카오광고'
+                    ws.cell(row=int(max_row),column=5).value = Utils.vlookup(wb["매칭테이블"], row[1], "상품1")
                     ws.cell(row=int(max_row),column=10).value = float(row[4])/1.1
 
         if domain == "yuge":
@@ -272,6 +268,7 @@ class Kakaomoment:
                     ws.cell(row=int(max_row),column=1).value = row[0]
                     ws.cell(row=int(max_row),column=2).value = date
                     ws.cell(row=int(max_row),column=4).value = '카카오광고'
+                    ws.cell(row=int(max_row),column=5).value = Utils.vlookup(wb["매칭테이블"], row[0], "상품1")
                     ws.cell(row=int(max_row),column=10).value = float(row[3])/1.1
         
         wb.save(RD_FILE[domain])
