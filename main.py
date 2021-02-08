@@ -34,6 +34,7 @@ def run(platform, account, days):
             logging.info(message)
             print(message)
         except Exception as e:
+            print(e)
             logging.error(e)
             print(f"{platform.__class__} {brand} failed.")
     driver.quit()

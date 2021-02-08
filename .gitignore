@@ -2,6 +2,7 @@ log/
 raw_data/
 dist/
 build/
+rd_file/
 
 
 # Byte-compiled / optimized / DLL files
