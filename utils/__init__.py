@@ -120,10 +120,12 @@ class Utils:
 
     @staticmethod
     def kill_proc(proc_exp: str):
-        for proc in psutil.process_iter():
-            if fnmatch.fnmatch(proc.name(), proc_exp):
-                proc.kill()
-
+        try:
+            for proc in psutil.process_iter():
+                if fnmatch.fnmatch(proc.name(), proc_exp):
+                    proc.kill()
+        except Exception as e:
+            print(e)
     @staticmethod
     def create_xl_sheet(wb: Workbook, sheet_name: str) -> worksheet:
         rd_ws_name = sheet_name

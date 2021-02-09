@@ -25,7 +25,7 @@ ACCOUNTS = {
         "project21": {
             "id": "pista1004",
             "pw": "founders21!",
-            "domain": "pista1004"
+            "domain": "project21"
         }
     },
     "cafe24": {
