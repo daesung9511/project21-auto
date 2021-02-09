@@ -147,25 +147,6 @@ class Utils:
         return dir_path + file_path
 
     @staticmethod
-    def set_xl_formula():
-        for domain, file in RD_FILE.items():
-            wb = load_workbook(Utils._get_raw_file_path(file), data_only=True, read_only=False)
-
-            ws = Utils.create_xl_sheet(wb, "RD")
-
-            max_row = ws.max_row
-            for rd_row in range(2, max_row + 1):
-                rd_row = str(rd_row)
-                ws["C" + rd_row] = '=TEXT(B' + rd_row + ',"aaa")'
-                ws["E" + rd_row] = '=VLOOKUP(G' + rd_row + ',매칭테이블!D:E,2,0)'
-                ws["K" + rd_row] = '=VLOOKUP($N' + rd_row + ',매칭테이블!$G:$J,2,0)*H' + rd_row
-                ws["L" + rd_row] = '=K' + rd_row + '-VLOOKUP($N' + rd_row + ',매칭테이블!$G:$J,3,0)*K' + rd_row
-                ws["M" + rd_row] = '=VLOOKUP($N' + rd_row + ',매칭테이블!$G:$J,4,0)*H' + rd_row
-                ws["N" + rd_row] = '=F' + rd_row + '&E' + rd_row + '&G' + rd_row + '&I' + rd_row
-
-            wb.save(file)
-
-    @staticmethod
     def backup_original_files():
         for domain, file in RD_FILE.items():
             domain_backup_path = f"{RAW_FILE_PATH}/backup/{domain}"
@@ -233,6 +214,20 @@ class Utils:
         max_row = ws.max_row + 1
         for row in range(1, max_row):
             if ws.cell(row = row, column = 7).value == cutoff:
+                res = ws.cell(row = row, column = content_map[content]).value
+                break
+        return res
+
+    @staticmethod
+    def vlookup_ads(ws: worksheet, matching: str, content: str):
+        res=""
+        content_map = {
+            "미디어": 3,
+            "상품1": 4,
+        }
+        max_row = ws.max_row + 1
+        for row in range(1, max_row):
+            if ws.cell(row = row, column = 2).value == matching:
                 res = ws.cell(row = row, column = content_map[content]).value
                 break
         return res

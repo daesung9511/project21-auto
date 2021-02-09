@@ -108,52 +108,6 @@ class Cafe24:
         return driver
 
     @staticmethod
-    def update_rd_data_prev(domain: str, day: float):
-
-        # 매칭테이블 엑셀 파일 로딩 (sales 매칭테이블))
-        sales_wb = load_workbook(RD_FILE[domain], data_only=True, read_only=False)
-
-        # TODO: 해당 날짜 시트겹치는 것 체크
-        sales_ws = Utils.create_xl_sheet(sales_wb, "RD")
-
-        # Cafe24에서 받은 csv 파일 찾기
-        csv_path = Utils.get_recent_file("*_ProductPrdchart.csv") 
-
-        with open(csv_path, 'r', encoding='UTF8') as f:
-            reader = csv.reader(f)
-            next(reader)    # 첫행(헤더 셀) 무시
-
-            date = (datetime.datetime.now() + datetime.timedelta(days=-day)).strftime('%Y-%m-%d')
-            # 카페24 RD 피벗테이블 작성
-
-            dict = {}
-
-            for row in reader:
-
-
-                key = row[2] + row[3]
-                key = Utils.vlookup_cafe24(sales_wb["카페24 매칭"], key)
-                if key not in dict.keys():
-                    dict[key] = int(row[8])
-                else:
-                    dict[key] += int(row[8]) 
-            
-            for matching, value in dict.items():
-                sales_max_row = str(sales_ws.max_row+1)
-                
-                sales_ws["B" + sales_max_row].value = date
-                sales_ws["E" + sales_max_row].value = Utils.vlookup(sales_wb["매칭테이블"], matching, "상품1")
-                sales_ws["F" + sales_max_row].value = "프로젝트21 홈페이지"
-                sales_ws["G" + sales_max_row].value = matching
-                sales_ws["H" + sales_max_row].value = value
-                sales_ws["I" + sales_max_row].value = Utils.vlookup(sales_wb["매칭테이블"], matching, "상품2")
-                sales_ws["K" + sales_max_row].value = Utils.vlookup(sales_wb["매칭테이블"], matching, "구분(판매가)")
-                sales_ws["L" + sales_max_row].value = int(Utils.vlookup(sales_wb["매칭테이블"], matching, "판매가")) * value
-                sales_ws["M" + sales_max_row].value = (100-int(Utils.vlookup(sales_wb["매칭테이블"], matching, "수수료").strip("%"))) / 100 * float(Utils.vlookup(sales_wb["매칭테이블"], matching, "판매가")) * value
-                sales_ws["N" + sales_max_row].value = int(Utils.vlookup(sales_wb["매칭테이블"], matching, "원가")) * value
-                sales_ws["O" + sales_max_row].value = int(Utils.vlookup(sales_wb["매칭테이블"], matching, "판매가")) * value / 1.1
-
-    @staticmethod
     def update_rd_data(domain: str, day: float):
         
         # 매칭테이블 엑셀 파일 로딩 (sales 매칭테이블))

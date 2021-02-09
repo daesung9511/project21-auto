@@ -244,8 +244,8 @@ class Kakaomoment:
                     
                     ws.cell(row=int(max_row),column=1).value = row[1]
                     ws.cell(row=int(max_row),column=2).value = row[2]
-                    ws.cell(row=int(max_row),column=4).value = '카카오광고'
-                    ws.cell(row=int(max_row),column=5).value = Utils.vlookup(wb["매칭테이블"], row[1], "상품1")
+                    ws.cell(row=int(max_row),column=4).value = Utils.vlookup_ads(wb["매칭테이블"], row[1], "미디어")
+                    ws.cell(row=int(max_row),column=5).value = Utils.vlookup_ads(wb["매칭테이블"], row[1], "상품1")
                     ws.cell(row=int(max_row),column=10).value = float(row[4])/1.1
 
         if domain == "yuge":
@@ -267,8 +267,8 @@ class Kakaomoment:
                     
                     ws.cell(row=int(max_row),column=1).value = row[0]
                     ws.cell(row=int(max_row),column=2).value = date
-                    ws.cell(row=int(max_row),column=4).value = '카카오광고'
-                    ws.cell(row=int(max_row),column=5).value = Utils.vlookup(wb["매칭테이블"], row[0], "상품1")
+                    ws.cell(row=int(max_row),column=4).value = Utils.vlookup_ads(wb["매칭테이블"], row[0], "미디어")
+                    ws.cell(row=int(max_row),column=5).value = Utils.vlookup_ads(wb["매칭테이블"], row[0], "상품1")
                     ws.cell(row=int(max_row),column=10).value = float(row[3])/1.1
         
         wb.save(RD_FILE[domain])

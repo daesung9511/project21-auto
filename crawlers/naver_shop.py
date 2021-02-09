@@ -75,8 +75,8 @@ class Naver_shop:
             
             ws.cell(row=int(max_row),column=1).value = data["name"]
             ws.cell(row=int(max_row),column=2).value = data["date"]
-            ws.cell(row=int(max_row),column=4).value = '네이버 검색'
-            ws.cell(row=int(max_row),column=5).value = Utils.vlookup(wb["매칭테이블"], data["name"], "상품1")
+            ws.cell(row=int(max_row),column=4).value = Utils.vlookup_ads(wb["매칭테이블"], data["name"], "미디어")
+            ws.cell(row=int(max_row),column=5).value = Utils.vlookup_ads(wb["매칭테이블"], data["name"], "상품1")
             ws.cell(row=int(max_row),column=10).value = float(data["cost"])/1.1
 
         wb.save(RD_FILE[domain])

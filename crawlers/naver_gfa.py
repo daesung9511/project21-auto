@@ -110,16 +110,11 @@ class Naver_GFA:
 
         date = datetime.date.today() - datetime.timedelta(day)
 
-        if account["domain"] == "anua":
-            query_url = "https://gfa.naver.com/adAccount/accounts/" + account["account_id"] + \
+        query_url = "https://gfa.naver.com/adAccount/accounts/" + account["account_id"] + \
                 "/report/performance?dateFirst=" + str(date) + "&dateSecond=" + str(date) + \
                 "&adUnit=CAMPAIGN&dateUnit=DAY&placeUnit=TOTAL&dimension=TOTAL&filterList=%5B%5D&showColList=%5B%22col_result%22,%22col_sales_per_result%22,%22col_sales%22,%22col_schedule%22,%22col_imp_count%22,%22col_cpm%22,%22col_click_count%22,%22col_cpc%22,%22col_ctr%22%5D" + \
                 "&currentPage=1&pageSize=10&accessAdAccountNo=" + account["account_id"]
-        else:
-            query_url = "https://gfa.naver.com/adAccount/accounts/" + account["account_id"] + \
-                "/report/sales?dateUnit=TOTAL&placeUnit=TOTAL&dateFirst=" + str(date) + "&dateSecond=" + str(date) + \
-                "&accessAdAccountNo=" + account["account_id"]
-
+        
         driver.get(query_url)
 
     def download_csv(self, driver, domain):
@@ -158,58 +153,26 @@ class Naver_GFA:
         date = (datetime.datetime.now() + datetime.timedelta(days=-day)).strftime('%Y-%m-%d')
 
         if domain == "yuge":
-
-            # 유즈 csv 파일 찾기
-            yuge_path = Utils.get_recent_file("유즈_광고비리포트_*.csv")
-
-            with open(yuge_path, 'r', encoding='utf-8') as f:
-                reader = csv.reader(f, delimiter = ",")
-                next(reader)
-                # 광고비 시트에 rd 대입
-                for row in reader:
-                    
-                    fee_max_row = str(ws.max_row+1)
-                    
-                    ws.cell(row=int(fee_max_row),column=1).value = row[0]
-                    ws.cell(row=int(fee_max_row),column=2).value = date
-                    ws.cell(row=int(fee_max_row),column=4).value = '네이버 GFA'
-                    ws.cell(row=int(fee_max_row),column=5).value = Utils.vlookup(wb["매칭테이블"], row[0], "상품1")
-                    ws.cell(row=int(fee_max_row),column=10).value = float(row[3])/1.1
-        
+            file_path = Utils.get_recent_file("유즈_광고비리포트_*.csv")
         elif domain == "anua":
-        
-            anua_path = Utils.get_recent_file("더파운더즈_성과리포트_*.csv")
-
-            with open(anua_path, 'r', encoding='utf-8') as f:
-                reader = csv.reader(f, delimiter = ",")
-                next(reader)
-                # 광고비 시트에 rd 대입
-                for row in reader:
-                    
-                    fee_max_row = str(ws.max_row+1)
-                    
-                    ws.cell(row=int(fee_max_row),column=1).value = row[0]
-                    ws.cell(row=int(fee_max_row),column=2).value = date
-                    ws.cell(row=int(fee_max_row),column=4).value = '네이버 GFA'
-                    ws.cell(row=int(fee_max_row),column=10).value = float(row[12])/1.1
-            
+            file_path = Utils.get_recent_file("더파운더즈_성과리포트_*.csv")
         elif domain == "lavena":
+            file_path = Utils.get_recent_file("라베나코리아_광고비리포트_*.csv")
 
-            lavena_path = Utils.get_recent_file("라베나코리아_광고비리포트_*.csv")
-
-            with open(lavena_path, 'r', encoding='utf-8') as f:
-                reader = csv.reader(f, delimiter = ",")
-                next(reader)
-                # 광고비 시트에 rd 대입
-                for row in reader:
-                    
-                    fee_max_row = str(ws.max_row+1)
-                    
-                    ws.cell(row=int(fee_max_row),column=1).value = row[0]
-                    ws.cell(row=int(fee_max_row),column=2).value = date
-                    ws.cell(row=int(fee_max_row),column=4).value = '네이버 GFA'
-                    ws.cell(row=int(fee_max_row),column=10).value = float(row[3])/1.1
-            
+        with open(file_path, 'r', encoding='utf-8') as f:
+            reader = csv.reader(f, delimiter = ",")
+            next(reader)
+            # 광고비 시트에 rd 대입
+            for row in reader:
+                
+                fee_max_row = str(ws.max_row+1)
+                
+                ws.cell(row=int(fee_max_row),column=1).value = row[0]
+                ws.cell(row=int(fee_max_row),column=2).value = date
+                ws.cell(row=int(fee_max_row),column=4).value = Utils.vlookup_ads(wb["매칭테이블"], row[0], "미디어")
+                ws.cell(row=int(fee_max_row),column=5).value = Utils.vlookup_ads(wb["매칭테이블"], row[0], "상품1")
+                ws.cell(row=int(fee_max_row),column=10).value = float(row[12])/1.1
+        
         wb.save(RD_FILE[domain])
 
 
@@ -234,6 +197,6 @@ class Naver_GFA:
             self.select_date(driver, account, day)
             self.download_csv(driver, account["domain"])
             self.clear_tabs(driver)
-            self.update_ad_costs(account["domain"], day)
+            # self.update_ad_costs(account["domain"], day)
         
         self.flag = False
