@@ -148,6 +148,7 @@ class Ezadmin:
             sales=int(data[6].replace(",",""))
             try:
                 sales_ws["B" + sales_max_row].value = data[0]
+                sales_ws["C" + sales_max_row].value = Utils.get_day_name(data[0])
                 sales_ws["E" + sales_max_row].value = prod1
                 sales_ws["F" + sales_max_row].value = channel
                 sales_ws["G" + sales_max_row].value = matching

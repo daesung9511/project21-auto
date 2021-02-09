@@ -89,6 +89,13 @@ class Utils:
                           download_path=path)
 
     @staticmethod
+    def get_day_name(date: str):
+
+        date_obj = datetime.datetime.strptime(date, '%Y-%m-%d')
+        daylist = ["월", "화", "수", "목", "금", "토", "일"]
+        return daylist[date_obj.weekday()]
+
+    @staticmethod
     def get_day(ago: float) -> str:
         date = datetime.date.today() - datetime.timedelta(ago)
         return date.isoformat()

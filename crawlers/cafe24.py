@@ -152,6 +152,7 @@ class Cafe24:
                 sales=int(row[8].replace(",",""))
 
                 sales_ws["B" + sales_max_row].value = date
+                sales_ws["C" + sales_max_row].value = Utils.get_day_name(date)
                 sales_ws["E" + sales_max_row].value = prod1
                 sales_ws["F" + sales_max_row].value = channel
                 sales_ws["G" + sales_max_row].value = prod2

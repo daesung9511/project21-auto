@@ -169,6 +169,7 @@ class Naver_GFA:
                 
                 ws.cell(row=int(fee_max_row),column=1).value = row[0]
                 ws.cell(row=int(fee_max_row),column=2).value = date
+                ws.cell(row=int(fee_max_row),column=3).value = Utils.get_day_name(date)
                 ws.cell(row=int(fee_max_row),column=4).value = Utils.vlookup_ads(wb["매칭테이블"], row[0], "미디어")
                 ws.cell(row=int(fee_max_row),column=5).value = Utils.vlookup_ads(wb["매칭테이블"], row[0], "상품1")
                 ws.cell(row=int(fee_max_row),column=10).value = float(row[12])/1.1
