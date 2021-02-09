@@ -153,51 +153,60 @@ class Cafe24:
                 sales_ws["N" + sales_max_row].value = int(Utils.vlookup(sales_wb["매칭테이블"], matching, "원가")) * value
                 sales_ws["O" + sales_max_row].value = int(Utils.vlookup(sales_wb["매칭테이블"], matching, "판매가")) * value / 1.1
 
-        @staticmethod
-        def update_rd_data(domain: str, day: float):
-            
-            # 매칭테이블 엑셀 파일 로딩 (sales 매칭테이블))
-            sales_wb = load_workbook(RD_FILE[domain], data_only=True, read_only=False)
+    @staticmethod
+    def update_rd_data(domain: str, day: float):
+        
+        # 매칭테이블 엑셀 파일 로딩 (sales 매칭테이블))
+        sales_wb = load_workbook(RD_FILE[domain], data_only=True, read_only=False)
 
-            # TODO: 해당 날짜 시트겹치는 것 체크
-            sales_ws = Utils.create_xl_sheet(sales_wb, "RD")
+        # TODO: 해당 날짜 시트겹치는 것 체크
+        sales_ws = Utils.create_xl_sheet(sales_wb, "RD")
 
-            cafe24_ws = Utils.create_xl_sheet(sales_wb, "카페24 RD")
+        cafe24_ws = Utils.create_xl_sheet(sales_wb, "카페24 RD")
 
-            # Cafe24에서 받은 csv 파일 찾기
-            csv_path = Utils.get_recent_file("*_ProductPrdchart.csv") 
+        # Cafe24에서 받은 csv 파일 찾기
+        csv_path = Utils.get_recent_file("*_ProductPrdchart.csv") 
 
-            with open(csv_path, 'r', encoding='UTF8') as f:
-                reader = csv.reader(f)
-                next(reader)    # 첫행(헤더 셀) 무시
+        with open(csv_path, 'r', encoding='UTF8') as f:
+            reader = csv.reader(f)
+            next(reader)    # 첫행(헤더 셀) 무시
 
-                date = (datetime.datetime.now() + datetime.timedelta(days=-day)).strftime('%Y-%m-%d')
-                # 카페24 RD 피벗테이블 작성
+            date = (datetime.datetime.now() + datetime.timedelta(days=-day)).strftime('%Y-%m-%d')
+            # 카페24 RD 피벗테이블 작성
 
-                dict = {}
+            dict = {}
 
-                for row in reader:
-                    
-                    matching = row[2] + row[3]
-                    cafe24_max_row = cafe24_ws.max_row + 1
-                    sales_max_row = str(sales_ws.max_row+1)
+            for row in reader:
+                
+                cafe24_max_row = cafe24_ws.max_row + 1
+                sales_max_row = str(sales_ws.max_row+1)
+                matching = row[2] + row[3]
+                prod2 = Utils.vlookup_cafe24(sales_wb["카페24 매칭"], matching)
 
-                    for idx, data in enumerate(row):
-                        cafe24_ws.cell(row=cafe24_max_row, column=1).value = date
-                        cafe24_ws.cell(row=cafe24_max_row, column=2).value = matching
-                        cafe24_ws.cell(row=cafe24_max_row, column=3).value = Utils.vlookup_cafe24(sales_wb["카페24 매칭"], matching)
-                        cafe24_ws.cell(row=cafe24_max_row, column=idx + 4).value = data
+                for idx, data in enumerate(row):
+                    cafe24_ws.cell(row=cafe24_max_row, column=1).value = date
+                    cafe24_ws.cell(row=cafe24_max_row, column=2).value = matching
+                    cafe24_ws.cell(row=cafe24_max_row, column=3).value = prod2
+                    cafe24_ws.cell(row=cafe24_max_row, column=idx + 4).value = data
 
-                    sales_ws["B" + sales_max_row].value = date
-                    sales_ws["E" + sales_max_row].value = Utils.vlookup(sales_wb["매칭테이블"], matching, "상품1")
-                    sales_ws["F" + sales_max_row].value = row[1]
-                    sales_ws["G" + sales_max_row].value = matching
-                    sales_ws["H" + sales_max_row].value = row[8]
-                    sales_ws["I" + sales_max_row].value = Utils.vlookup(sales_wb["매칭테이블"], matching, "상품2")
-                    sales_ws["K" + sales_max_row].value = Utils.vlookup(sales_wb["매칭테이블"], matching, "구분(판매가)")
-                    sales_ws["L" + sales_max_row].value = int(Utils.vlookup(sales_wb["매칭테이블"], matching, "판매가")) * row[6]
-                    sales_ws["M" + sales_max_row].value = (100-int(Utils.vlookup(sales_wb["매칭테이블"], matching, "수수료").strip("%"))) / 100 * float(Utils.vlookup(sales_wb["매칭테이블"], matching, "판매가")) * row[6]
-                    sales_ws["N" + sales_max_row].value = int(Utils.vlookup(sales_wb["매칭테이블"], matching, "원가")) * row[6]
-                    sales_ws["O" + sales_max_row].value = int(Utils.vlookup(sales_wb["매칭테이블"], matching, "판매가")) * row[6] / 1.1
+                
+                prod1 = Utils.vlookup_by_matching(sales_wb["매칭테이블"], matching, "상품1")
+                channel = "프로젝트21 홈페이지"
+                # TODO: 구분 (ex. 210201) 값이 변동할시 어떻게 적용할지
+                cur_cutoff = "210201"
+                cutoff = channel+prod1+prod2+cur_cutoff
+                sales=int(row[8].replace(",",""))
 
-            sales_wb.save(RD_FILE[domain])
+                sales_ws["B" + sales_max_row].value = date
+                sales_ws["E" + sales_max_row].value = prod1
+                sales_ws["F" + sales_max_row].value = channel
+                sales_ws["G" + sales_max_row].value = prod2
+                sales_ws["H" + sales_max_row].value = sales
+                sales_ws["I" + sales_max_row].value = Utils.vlookup_by_matching(sales_wb["매칭테이블"], matching, "상품2")
+                sales_ws["J" + sales_max_row].value = cur_cutoff
+                sales_ws["L" + sales_max_row].value = int(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "판매가")) * sales
+                sales_ws["M" + sales_max_row].value = (100.0-float(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "수수료").strip("%"))) / 100.0 * float(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "판매가")) * sales
+                sales_ws["N" + sales_max_row].value = int(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "원가")) * sales
+                sales_ws["O" + sales_max_row].value = int(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "판매가")) * sales / 1.1
+
+        sales_wb.save(RD_FILE[domain])

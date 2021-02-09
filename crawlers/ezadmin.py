@@ -28,10 +28,9 @@ class Ezadmin:
         uid = account["id"]
         upw = account["pw"]
         udomain = account["domain"]
-        # for day in range(days, 0, -1):
-        #     Ezadmin.download_yesterday_revenue(driver, udomain, uid, upw, 3)
-        #     Ezadmin.update_rd_data(account["domain"], day)
-        Ezadmin.update_rd_data(account["domain"], days)
+        for day in range(days, 0, -1):
+            Ezadmin.download_yesterday_revenue(driver, udomain, uid, upw, 3)
+            Ezadmin.update_rd_data(account["domain"], day)
     
     @staticmethod
     def get_admin_page(driver: WebDriver, domain: str, id: str, password: str) -> WebDriver:
@@ -141,18 +140,24 @@ class Ezadmin:
         for data in datas:
             sales_max_row = str(sales_ws.max_row+1)
             matching = data[3] + data[4]
+            prod1=Utils.vlookup_by_matching(sales_wb["매칭테이블"], matching, "상품1")
+            channel=data[1]
+            # TODO: 구분 (ex. 210201) 값이 변동할시 어떻게 적용할지
+            cur_cutoff = "210201"
+            cutoff = channel+prod1+matching+cur_cutoff
+            sales=int(data[6].replace(",",""))
             try:
                 sales_ws["B" + sales_max_row].value = data[0]
-                sales_ws["E" + sales_max_row].value = Utils.vlookup(sales_wb["매칭테이블"], matching, "상품1")
-                sales_ws["F" + sales_max_row].value = data[1]
+                sales_ws["E" + sales_max_row].value = prod1
+                sales_ws["F" + sales_max_row].value = channel
                 sales_ws["G" + sales_max_row].value = matching
-                sales_ws["H" + sales_max_row].value = data[6]
-                sales_ws["I" + sales_max_row].value = Utils.vlookup(sales_wb["매칭테이블"], matching, "상품2")
-                sales_ws["K" + sales_max_row].value = Utils.vlookup(sales_wb["매칭테이블"], matching, "구분(판매가)")
-                sales_ws["L" + sales_max_row].value = int(Utils.vlookup(sales_wb["매칭테이블"], matching, "판매가")) * data[6]
-                sales_ws["M" + sales_max_row].value = (100-int(Utils.vlookup(sales_wb["매칭테이블"], matching, "수수료").strip("%"))) / 100 * float(Utils.vlookup(sales_wb["매칭테이블"], matching, "판매가")) * data[6]
-                sales_ws["N" + sales_max_row].value = int(Utils.vlookup(sales_wb["매칭테이블"], matching, "원가")) * data[6]
-                sales_ws["O" + sales_max_row].value = int(Utils.vlookup(sales_wb["매칭테이블"], matching, "판매가")) * data[6] / 1.1
+                sales_ws["H" + sales_max_row].value = sales
+                sales_ws["I" + sales_max_row].value = Utils.vlookup_by_matching(sales_wb["매칭테이블"], matching, "상품2")
+                sales_ws["J" + sales_max_row].value = cur_cutoff
+                sales_ws["L" + sales_max_row].value = int(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "판매가")) * sales
+                sales_ws["M" + sales_max_row].value = (100.0-float(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "수수료").strip("%"))) / 100.0 * float(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "판매가")) * sales
+                sales_ws["N" + sales_max_row].value = int(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "원가")) * sales
+                sales_ws["O" + sales_max_row].value = int(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "판매가")) * sales / 1.1
             except Exception as e:
                 print(e)
         sales_wb.save(RD_FILE[domain])

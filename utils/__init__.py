@@ -198,13 +198,12 @@ class Utils:
 
 
     @staticmethod
-    def vlookup(ws: worksheet, matching: str, content: str):
+    def vlookup_by_matching(ws: worksheet, matching: str, content: str):
         res = "0"
         content_map = {
             "채널": 2,
             "상품1": 3,
-            "상품2": 4,
-            "상품1(vlookup용)": 5,
+            "상품2": 5,
             "구분(판매가)": 6,
             "판매가": 8,
             "수수료": 9,
@@ -214,6 +213,26 @@ class Utils:
         max_row = ws.max_row + 1
         for row in range(1, max_row):
             if ws.cell(row = row, column = 6).value == matching:
+                res = ws.cell(row = row, column = content_map[content]).value
+                break
+        return res
+
+    @staticmethod
+    def vlookup_by_cutoff(ws: worksheet, cutoff: str, content: str):
+        res = "0"
+        content_map = {
+            "채널": 2,
+            "상품1": 3,
+            "상품2": 5,
+            "구분(판매가)": 6,
+            "판매가": 8,
+            "수수료": 9,
+            "원가": 10
+            }
+        
+        max_row = ws.max_row + 1
+        for row in range(1, max_row):
+            if ws.cell(row = row, column = 7).value == cutoff:
                 res = ws.cell(row = row, column = content_map[content]).value
                 break
         return res
