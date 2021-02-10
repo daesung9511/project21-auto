@@ -9,8 +9,13 @@ from crawlers.kakaomoment import Kakaomoment
 from crawlers.facebook import Facebook
 from utils import Utils
 from secrets import ACCOUNTS
+from openpyxl import load_workbook
+from config import RD_FILE
 import logging
 import sys
+import traceback
+
+import time
 
 
 def setup_logger():
@@ -22,14 +27,14 @@ def setup_logger():
     logging.basicConfig(filename=path + os.sep + file_name, level=logging.DEBUG)
 
 
-def run(platform, account, days):
+def run(platform, account, days, workbooks):
     Utils.kill_proc("chrome*")
     driver = Utils.get_chrome_driver()
     driver.set_window_size(1980, 1080)
 
     for brand in account["index"]:
         try:
-            platform.run(driver, account[brand], days)
+            platform.run(driver, account[brand], days, workbooks)
             message = f"{platform.__class__} {brand} success."
             logging.info(message)
             print(message)
@@ -40,18 +45,25 @@ def run(platform, account, days):
     driver.quit()
 
 
-def start(days: int):
+def start(days: int, wbs: dict):
     Utils.backup_original_files()
     Utils.remove_old_backup_files()
-    run(Facebook(), ACCOUNTS["facebook"], days)
-    run(Naver_shop(), ACCOUNTS["naver_shop"], days)
-    run(Kakaomoment(), ACCOUNTS["kakaomoment"], days)
-    run(Cafe24(), ACCOUNTS["cafe24"], days)
-    run(Ezadmin(), ACCOUNTS["ezadmin"], days)
-    run(Naver_GFA(), ACCOUNTS["naver_gfa"], days)
+    run(Facebook(), ACCOUNTS["facebook"], days, wbs)
+    run(Naver_shop(), ACCOUNTS["naver_shop"], days, wbs)
+    run(Kakaomoment(), ACCOUNTS["kakaomoment"], days, wbs)
+    run(Cafe24(), ACCOUNTS["cafe24"], days, wbs)
+    run(Ezadmin(), ACCOUNTS["ezadmin"], days, wbs)
+    run(Naver_GFA(), ACCOUNTS["naver_gfa"], days, wbs)
+
 
 if __name__ == '__main__':
     # setup_logger()
+    
+    wbs = {}
+    domains = ["lavena", "yuge", "anua", "project21"]
+    for domain in domains:
+        print("Opening - ", domain )
+        wbs[domain] = load_workbook(RD_FILE[domain])
 
     try:
         command = sys.argv[1]
@@ -59,21 +71,22 @@ if __name__ == '__main__':
     except IndexError or ValueError:
         command = "main"
         days = 1
-
     if command == "":
-        start(days)
+        start(days, wbs)
     elif command == "main":
-        start(days)
+        start(days, wbs)
     elif command == "kakaomoment":
-        run(Kakaomoment(), ACCOUNTS["kakaomoment"], days)
+        run(Kakaomoment(), ACCOUNTS["kakaomoment"], days, wbs)
     elif command == "facebook":
-        run(Facebook(), ACCOUNTS["facebook"], days)
+        run(Facebook(), ACCOUNTS["facebook"], days, wbs)
     elif command == "naver_shop":
         run(Naver_shop(), ACCOUNTS["naver_shop"], days)
     elif command == "naver_gfa":
-        run(Naver_GFA(), ACCOUNTS["naver_gfa"], days)
+        run(Naver_GFA(), ACCOUNTS["naver_gfa"], days, wbs)
     elif command == "cafe24":
         run(Cafe24(), ACCOUNTS["cafe24"], days)
     elif command == "ezadmin":
-        run(Ezadmin(), ACCOUNTS["ezadmin"], days)
-
+        run(Ezadmin(), ACCOUNTS["ezadmin"], days, wbs)
+    
+    for domain in domains:
+        wbs[domain].save(RD_FILE[domain])

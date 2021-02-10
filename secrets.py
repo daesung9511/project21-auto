@@ -10,21 +10,25 @@ ACCOUNTS = {
         "lavena": {
             "id": "lavena",
             "pw": "founders21!",
+            "udomain": "lavena",
             "domain": "lavena"
         },
         "anua": {
             "id": "anua",
             "pw": "founders21!",
+            "udomain": "anua",
             "domain": "anua"
         },
         "yuge": {
             "id": "yuge",
             "pw": "founders21!",
+            "udomain": "yuge",
             "domain": "yuge"
         },
         "project21": {
             "id": "pista1004",
             "pw": "founders21!",
+            "udomain": "pista1004",
             "domain": "project21"
         }
     },
@@ -94,12 +98,13 @@ ACCOUNTS = {
             "domain": "yuge",
             "account_id": "9762"
         },
-        "project21": {
-            "id": "project21official",
-            "pw": "pista1004",
-            "domain": "yuge",
-            "account_id": "9762"
-        },
+        # TODO: 아직 계정에 추가되지 않은부분
+        # "project21": {
+        #     "id": "project21official",
+        #     "pw": "pista1004",
+        #     "domain": "yuge",
+        #     "account_id": "9762"
+        # },
     },
     "kakaomoment": {
         "index": ["anua", "yuge"],

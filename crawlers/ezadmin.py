@@ -24,13 +24,13 @@ from config import RD_FILE
 
 class Ezadmin:
 
-    def run(self, driver, account, days):
+    def run(self, driver, account, days, workbooks):
         uid = account["id"]
         upw = account["pw"]
-        udomain = account["domain"]
+        udomain = account["udomain"]
         for day in range(days, 0, -1):
             Ezadmin.download_yesterday_revenue(driver, udomain, uid, upw, 3)
-            Ezadmin.update_rd_data(account["domain"], day)
+            Ezadmin.update_rd_data(account["domain"], day, workbooks)
     
     @staticmethod
     def get_admin_page(driver: WebDriver, domain: str, id: str, password: str) -> WebDriver:
@@ -123,11 +123,9 @@ class Ezadmin:
         return driver
 
     @staticmethod
-    def update_rd_data(domain: str, day: float):
+    def update_rd_data(domain: str, day: float, workbooks: dict):
         
-        # 매칭테이블 엑셀 파일 로딩 (sales 매칭테이블))
-        sales_wb = load_workbook(RD_FILE[domain], data_only=True, read_only=False)
-
+        sales_wb = workbooks[domain]
         # TODO: 해당 날짜 시트겹치는 것 체크
         sales_ws = Utils.create_xl_sheet(sales_wb, "RD")
 
@@ -153,15 +151,13 @@ class Ezadmin:
                 sales_ws["F" + sales_max_row].value = channel
                 sales_ws["G" + sales_max_row].value = matching
                 sales_ws["H" + sales_max_row].value = sales
-                sales_ws["I" + sales_max_row].value = Utils.vlookup_by_matching(sales_wb["매칭테이블"], matching, "상품2")
-                sales_ws["J" + sales_max_row].value = cur_cutoff
+                sales_ws["I" + sales_max_row].value = cur_cutoff
                 sales_ws["L" + sales_max_row].value = int(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "판매가")) * sales
                 sales_ws["M" + sales_max_row].value = (100.0-float(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "수수료").strip("%"))) / 100.0 * float(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "판매가")) * sales
                 sales_ws["N" + sales_max_row].value = int(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "원가")) * sales
-                sales_ws["O" + sales_max_row].value = int(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "판매가")) * sales / 1.1
+                sales_ws["O" + sales_max_row].value = cutoff
             except Exception as e:
                 print(e)
-        sales_wb.save(RD_FILE[domain])
 
     @staticmethod
     def update_rd_data_legacy(domain: str, day: float):
@@ -190,8 +186,6 @@ class Ezadmin:
                 sales_ws["F" + sales_max_row].value = "프로젝트21 홈페이지"
                 sales_ws["I" + sales_max_row].value = '201207'
                 sales_ws["H" + sales_max_row].value = row[8]
-
-        sales_wb.save(RD_FILE[domain])
 
     @staticmethod
     def download_yesterday_revenue_legacy(driver: WebDriver, domain: str, id: str, password: str) -> WebDriver:

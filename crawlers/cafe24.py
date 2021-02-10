@@ -20,12 +20,12 @@ from utils import Utils, DEFAULT_TIMEOUT_DELAY, RD_FILE
 
 
 class Cafe24:
-    def run(self, driver, account, days):
+    def run(self, driver, account, days, workbooks):
         uid = account["id"]
         upw = account["pw"]
         for day in range(days, 0, -1):
             Cafe24.download_lacto_revenue(driver, uid, upw, day)
-            Cafe24.update_rd_data("project21", day)
+            Cafe24.update_rd_data("project21", day, workbooks)
 
     @staticmethod
     def get_admin_page(driver: WebDriver, id: str, password: str) -> WebDriver:
@@ -108,10 +108,10 @@ class Cafe24:
         return driver
 
     @staticmethod
-    def update_rd_data(domain: str, day: float):
+    def update_rd_data(domain: str, day: float, workbooks: dict):
         
         # 매칭테이블 엑셀 파일 로딩 (sales 매칭테이블))
-        sales_wb = load_workbook(RD_FILE[domain], data_only=True, read_only=False)
+        sales_wb = workbooks[domain]
 
         # TODO: 해당 날짜 시트겹치는 것 체크
         sales_ws = Utils.create_xl_sheet(sales_wb, "RD")
@@ -157,11 +157,8 @@ class Cafe24:
                 sales_ws["F" + sales_max_row].value = channel
                 sales_ws["G" + sales_max_row].value = prod2
                 sales_ws["H" + sales_max_row].value = sales
-                sales_ws["I" + sales_max_row].value = Utils.vlookup_by_matching(sales_wb["매칭테이블"], matching, "상품2")
-                sales_ws["J" + sales_max_row].value = cur_cutoff
-                sales_ws["L" + sales_max_row].value = int(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "판매가")) * sales
-                sales_ws["M" + sales_max_row].value = (100.0-float(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "수수료").strip("%"))) / 100.0 * float(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "판매가")) * sales
-                sales_ws["N" + sales_max_row].value = int(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "원가")) * sales
-                sales_ws["O" + sales_max_row].value = int(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "판매가")) * sales / 1.1
-
-        sales_wb.save(RD_FILE[domain])
+                sales_ws["I" + sales_max_row].value = cur_cutoff
+                sales_ws["K" + sales_max_row].value = int(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "판매가")) * sales
+                sales_ws["L" + sales_max_row].value = (100.0-float(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "수수료").strip("%"))) / 100.0 * float(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "판매가")) * sales
+                sales_ws["M" + sales_max_row].value = int(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "원가")) * sales
+                sales_ws["N" + sales_max_row].value = cutoff

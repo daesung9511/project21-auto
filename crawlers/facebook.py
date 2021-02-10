@@ -11,18 +11,18 @@ from utils import Utils, RD_FILE
 from secrets import ACCOUNTS
 
 class Facebook:
-    def update_ad_fee_data(self, account, term):
+    def update_ad_fee_data(self, account, term, workbooks):
 
         domain = account["domain"]
 
         app = ACCOUNTS["facebook"]["app"]
 
         FacebookAdsApi.init(app["id"], app["secret"], app["access_token"])
-
-        wb = load_workbook(RD_FILE[domain], data_only=True, read_only=False)
-
+        
+        wb = workbooks[domain]
+        
         ws = Utils.create_xl_sheet(wb, "RD")
-            
+        
         campaigns = list(AdAccount(account["id"]).get_campaigns(
         fields=[
                 'id',
@@ -57,9 +57,7 @@ class Facebook:
                     ws.cell(row=int(max_row),column=4).value = Utils.vlookup_ads(wb["매칭테이블"], campaign["name"], "미디어")
                     ws.cell(row=int(max_row),column=5).value = Utils.vlookup_ads(wb["매칭테이블"], campaign["name"], "상품1")
                     ws.cell(row=int(max_row),column=10).value = insight["spend"]
-
-        wb.save(RD_FILE[domain])
-        
-    def run(self, driver, account, term):
-        self.update_ad_fee_data(account, term)
+ 
+    def run(self, driver, account, term, workbooks):
+        self.update_ad_fee_data(account, term, workbooks)
 

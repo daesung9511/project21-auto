@@ -63,10 +63,10 @@ class Naver_shop:
             info = self.get_n_days_past_data(n, account)
             print(info)
 
-    def update_ad_costs(self, domain, datas):
+    def update_ad_costs(self, domain, datas, workbooks):
 
         # RD 엑셀 파일 로딩
-        wb = load_workbook(RD_FILE[domain], data_only=True, read_only=False)
+        wb = workbooks[domain]
 
         ws = Utils.create_xl_sheet(wb, "RD")
 
@@ -82,11 +82,11 @@ class Naver_shop:
 
         wb.save(RD_FILE[domain])
 
-    def run(self, driver, account, days):
+    def run(self, driver, account, days, workbooks):
         # account list
         # lavena, yuge, anua, project21
         
         for n in range(1, days + 1):
             datas = self.get_n_days_past_data(n, account)
-            self.update_ad_costs(account["domain"], datas)
+            self.update_ad_costs(account["domain"], datas, workbooks)
 

@@ -143,21 +143,21 @@ class Naver_GFA:
 
         driver.switch_to.window(main)
 
-    def update_ad_costs(self, domain, day):
+    def update_ad_costs(self, domain, day, workbooks):
     
         # RD 엑셀 파일 로딩
-        wb = load_workbook(RD_FILE[domain], data_only=True, read_only=False)
+        wb = workbooks[domain]
 
         ws = Utils.create_xl_sheet(wb, "RD")
 
         date = (datetime.datetime.now() + datetime.timedelta(days=-day)).strftime('%Y-%m-%d')
 
         if domain == "yuge":
-            file_path = Utils.get_recent_file("유즈_광고비리포트_*.csv")
+            file_path = Utils.get_recent_file("유즈_성과리포트_*.csv")
         elif domain == "anua":
             file_path = Utils.get_recent_file("더파운더즈_성과리포트_*.csv")
         elif domain == "lavena":
-            file_path = Utils.get_recent_file("라베나코리아_광고비리포트_*.csv")
+            file_path = Utils.get_recent_file("라베나코리아_성과리포트_*.csv")
 
         with open(file_path, 'r', encoding='utf-8') as f:
             reader = csv.reader(f, delimiter = ",")
@@ -173,11 +173,9 @@ class Naver_GFA:
                 ws.cell(row=int(fee_max_row),column=4).value = Utils.vlookup_ads(wb["매칭테이블"], row[0], "미디어")
                 ws.cell(row=int(fee_max_row),column=5).value = Utils.vlookup_ads(wb["매칭테이블"], row[0], "상품1")
                 ws.cell(row=int(fee_max_row),column=10).value = float(row[12])/1.1
-        
-        wb.save(RD_FILE[domain])
 
 
-    def run(self, driver, account, term):
+    def run(self, driver, account, term, workbooks):
         # account list
         # lavena, yuge, anua, project21
 
@@ -198,6 +196,6 @@ class Naver_GFA:
             self.select_date(driver, account, day)
             self.download_csv(driver, account["domain"])
             self.clear_tabs(driver)
-            # self.update_ad_costs(account["domain"], day)
+            self.update_ad_costs(account["domain"], day, workbooks)
         
         self.flag = False
