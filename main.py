@@ -80,11 +80,11 @@ if __name__ == '__main__':
     elif command == "facebook":
         run(Facebook(), ACCOUNTS["facebook"], days, wbs)
     elif command == "naver_shop":
-        run(Naver_shop(), ACCOUNTS["naver_shop"], days)
+        run(Naver_shop(), ACCOUNTS["naver_shop"], days, wbs)
     elif command == "naver_gfa":
         run(Naver_GFA(), ACCOUNTS["naver_gfa"], days, wbs)
     elif command == "cafe24":
-        run(Cafe24(), ACCOUNTS["cafe24"], days)
+        run(Cafe24(), ACCOUNTS["cafe24"], days, wbs)
     elif command == "ezadmin":
         run(Ezadmin(), ACCOUNTS["ezadmin"], days, wbs)
     

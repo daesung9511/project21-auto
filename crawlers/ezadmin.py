@@ -151,80 +151,15 @@ class Ezadmin:
                 sales_ws["F" + sales_max_row].value = channel
                 sales_ws["G" + sales_max_row].value = matching
                 sales_ws["H" + sales_max_row].value = sales
-                sales_ws["I" + sales_max_row].value = cur_cutoff
+                sales_ws["I" + sales_max_row].value = Utils.vlookup_by_matching(sales_wb["매칭테이블"], matching, "상품 상세")
+                sales_ws["J" + sales_max_row].value = cur_cutoff
                 sales_ws["L" + sales_max_row].value = int(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "판매가")) * sales
                 sales_ws["M" + sales_max_row].value = (100.0-float(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "수수료").strip("%"))) / 100.0 * float(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "판매가")) * sales
                 sales_ws["N" + sales_max_row].value = int(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "원가")) * sales
-                sales_ws["O" + sales_max_row].value = cutoff
+                sales_ws["O" + sales_max_row].value = int(sales_ws["L" + sales_max_row].value)/1.1
+                sales_ws["P" + sales_max_row].value = cutoff
             except Exception as e:
                 print(e)
-
-    @staticmethod
-    def update_rd_data_legacy(domain: str, day: float):
-
-        # 매칭테이블 엑셀 파일 로딩 (sales 매칭테이블))
-        sales_wb = load_workbook(RD_FILE[domain], data_only=True, read_only=False)
-
-        # TODO: 해당 날짜 시트겹치는 것 체크
-        sales_ws = Utils.create_xl_sheet(sales_wb, "RD")
-
-        # Cafe24에서 받은 csv 파일 찾기
-        csv_path = Utils.get_recent_file("판매처상품매출통계_*.xls") 
-
-        with open(csv_path, 'r', encoding='UTF8') as f:
-            reader = csv.reader(f)
-            next(reader)    # 첫행(헤더 셀) 무시
-
-            # 카페24 RD 피벗테이블 작성
-            for row in reader:
-    
-                sales_max_row = str(sales_ws.max_row+1)
-                
-                # 피벗 테이블 결과를 통한 판매실적 시트 채우기
-                sales_ws["A" + sales_max_row].value = row[2] + row[3]
-                sales_ws["B" + sales_max_row].value = Utils.get_day(day)
-                sales_ws["F" + sales_max_row].value = "프로젝트21 홈페이지"
-                sales_ws["I" + sales_max_row].value = '201207'
-                sales_ws["H" + sales_max_row].value = row[8]
-
-    @staticmethod
-    def download_yesterday_revenue_legacy(driver: WebDriver, domain: str, id: str, password: str) -> WebDriver:
-        driver = Ezadmin.get_admin_page(driver, domain, id, password)
-        menu_selector = "#mymenu > a"
-        driver.find_element_by_css_selector(menu_selector).click()
-
-        revenue_selector = "#mymenu_list > li:nth-child(3) > a"
-        WebDriverWait(driver, DEFAULT_TIMEOUT_DELAY).until(
-            expected_conditions.presence_of_all_elements_located((By.CSS_SELECTOR, revenue_selector))
-        )
-        driver.find_element_by_css_selector(revenue_selector).click()
-
-        query_type = '#query_type'
-        select = Select(driver.find_element_by_css_selector(query_type))
-        select.select_by_value('order_date')
-
-        query_date = '#date_period_sel'
-        date_select = Select(driver.find_element_by_css_selector(query_date))
-        date_select.select_by_value('2')
-
-        driver.find_element_by_css_selector('#search').click()
-        try:
-            query_result_selector = '#table_container > table > tbody > tr:nth-child(2) > td:nth-child(1)'
-            WebDriverWait(driver, DEFAULT_TIMEOUT_DELAY).until(
-                expected_conditions.presence_of_all_elements_located((By.CSS_SELECTOR, query_result_selector))
-            )
-
-            download = '#download'
-            driver.find_element_by_css_selector(download).click()
-            WebDriverWait(driver, DEFAULT_TIMEOUT_DELAY).until(
-                expected_conditions.alert_is_present()
-            )
-            driver.switch_to.alert.accept()
-        except Exception as e:
-            logging.debug(f"검색결과 없음 {e}")
-            raise NameError("검색결과 없음") from e
-
-        return driver
 
     @staticmethod
     def wait(self, driver, selector, sec):

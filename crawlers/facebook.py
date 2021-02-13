@@ -56,7 +56,7 @@ class Facebook:
                     ws.cell(row=int(max_row),column=3).value = Utils.get_day_name(date)
                     ws.cell(row=int(max_row),column=4).value = Utils.vlookup_ads(wb["매칭테이블"], campaign["name"], "미디어")
                     ws.cell(row=int(max_row),column=5).value = Utils.vlookup_ads(wb["매칭테이블"], campaign["name"], "상품1")
-                    ws.cell(row=int(max_row),column=10).value = insight["spend"]
+                    ws.cell(row=int(max_row),column=11).value = float(insight["spend"]) / 1.1
  
     def run(self, driver, account, term, workbooks):
         self.update_ad_fee_data(account, term, workbooks)
