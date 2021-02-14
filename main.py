@@ -7,6 +7,7 @@ from crawlers.naver_shop import Naver_shop
 from crawlers.naver_gfa import Naver_GFA
 from crawlers.kakaomoment import Kakaomoment
 from crawlers.facebook import Facebook
+from crawlers.google import Google
 from utils import Utils
 from secrets import ACCOUNTS
 from openpyxl import load_workbook
@@ -87,6 +88,8 @@ if __name__ == '__main__':
         run(Cafe24(), ACCOUNTS["cafe24"], days, wbs)
     elif command == "ezadmin":
         run(Ezadmin(), ACCOUNTS["ezadmin"], days, wbs)
+    elif command == "google":
+        run(Google(), ACCOUNTS["google"], days, wbs)    
     
     for domain in domains:
         wbs[domain].save(RD_FILE[domain])

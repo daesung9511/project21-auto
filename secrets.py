@@ -146,6 +146,14 @@ ACCOUNTS = {
         }
     },
     "google": {
-
+        "index": ["anua", "yuge"],
+        "anua": {
+            "client_customer_id": "636-545-6711",
+            "domain": "anua"
+        },
+        "yuge": {
+            "client_customer_id": "390-049-6858",
+            "domain": "yuge"
+        },
     }
 }
