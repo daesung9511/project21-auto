@@ -12,6 +12,8 @@ CHROME_GFA_PROFILE_NAME = "Profile 3"
 # 파일들 저장 경로
 RAW_FILE_PATH = "rd_file"
 
+GOOGLE_ADS_PATH = "C:\\Users\\krims\\eclipse-workspace\\project21-auto\\googleads.yaml"
+
 # 매칭테이블 포함 데이터 엑셀 파일
 RD_FILE = {
     "lavena": "lavena_rd_data.xlsx",

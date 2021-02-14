@@ -8,6 +8,7 @@ from openpyxl import load_workbook
 from datetime import datetime, timedelta
 
 from utils import Utils, RD_FILE
+from config import GOOGLE_ADS_PATH
 
 import math
 import csv
@@ -38,7 +39,7 @@ class Google:
         output = io.StringIO()
 
         # Initialize appropriate service.
-        adwords_client = adwords.AdWordsClient.LoadFromStorage(path="C:\\Users\\krims\\eclipse-workspace\\project21-auto\\googleads.yaml")
+        adwords_client = adwords.AdWordsClient.LoadFromStorage(path=GOOGLE_ADS_PATH)
         report_downloader = adwords_client.GetReportDownloader(version='v201809')
 
         # Create report query.

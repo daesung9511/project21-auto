@@ -29,7 +29,7 @@ class Ezadmin:
         upw = account["pw"]
         udomain = account["udomain"]
         for day in range(days, 0, -1):
-            Ezadmin.download_yesterday_revenue(driver, udomain, uid, upw, 3)
+            Ezadmin.download_yesterday_revenue(driver, udomain, uid, upw, day)
             Ezadmin.update_rd_data(account["domain"], day, workbooks)
     
     @staticmethod
@@ -135,31 +135,72 @@ class Ezadmin:
         f = open(xls_path, 'r', encoding='UTF8')
         datas = Ezadmin.parse_html_data(f)
         datas.pop(0)
-        for data in datas:
-            sales_max_row = str(sales_ws.max_row+1)
-            matching = data[3] + data[4]
-            prod1=Utils.vlookup_by_matching(sales_wb["매칭테이블"], matching, "상품1")
-            channel=data[1]
-            # TODO: 구분 (ex. 210201) 값이 변동할시 어떻게 적용할지
-            cur_cutoff = "210201"
-            cutoff = channel+prod1+matching+cur_cutoff
-            sales=int(data[6].replace(",",""))
-            try:
-                sales_ws["B" + sales_max_row].value = data[0]
-                sales_ws["C" + sales_max_row].value = Utils.get_day_name(data[0])
-                sales_ws["E" + sales_max_row].value = prod1
-                sales_ws["F" + sales_max_row].value = channel
-                sales_ws["G" + sales_max_row].value = matching
-                sales_ws["H" + sales_max_row].value = sales
-                sales_ws["I" + sales_max_row].value = Utils.vlookup_by_matching(sales_wb["매칭테이블"], matching, "상품 상세")
-                sales_ws["J" + sales_max_row].value = cur_cutoff
-                sales_ws["L" + sales_max_row].value = int(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "판매가")) * sales
-                sales_ws["M" + sales_max_row].value = (100.0-float(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "수수료").strip("%"))) / 100.0 * float(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "판매가")) * sales
-                sales_ws["N" + sales_max_row].value = int(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "원가")) * sales
-                sales_ws["O" + sales_max_row].value = int(sales_ws["L" + sales_max_row].value)/1.1
-                sales_ws["P" + sales_max_row].value = cutoff
-            except Exception as e:
-                print(e)
+
+        if domain == "project21":
+            new_datas = [] 
+            for data in datas:
+                over = int((len(data) - 20)/2) + 1
+                data.pop(5)
+                data.pop(5+over)
+                for i in range(over):
+                    prefix = data[:5]
+                    value1 = [data[5+i]]
+                    value2 = [data[5+i+over]]
+                    suffix = data[(5+over*2):]
+                    new_data = prefix + value1 + value2 + suffix
+                    new_datas.append(new_data)
+            for data in new_datas:
+                sales_max_row = str(sales_ws.max_row+1)
+                matching = data[6]
+                prod1=Utils.vlookup_by_matching(sales_wb["매칭테이블"], matching, "상품1")
+                channel=data[1]
+                # TODO: 구분 (ex. 210201) 값이 변동할시 어떻게 적용할지
+                cur_cutoff = "210201"
+                cutoff = channel+prod1+matching+cur_cutoff
+                sales=int(data[8].replace(",",""))
+                try:
+                    sales_ws["B" + sales_max_row].value = data[0]
+                    sales_ws["C" + sales_max_row].value = Utils.get_day_name(data[0])
+                    sales_ws["E" + sales_max_row].value = prod1
+                    sales_ws["F" + sales_max_row].value = channel
+                    sales_ws["G" + sales_max_row].value = matching
+                    sales_ws["H" + sales_max_row].value = sales
+                    sales_ws["I" + sales_max_row].value = Utils.vlookup_by_matching(sales_wb["매칭테이블"], matching, "상품 상세")
+                    sales_ws["J" + sales_max_row].value = cur_cutoff
+                    sales_ws["L" + sales_max_row].value = int(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "판매가")) * sales
+                    sales_ws["M" + sales_max_row].value = (100.0-float(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "수수료").strip("%"))) / 100.0 * float(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "판매가")) * sales
+                    sales_ws["N" + sales_max_row].value = int(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "원가")) * sales
+                    sales_ws["O" + sales_max_row].value = int(sales_ws["L" + sales_max_row].value)/1.1
+                    sales_ws["P" + sales_max_row].value = cutoff
+                except Exception as e:
+                    print(e)
+
+        else:
+            for data in datas:
+                sales_max_row = str(sales_ws.max_row+1)
+                matching = data[3] + data[4]
+                prod1=Utils.vlookup_by_matching(sales_wb["매칭테이블"], matching, "상품1")
+                channel=data[1]
+                # TODO: 구분 (ex. 210201) 값이 변동할시 어떻게 적용할지
+                cur_cutoff = "210201"
+                cutoff = channel+prod1+matching+cur_cutoff
+                sales=int(data[6].replace(",",""))
+                try:
+                    sales_ws["B" + sales_max_row].value = data[0]
+                    sales_ws["C" + sales_max_row].value = Utils.get_day_name(data[0])
+                    sales_ws["E" + sales_max_row].value = prod1
+                    sales_ws["F" + sales_max_row].value = channel
+                    sales_ws["G" + sales_max_row].value = matching
+                    sales_ws["H" + sales_max_row].value = sales
+                    sales_ws["I" + sales_max_row].value = Utils.vlookup_by_matching(sales_wb["매칭테이블"], matching, "상품 상세")
+                    sales_ws["J" + sales_max_row].value = cur_cutoff
+                    sales_ws["L" + sales_max_row].value = int(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "판매가")) * sales
+                    sales_ws["M" + sales_max_row].value = (100.0-float(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "수수료").strip("%"))) / 100.0 * float(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "판매가")) * sales
+                    sales_ws["N" + sales_max_row].value = int(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "원가")) * sales
+                    sales_ws["O" + sales_max_row].value = int(sales_ws["L" + sales_max_row].value)/1.1
+                    sales_ws["P" + sales_max_row].value = cutoff
+                except Exception as e:
+                    print(e)
 
     @staticmethod
     def wait(self, driver, selector, sec):
