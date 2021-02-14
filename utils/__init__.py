@@ -42,6 +42,7 @@ class Utils:
 
         options = webdriver.ChromeOptions()
         # https://www.python2.net/questions-80772.htm
+        options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36")
         options.add_experimental_option("detach", True)
         user_config = Utils._get_config()
         prefs = {
