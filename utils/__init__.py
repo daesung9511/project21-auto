@@ -205,7 +205,7 @@ class Utils:
         
         max_row = ws.max_row + 1
         for row in range(1, max_row):
-            if ws.cell(row = row, column = 6).value == matching:
+            if ws.cell(row = row, column = 4).value == matching:
                 res = ws.cell(row = row, column = content_map[content]).value
                 break
         return res

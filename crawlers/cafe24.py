@@ -23,9 +23,11 @@ class Cafe24:
     def run(self, driver, account, days, workbooks):
         uid = account["id"]
         upw = account["pw"]
+        products = ["유산균", "하루채움"]
         for day in range(days, 0, -1):
-            Cafe24.download_lacto_revenue(driver, uid, upw, day)
-            Cafe24.update_rd_data("project21", day, workbooks)
+            for product in products:
+                Cafe24.download_lacto_revenue(driver, uid, upw, day, product)
+                Cafe24.update_rd_data("project21", day, workbooks, product)
 
     @staticmethod
     def get_admin_page(driver: WebDriver, id: str, password: str) -> WebDriver:
@@ -44,14 +46,14 @@ class Cafe24:
         return driver
 
     @staticmethod
-    def download_lacto_revenue(driver:WebDriver, id: str, password: str, day: float) -> WebDriver:
+    def download_lacto_revenue(driver:WebDriver, id: str, password: str, day: float, product: str) -> WebDriver:
         
         driver = Cafe24.get_admin_page(driver, id, password)
         time.sleep(5)
         driver.get("https://project21.cafe24.com/disp/admin/shop1/report/ProductPrdchart")
 
         report_base_url = "https://project21.cafe24.com/disp/admin/shop1/report/ProductPrdchart"
-        product_name = "유산균"
+        product_name = product
         start_date = Utils.get_day(day)
         end_date = Utils.get_day(day)
         report_query = f"?searchDateRange=7&eOrderProductCode=&eOrderProductNo=&eOrderProductTag=&rows=10&sOrderBy=sale_cnt&sType=item&excel_public_auth=T&start_date={start_date}&end_date={end_date}&sCategory-1=&eProductSearchType=product_name&eOrderProductText={product_name}&sManufacturerCode=&sTrendCode=&sBrandCode=&sSupplierCode=&sClassificationCode=&iStartProductPrice=0&iEndProductPrice=0&sMobileFlag=ALL&sOverseaFlag=ALL"
@@ -108,7 +110,7 @@ class Cafe24:
         return driver
 
     @staticmethod
-    def update_rd_data(domain: str, day: float, workbooks: dict):
+    def update_rd_data(domain: str, day: float, workbooks: dict, product: str):
         
         # 매칭테이블 엑셀 파일 로딩 (sales 매칭테이블))
         sales_wb = workbooks[domain]
@@ -127,40 +129,64 @@ class Cafe24:
 
             date = (datetime.datetime.now() + datetime.timedelta(days=-day)).strftime('%Y-%m-%d')
             # 카페24 RD 피벗테이블 작성
+            if product == "하루채움":
+                for row in reader:
+                    
+                    cafe24_max_row = cafe24_ws.max_row + 1
+                    sales_max_row = str(sales_ws.max_row+1)
+                    matching = row[2] + row[3]
+                    prod2 = Utils.vlookup_cafe24(sales_wb["카페24 매칭"], matching)
 
-            dict = {}
+                    for idx, data in enumerate(row):
+                        cafe24_ws.cell(row=cafe24_max_row, column=1).value = date
+                        cafe24_ws.cell(row=cafe24_max_row, column=2).value = matching
+                        cafe24_ws.cell(row=cafe24_max_row, column=3).value = prod2
+                        cafe24_ws.cell(row=cafe24_max_row, column=idx + 4).value = data
 
-            for row in reader:
-                
-                cafe24_max_row = cafe24_ws.max_row + 1
-                sales_max_row = str(sales_ws.max_row+1)
-                matching = row[2] + row[3]
-                prod2 = Utils.vlookup_cafe24(sales_wb["카페24 매칭"], matching)
+            elif product == "유산균":
+                dict = {}
+                for row in reader:
+                    
+                    cafe24_max_row = cafe24_ws.max_row + 1
+                    matching = row[2] + row[3]
+                    prod2 = Utils.vlookup_cafe24(sales_wb["카페24 매칭"], matching)
+                    sales=int(row[8].replace(",",""))
 
-                for idx, data in enumerate(row):
-                    cafe24_ws.cell(row=cafe24_max_row, column=1).value = date
-                    cafe24_ws.cell(row=cafe24_max_row, column=2).value = matching
-                    cafe24_ws.cell(row=cafe24_max_row, column=3).value = prod2
-                    cafe24_ws.cell(row=cafe24_max_row, column=idx + 4).value = data
+                    if prod2 == "0":
+                        # Remove suffix of matching
+                        matching = matching.split("-", -1)[0]
+                        prod2 = Utils.vlookup_cafe24(sales_wb["카페24 매칭"], matching)
+                        
+                    if prod2 in dict:
+                        dict[prod2] += sales
+                    else:
+                        dict[prod2] = sales
 
-                
-                prod1 = Utils.vlookup_by_matching(sales_wb["매칭테이블"], matching, "상품1")
-                channel = "프로젝트21 홈페이지"
-                # TODO: 구분 (ex. 210201) 값이 변동할시 어떻게 적용할지
-                cur_cutoff = "210201"
-                cutoff = channel+prod1+prod2+cur_cutoff
-                sales=int(row[8].replace(",",""))
+                    for idx, data in enumerate(row):
+                        cafe24_ws.cell(row=cafe24_max_row, column=1).value = date
+                        cafe24_ws.cell(row=cafe24_max_row, column=2).value = matching
+                        cafe24_ws.cell(row=cafe24_max_row, column=3).value = prod2
+                        cafe24_ws.cell(row=cafe24_max_row, column=idx + 4).value = data
 
-                sales_ws["B" + sales_max_row].value = date
-                sales_ws["C" + sales_max_row].value = Utils.get_day_name(date)
-                sales_ws["E" + sales_max_row].value = prod1
-                sales_ws["F" + sales_max_row].value = channel
-                sales_ws["G" + sales_max_row].value = matching
-                sales_ws["H" + sales_max_row].value = sales
-                sales_ws["I" + sales_max_row].value = Utils.vlookup_by_matching(sales_wb["매칭테이블"], matching, "상품 상세")
-                sales_ws["J" + sales_max_row].value = cur_cutoff
-                sales_ws["L" + sales_max_row].value = int(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "판매가")) * sales
-                sales_ws["M" + sales_max_row].value = (100.0-float(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "수수료").strip("%"))) / 100.0 * float(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "판매가")) * sales
-                sales_ws["N" + sales_max_row].value = int(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "원가")) * sales
-                sales_ws["O" + sales_max_row].value = int(sales_ws["L" + sales_max_row].value) / 1.1
-                sales_ws["P" + sales_max_row].value = cutoff
+                for matching in dict.keys():
+                    sales_max_row = str(sales_ws.max_row+1)
+                    prod1 = Utils.vlookup_by_matching(sales_wb["매칭테이블"], matching, "상품1")
+                    channel = Utils.vlookup_by_matching(sales_wb["매칭테이블"], matching, "채널")
+                    sales = dict[matching]
+                    # TODO: 구분 (ex. 210201) 값이 변동할시 어떻게 적용할지
+                    cur_cutoff = "210201"
+                    cutoff = channel+prod1+matching+cur_cutoff
+
+                    sales_ws["B" + sales_max_row].value = date
+                    sales_ws["C" + sales_max_row].value = Utils.get_day_name(date)
+                    sales_ws["E" + sales_max_row].value = prod1
+                    sales_ws["F" + sales_max_row].value = channel
+                    sales_ws["G" + sales_max_row].value = matching
+                    sales_ws["H" + sales_max_row].value = sales
+                    sales_ws["I" + sales_max_row].value = Utils.vlookup_by_matching(sales_wb["매칭테이블"], matching, "상품 상세")
+                    sales_ws["J" + sales_max_row].value = cur_cutoff
+                    sales_ws["L" + sales_max_row].value = int(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "판매가")) * sales
+                    sales_ws["M" + sales_max_row].value = (100.0-float(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "수수료").strip("%"))) / 100.0 * float(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "판매가")) * sales
+                    sales_ws["N" + sales_max_row].value = int(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "원가")) * sales
+                    sales_ws["O" + sales_max_row].value = int(sales_ws["L" + sales_max_row].value) / 1.1
+                    sales_ws["P" + sales_max_row].value = cutoff

@@ -65,7 +65,7 @@ if __name__ == '__main__':
     for domain in domains:
         print("Opening - ", domain )
         wbs[domain] = load_workbook(RD_FILE[domain])
-
+        print("Opened - ", domain )
     try:
         command = sys.argv[1]
         days: int = int(sys.argv[2])
