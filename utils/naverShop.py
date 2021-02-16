@@ -5,6 +5,7 @@ from powernad.API.Campaign import Campaign, CampaignList
 from powernad.API.Stat import Stat
 from powernad.Object.Campaign.CampaignObject import CampaignObject
 from powernad.Object.Stat.StatObject import StatObject
+from powernad.Object.AdGroup.AdgroupObject import AdgroupObject
 
 
 class AsCampaign(Campaign):
@@ -19,6 +20,18 @@ class AsCampaign(Campaign):
             camp_list.append(camp)
 
         return camp_list
+
+    def get_adgroup_list(self, customerId: int, campaignId: str) -> CampaignList:
+        query = {'customerId': str(customerId),
+                 'nccCampaignId': campaignId }
+        result = self.r.get('/ncc/adgroups', query)
+
+        adgroups = []
+        for arr in result:
+            adgroup = AdgroupObject(arr)
+            adgroups.append(adgroup)
+
+        return adgroups
 
 
 class AsStat(Stat):

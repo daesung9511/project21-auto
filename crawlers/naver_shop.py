@@ -4,6 +4,7 @@ import csv
 import time
 import datetime
 
+from powernad.Object.AdGroup.AdgroupObject import AdgroupObject
 from powernad.Object.Campaign.CampaignObject import CampaignObject
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -23,39 +24,49 @@ class Naver_shop:
         id = account["account_id"]
         license = account["license"]
         secret = account["secret"]
-
+        
         campaign = AsCampaign("https://api.naver.com", license, secret, id)
-        c_list: list[CampaignObject] = campaign.get_campaign_list_with_customer_id(customerId=1625878)
+        c_list: list[CampaignObject] = campaign.get_campaign_list_with_customer_id(id)
         c_ids = list(map(lambda x: x.nccCampaignId, c_list))
-
-        stat = AsStat("https://api.naver.com", license, secret, id)
-        start = datetime.datetime.now() - datetime.timedelta(days=timedelta_days)
-
-        date_format = "%Y-%m-%d"
-
-        start_date = start.strftime(date_format)
-
-        end_date = (start - datetime.timedelta(days=1)).strftime(date_format)
-        # fields = """[\"clkCnt\",\"impCnt\",\"salesAmt\",\"ctr\",\"cpc\",\"ccnt\",\"crto\",\"convAmt\",\"ror\",\"cpConv\",\"viewCnt\"]"""
-        fields = """[\"salesAmt\"]"""
-        range = """{\"since\":\"""" + end_date + """\",\"until\":\"""" + start_date + """\"}"""
-
-        stats = stat.get_stat_by_ids(
-            ids=c_ids,
-            fields=fields,
-            timeRange=range,
-            timeIncrement="allDays"
-        )
-        sales_info_list = stats["data"]
-
+        
         info = []
-        for c in c_list:
-            for x in sales_info_list:
-                sales_info = dict(x)
-                if sales_info["id"] == c.nccCampaignId:
-                    result = dict({"id": sales_info["id"], "name": c.name, "cost": sales_info["salesAmt"], "date": start_date})
-                    info.append(result)
-                    break
+        for c_id in c_ids:
+            campaign = AsCampaign("https://api.naver.com", license, secret, id)
+            ads_list: list[AdgroupObject] = campaign.get_adgroup_list(id, c_id)
+            ads_ids = list(map(lambda x: x.nccAdgroupId, ads_list))
+
+            stat = AsStat("https://api.naver.com", license, secret, id)
+            start = datetime.datetime.now() - datetime.timedelta(days=timedelta_days)
+
+            date_format = "%Y-%m-%d"
+
+            start_date = start.strftime(date_format)
+
+            end_date = (start - datetime.timedelta(days=1)).strftime(date_format)
+            # fields = """[\"clkCnt\",\"impCnt\",\"salesAmt\",\"ctr\",\"cpc\",\"ccnt\",\"crto\",\"convAmt\",\"ror\",\"cpConv\",\"viewCnt\"]"""
+            fields = """[\"salesAmt\"]"""
+            range = """{\"since\":\"""" + end_date + """\",\"until\":\"""" + start_date + """\"}"""
+
+            # Check if ads_ids empty
+            stats = stat.get_stat_by_ids(
+                ids=ads_ids,
+                fields=fields,
+                timeRange=range,
+                timeIncrement="allDays"
+            )
+
+            try:
+                sales_info_list = stats["data"]
+
+                for c in ads_list:
+                    for x in sales_info_list:
+                        sales_info = dict(x)
+                        if sales_info["id"] == c.nccAdgroupId:
+                            result = dict({"id": sales_info["id"], "name": c.name, "cost": sales_info["salesAmt"], "date": start_date})
+                            info.append(result)
+                            break
+            except Exception as e:
+                print(e)
         return info
 
     def get_data(self, account, days):
