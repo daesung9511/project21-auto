@@ -2,6 +2,7 @@ from selenium.webdriver.android.webdriver import WebDriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
+from config import CUTOFF_VERSION
 import logging
 
 from openpyxl.styles import PatternFill, Color
@@ -173,8 +174,8 @@ class Cafe24:
                     prod1 = Utils.vlookup_by_matching(sales_wb["매칭테이블"], matching, "상품1")
                     channel = Utils.vlookup_by_matching(sales_wb["매칭테이블"], matching, "채널")
                     sales = dict[matching]
-                    # TODO: 구분 (ex. 210201) 값이 변동할시 어떻게 적용할지
-                    cur_cutoff = "210201"
+                    
+                    cur_cutoff = CUTOFF_VERSION
                     cutoff = channel+prod1+matching+cur_cutoff
 
                     sales_ws["B" + sales_max_row].value = date

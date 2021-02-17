@@ -4,6 +4,7 @@ from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.keys import Keys
+from config import CUTOFF_VERSION
 import logging
 
 import datetime
@@ -154,8 +155,8 @@ class Ezadmin:
                 matching = data[6]
                 prod1=Utils.vlookup_by_matching(sales_wb["매칭테이블"], matching, "상품1")
                 channel=data[1]
-                # TODO: 구분 (ex. 210201) 값이 변동할시 어떻게 적용할지
-                cur_cutoff = "210201"
+
+                cur_cutoff = CUTOFF_VERSION
                 cutoff = channel+prod1+matching+cur_cutoff
                 sales=int(data[8].replace(",",""))
                 try:
@@ -181,8 +182,8 @@ class Ezadmin:
                 matching = data[3] + data[4]
                 prod1=Utils.vlookup_by_matching(sales_wb["매칭테이블"], matching, "상품1")
                 channel=data[1]
-                # TODO: 구분 (ex. 210201) 값이 변동할시 어떻게 적용할지
-                cur_cutoff = "210201"
+                
+                cur_cutoff = CUTOFF_VERSION
                 cutoff = channel+prod1+matching+cur_cutoff
                 sales=int(data[6].replace(",",""))
                 try:
@@ -221,8 +222,10 @@ class Ezadmin:
         data = []
         for row in rows:
             cols = row.find_all('td')
-            cols = [ele.text.strip() for ele in cols]
-            if len(cols) > 5:
-                data.append([ele for ele in cols if ele]) # Get rid of empty values
+            for col in cols:
+                data.append(col.text.strip())
+            # cols = [ele.text.strip() for ele in cols]
+            # if len(cols) > 5:
+            #     data.append([ele for ele in cols if ele]) # Get rid of empty values
                 
         return data

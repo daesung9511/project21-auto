@@ -246,7 +246,7 @@ class Kakaomoment:
                     ws.cell(row=int(max_row),column=3).value = Utils.get_day_name(row[2])
                     ws.cell(row=int(max_row),column=4).value = Utils.vlookup_ads(wb["매칭테이블"], row[1], "미디어")
                     ws.cell(row=int(max_row),column=5).value = Utils.vlookup_ads(wb["매칭테이블"], row[1], "상품1")
-                    ws.cell(row=int(max_row),column=10).value = float(row[4])/1.1
+                    ws.cell(row=int(max_row),column=11).value = float(row[4])/1.1
 
         if domain == "yuge":
         

@@ -50,6 +50,7 @@ def start(days: int, wbs: dict):
     Utils.backup_original_files()
     Utils.remove_old_backup_files()
     run(Facebook(), ACCOUNTS["facebook"], days, wbs)
+    run(Google(), ACCOUNTS["google"], days, wbs)
     run(Naver_shop(), ACCOUNTS["naver_shop"], days, wbs)
     run(Kakaomoment(), ACCOUNTS["kakaomoment"], days, wbs)
     run(Cafe24(), ACCOUNTS["cafe24"], days, wbs)

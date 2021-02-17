@@ -21,3 +21,5 @@ RD_FILE = {
     "yuge": "yuge_rd_data.xlsx",
     "project21": "project21_rd_data.xlsx",
 }
+
+CUTOFF_VERSION = "210201"
