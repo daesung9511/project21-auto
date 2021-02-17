@@ -98,13 +98,12 @@ ACCOUNTS = {
             "domain": "yuge",
             "account_id": "9762"
         },
-        # TODO: 아직 계정에 추가되지 않은부분
-        # "project21": {
-        #     "id": "project21official",
-        #     "pw": "pista1004",
-        #     "domain": "yuge",
-        #     "account_id": "9762"
-        # },
+        "project21": {
+            "id": "project21official",
+            "pw": "pista1004",
+            "domain": "project21",
+            "account_id": "26649"
+        },
     },
     "kakaomoment": {
         "index": ["anua", "yuge"],

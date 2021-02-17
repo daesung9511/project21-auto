@@ -59,13 +59,13 @@ def start(days: int, wbs: dict):
 
 
 if __name__ == '__main__':
-    # setup_logger()
+    setup_logger()
     
     wbs = {}
     domains = ["lavena", "yuge", "anua", "project21"]
     for domain in domains:
         print("Opening - ", domain )
-        wbs[domain] = load_workbook(RD_FILE[domain])
+        wbs[domain] = load_workbook(Utils._get_raw_file_path(RD_FILE[domain]))
         print("Opened - ", domain )
     try:
         command = sys.argv[1]
@@ -93,4 +93,4 @@ if __name__ == '__main__':
         run(Google(), ACCOUNTS["google"], days, wbs)    
     
     for domain in domains:
-        wbs[domain].save(RD_FILE[domain])
+        wbs[domain].save(Utils._get_raw_file_path(RD_FILE[domain]))
