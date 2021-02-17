@@ -189,5 +189,4 @@ class Cafe24:
                     sales_ws["L" + sales_max_row].value = int(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "판매가")) * sales
                     sales_ws["M" + sales_max_row].value = (100.0-float(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "수수료").strip("%"))) / 100.0 * float(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "판매가")) * sales
                     sales_ws["N" + sales_max_row].value = int(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "원가")) * sales
-                    sales_ws["O" + sales_max_row].value = int(sales_ws["L" + sales_max_row].value) / 1.1
-                    sales_ws["P" + sales_max_row].value = cutoff
+                    sales_ws["O" + sales_max_row].value = cutoff
