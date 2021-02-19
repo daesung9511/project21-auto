@@ -143,9 +143,9 @@ class Ezadmin:
             prod1=Utils.vlookup_by_matching(sales_wb["매칭테이블"], matching, "상품1")
             channel=data[1]
             
-            cur_cutoff = CUTOFF_VERSION
+            cur_cutoff = CUTOFF_VERSION[domain]
             cutoff = channel+prod1+matching+cur_cutoff
-            sales=int(data[-10].replace(",",""))
+            sales=int(data[-11].replace(",",""))
             try:
                 sales_ws["B" + sales_max_row].value = data[0]
                 sales_ws["C" + sales_max_row].value = Utils.get_day_name(data[0])

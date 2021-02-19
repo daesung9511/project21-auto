@@ -22,4 +22,9 @@ RD_FILE = {
     "project21": "project21_rd_data.xlsx",
 }
 
-CUTOFF_VERSION = "210201"
+CUTOFF_VERSION = {
+    "lavena" : "201208",
+    "anua": "201208",
+    "yuge": "201208",
+    "project21": "201208",
+}

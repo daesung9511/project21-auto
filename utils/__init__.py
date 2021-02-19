@@ -233,9 +233,6 @@ class Utils:
             if xl_cutoff == cutoff:
                 res = ws.cell(row = row, column = content_map[content]).value
                 break
-        
-        if(content_map[content] == 9):
-            print(res)
         return res
 
     @staticmethod
