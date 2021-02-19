@@ -156,7 +156,7 @@ class Ezadmin:
                 sales_ws["I" + sales_max_row].value = Utils.vlookup_by_matching(sales_wb["매칭테이블"], matching, "상품 상세")
                 sales_ws["J" + sales_max_row].value = cur_cutoff
                 sales_ws["L" + sales_max_row].value = int(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "판매가")) * sales
-                sales_ws["M" + sales_max_row].value = (100.0-float(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "수수료").strip("%"))) / 100.0 * float(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "판매가")) * sales
+                sales_ws["M" + sales_max_row].value = (1-Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "수수료")) * float(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "판매가")) * sales
                 sales_ws["N" + sales_max_row].value = int(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "원가")) * sales
                 sales_ws["O" + sales_max_row].value = cutoff
             except Exception as e:

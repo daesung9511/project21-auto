@@ -225,9 +225,17 @@ class Utils:
         
         max_row = ws.max_row + 1
         for row in range(1, max_row):
-            if ws.cell(row = row, column = 7).value == cutoff:
+            xl_cutoff = ws.cell(row = row, column = 2).value + \
+                        ws.cell(row = row, column = 3).value + \
+                        ws.cell(row = row, column = 4).value + \
+                        str(ws.cell(row = row, column = 6).value)
+
+            if xl_cutoff == cutoff:
                 res = ws.cell(row = row, column = content_map[content]).value
                 break
+        
+        if(content_map[content] == 9):
+            print(res)
         return res
 
     @staticmethod
