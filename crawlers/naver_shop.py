@@ -36,17 +36,16 @@ class Naver_shop:
             ads_ids = list(map(lambda x: x.nccAdgroupId, ads_list))
 
             stat = AsStat("https://api.naver.com", license, secret, id)
-            start = datetime.datetime.now() - datetime.timedelta(days=timedelta_days)
+            current = datetime.datetime.now() - datetime.timedelta(days=timedelta_days)
 
             date_format = "%Y-%m-%d"
 
-            start_date = start.strftime(date_format)
+            current_date = current.strftime(date_format)
 
-            end_date = (start - datetime.timedelta(days=1)).strftime(date_format)
             # fields = """[\"clkCnt\",\"impCnt\",\"salesAmt\",\"ctr\",\"cpc\",\"ccnt\",\"crto\",\"convAmt\",\"ror\",\"cpConv\",\"viewCnt\"]"""
             fields = """[\"salesAmt\"]"""
-            range = """{\"since\":\"""" + end_date + """\",\"until\":\"""" + start_date + """\"}"""
-
+            range = """{\"since\":\"""" + current_date + """\",\"until\":\"""" + current_date + """\"}"""
+            
             # Check if ads_ids empty
             stats = stat.get_stat_by_ids(
                 ids=ads_ids,
@@ -62,7 +61,7 @@ class Naver_shop:
                     for x in sales_info_list:
                         sales_info = dict(x)
                         if sales_info["id"] == c.nccAdgroupId:
-                            result = dict({"id": sales_info["id"], "name": c.name, "cost": sales_info["salesAmt"], "date": start_date})
+                            result = dict({"id": sales_info["id"], "name": c.name, "cost": sales_info["salesAmt"], "date": current_date})
                             info.append(result)
                             break
             except Exception as e:

@@ -19,7 +19,7 @@ from dataclasses import dataclass
 from selenium.webdriver.remote.webelement import WebElement
 
 from config import CHROME_USER_DATA_PATH, CHROME_PROFILE_NAME, CHROME_GFA_PROFILE_NAME, KEY_SHEET_FILE_PATH, \
-    RAW_FILE_PATH, RD_FILE
+    RAW_FILE_PATH, RD_FILE, EXCLUDE_KEYWORD
 
 from openpyxl import Workbook, worksheet, load_workbook
 import fnmatch
@@ -258,3 +258,12 @@ class Utils:
                 res = ws.cell(row = row, column = 3).value
                 break
         return res
+
+    @staticmethod
+    def exclude_by_keyword(brand: str, seller: str):
+        
+        for keyword in EXCLUDE_KEYWORD[brand]:
+            if keyword in seller:
+                return True
+
+        return False

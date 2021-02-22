@@ -22,9 +22,19 @@ RD_FILE = {
     "project21": "project21_rd_data.xlsx",
 }
 
+# 브랜드별 구분값 설정 
 CUTOFF_VERSION = {
     "lavena" : "201208",
     "anua": "201208",
     "yuge": "201208",
     "project21": "201208",
+}
+
+# 예외 판매처 키워드 설정
+# 해당 키워드가 들어있는 판매처명은 RD에서 제외됩니다. 
+EXCLUDE_KEYWORD = {
+    "lavena" : [],
+    "anua": [ "쇼피", "큐텐", "수출" ],
+    "yuge": [],
+    "project21": [],
 }

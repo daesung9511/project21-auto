@@ -138,10 +138,15 @@ class Ezadmin:
         datas.pop(0)
 
         for data in datas:
+            
+            channel=data[1]
+
+            if Utils.exclude_by_keyword(domain, channel):
+                continue
+
             sales_max_row = str(sales_ws.max_row+1)
             matching = data[3] + data[4]
             prod1=Utils.vlookup_by_matching(sales_wb["매칭테이블"], matching, "상품1")
-            channel=data[1]
             
             cur_cutoff = CUTOFF_VERSION[domain]
             cutoff = channel+prod1+matching+cur_cutoff

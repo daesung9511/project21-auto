@@ -19,12 +19,14 @@ import fnmatch
 
 from utils import Utils, DEFAULT_TIMEOUT_DELAY, RD_FILE
 
+DOWNLOAD_TIME = 10
 
 class Cafe24:
+
     def run(self, driver, account, days, workbooks):
         uid = account["id"]
         upw = account["pw"]
-        products = ["유산균", "하루채움"]
+        products = [ "유산균", "하루채움"]
         for day in range(days, 0, -1):
             for product in products:
                 Cafe24.download_lacto_revenue(driver, uid, upw, day, product)
@@ -50,7 +52,7 @@ class Cafe24:
     def download_lacto_revenue(driver:WebDriver, id: str, password: str, day: float, product: str) -> WebDriver:
         
         driver = Cafe24.get_admin_page(driver, id, password)
-        time.sleep(5)
+
         driver.get("https://project21.cafe24.com/disp/admin/shop1/report/ProductPrdchart")
 
         report_base_url = "https://project21.cafe24.com/disp/admin/shop1/report/ProductPrdchart"
@@ -100,12 +102,12 @@ class Cafe24:
                 else:
                     logging.debug("File is not ready retry download")
                     driver.implicitly_wait(1)  # wait for some delay
-
                 driver.close()
             else:
                 logging.debug("First excel sheet is not correct")
                 # Stop download loop because something wrong happend
                 download_done = True
+            time.sleep(DOWNLOAD_TIME)
             driver.switch_to.window(original_window)
 
         return driver
