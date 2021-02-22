@@ -81,7 +81,7 @@ class Cafe24:
             expected_conditions.alert_is_present()
         )
         driver.switch_to.alert.dismiss()
-
+        time.sleep(DOWNLOAD_TIME)
         download_done = False
 
         while not download_done:
@@ -176,19 +176,21 @@ class Cafe24:
                     prod1 = Utils.vlookup_by_matching(sales_wb["매칭테이블"], matching, "상품1")
                     channel = Utils.vlookup_by_matching(sales_wb["매칭테이블"], matching, "채널")
                     sales = dict[matching]
-                    
-                    cur_cutoff = CUTOFF_VERSION[domain]
-                    cutoff = channel+prod1+matching+cur_cutoff
+                    try:
+                        cur_cutoff = CUTOFF_VERSION[domain]
+                        cutoff = channel+prod1+matching+cur_cutoff
 
-                    sales_ws["B" + sales_max_row].value = date
-                    sales_ws["C" + sales_max_row].value = Utils.get_day_name(date)
-                    sales_ws["E" + sales_max_row].value = prod1
-                    sales_ws["F" + sales_max_row].value = channel
-                    sales_ws["G" + sales_max_row].value = matching
-                    sales_ws["H" + sales_max_row].value = sales
-                    sales_ws["I" + sales_max_row].value = Utils.vlookup_by_matching(sales_wb["매칭테이블"], matching, "상품 상세")
-                    sales_ws["J" + sales_max_row].value = cur_cutoff
-                    sales_ws["L" + sales_max_row].value = int(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "판매가")) * sales
-                    sales_ws["M" + sales_max_row].value = (1-Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "수수료")) * float(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "판매가")) * sales
-                    sales_ws["N" + sales_max_row].value = int(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "원가")) * sales
-                    sales_ws["O" + sales_max_row].value = cutoff
+                        sales_ws["B" + sales_max_row].value = date
+                        sales_ws["C" + sales_max_row].value = Utils.get_day_name(date)
+                        sales_ws["E" + sales_max_row].value = prod1
+                        sales_ws["F" + sales_max_row].value = channel
+                        sales_ws["G" + sales_max_row].value = matching
+                        sales_ws["H" + sales_max_row].value = sales
+                        sales_ws["I" + sales_max_row].value = Utils.vlookup_by_matching(sales_wb["매칭테이블"], matching, "상품 상세")
+                        sales_ws["J" + sales_max_row].value = cur_cutoff
+                        sales_ws["L" + sales_max_row].value = int(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "판매가")) * sales
+                        sales_ws["M" + sales_max_row].value = (1-float(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "수수료"))) * float(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "판매가")) * sales
+                        sales_ws["N" + sales_max_row].value = int(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "원가")) * sales
+                        sales_ws["O" + sales_max_row].value = cutoff
+                    except Exception as e:
+                        print(e)
