@@ -52,7 +52,7 @@ class Facebook:
                     insight = insights[0] 
                     max_row = str(ws.max_row+1)
                     ws.cell(row=int(max_row),column=1).value = campaign["name"]
-                    ws.cell(row=int(max_row),column=2).value = datetime.datetime.strptime(date, '%Y-%m-%d').date()
+                    ws.cell(row=int(max_row),column=2).value = datetime.strptime(date, '%Y-%m-%d').date()
                     ws.cell(row=int(max_row),column=3).value = Utils.get_day_name(date)
                     ws.cell(row=int(max_row),column=4).value = Utils.vlookup_ads(wb["매칭테이블"], campaign["name"], "미디어")
                     ws.cell(row=int(max_row),column=5).value = Utils.vlookup_ads(wb["매칭테이블"], campaign["name"], "상품1")

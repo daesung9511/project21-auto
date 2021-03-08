@@ -25,7 +25,7 @@ class Google:
             if not len(inner_datas) == 0: 
                 max_row = str(ws.max_row+1)
                 ws.cell(row=int(max_row),column=1).value = (inner_datas[1]).strip("\"")
-                ws.cell(row=int(max_row),column=2).value = datetime.datetime.strptime(inner_datas[0], '%Y-%m-%d').date()
+                ws.cell(row=int(max_row),column=2).value = datetime.strptime(inner_datas[0], '%Y-%m-%d').date()
                 ws.cell(row=int(max_row),column=3).value = Utils.get_day_name(inner_datas[0])
                 ws.cell(row=int(max_row),column=4).value = Utils.vlookup_ads(wb["매칭테이블"], inner_datas[1], "미디어")
                 ws.cell(row=int(max_row),column=5).value = Utils.vlookup_ads(wb["매칭테이블"], inner_datas[1], "상품1")
