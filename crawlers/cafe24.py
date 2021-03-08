@@ -29,6 +29,7 @@ class Cafe24:
         products = [ "유산균", "하루채움"]
         for day in range(days, 0, -1):
             for product in products:
+                print(product)
                 Cafe24.download_lacto_revenue(driver, uid, upw, day, product)
                 Cafe24.update_rd_data("project21", day, workbooks, product)
 
@@ -139,12 +140,14 @@ class Cafe24:
                     sales_max_row = str(sales_ws.max_row+1)
                     matching = row[2] + row[3]
                     prod2 = Utils.vlookup_cafe24(sales_wb["카페24 매칭"], matching)
-
+                    
+                    cafe24_ws.cell(row=cafe24_max_row, column=1).value = datetime.datetime.strptime(date, '%Y-%m-%d').date()
+                    cafe24_ws.cell(row=cafe24_max_row, column=2).value = matching
+                    cafe24_ws.cell(row=cafe24_max_row, column=3).value = prod2
                     for idx, data in enumerate(row):
-                        cafe24_ws.cell(row=cafe24_max_row, column=1).value = date
-                        cafe24_ws.cell(row=cafe24_max_row, column=2).value = matching
-                        cafe24_ws.cell(row=cafe24_max_row, column=3).value = prod2
                         cafe24_ws.cell(row=cafe24_max_row, column=idx + 4).value = data
+                    cafe24_ws.cell(row=cafe24_max_row, column=12).number_format = '0'
+
 
             elif product == "유산균":
                 dict = {}
@@ -164,13 +167,14 @@ class Cafe24:
                         dict[prod2] += sales
                     else:
                         dict[prod2] = sales
-
+                    
+                    cafe24_ws.cell(row=cafe24_max_row, column=1).value = datetime.datetime.strptime(date, '%Y-%m-%d').date()
+                    cafe24_ws.cell(row=cafe24_max_row, column=2).value = matching
+                    cafe24_ws.cell(row=cafe24_max_row, column=3).value = prod2
                     for idx, data in enumerate(row):
-                        cafe24_ws.cell(row=cafe24_max_row, column=1).value = date
-                        cafe24_ws.cell(row=cafe24_max_row, column=2).value = matching
-                        cafe24_ws.cell(row=cafe24_max_row, column=3).value = prod2
                         cafe24_ws.cell(row=cafe24_max_row, column=idx + 4).value = data
-
+                    cafe24_ws.cell(row=cafe24_max_row, column=12).number_format = '0'
+               
                 for matching in dict.keys():
                     sales_max_row = str(sales_ws.max_row+1)
                     prod1 = Utils.vlookup_by_matching(sales_wb["매칭테이블"], matching, "상품1")
@@ -180,7 +184,7 @@ class Cafe24:
                         cur_cutoff = CUTOFF_VERSION[domain]
                         cutoff = channel+prod1+matching+cur_cutoff
 
-                        sales_ws["B" + sales_max_row].value = date
+                        sales_ws["B" + sales_max_row].value = datetime.datetime.strptime(date, '%Y-%m-%d').date()
                         sales_ws["C" + sales_max_row].value = Utils.get_day_name(date)
                         sales_ws["E" + sales_max_row].value = prod1
                         sales_ws["F" + sales_max_row].value = channel

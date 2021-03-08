@@ -153,14 +153,15 @@ class Naver_GFA:
         date = (datetime.datetime.now() + datetime.timedelta(days=-day)).strftime('%Y-%m-%d')
 
         if domain == "yuge":
-            file_path = Utils.get_recent_file("유즈_성과리포트_*.csv")
+            file_path = Utils.get_recent_file("유즈_성과 리포트_*.csv")
         elif domain == "anua":
-            file_path = Utils.get_recent_file("더파운더즈_성과리포트_*.csv")
+            file_path = Utils.get_recent_file("더파운더즈_성과 리포트_*.csv")
         elif domain == "lavena":
-            file_path = Utils.get_recent_file("라베나코리아_성과리포트_*.csv")
+            file_path = Utils.get_recent_file("라베나코리아_성과 리포트_*.csv")
         elif domain == "project21":
-            file_path = Utils.get_recent_file("더파운더즈21_성과리포트_*.csv")
+            file_path = Utils.get_recent_file("더파운더즈21_성과 리포트_*.csv")
 
+        print(file_path)
         with open(file_path, 'r', encoding='utf-8') as f:
             reader = csv.reader(f, delimiter = ",")
             next(reader)
@@ -170,7 +171,7 @@ class Naver_GFA:
                 fee_max_row = str(ws.max_row+1)
                 
                 ws.cell(row=int(fee_max_row),column=1).value = row[0]
-                ws.cell(row=int(fee_max_row),column=2).value = date
+                ws.cell(row=int(fee_max_row),column=2).value = datetime.datetime.strptime(date, '%Y-%m-%d').date()
                 ws.cell(row=int(fee_max_row),column=3).value = Utils.get_day_name(date)
                 ws.cell(row=int(fee_max_row),column=4).value = Utils.vlookup_ads(wb["매칭테이블"], row[0], "미디어")
                 ws.cell(row=int(fee_max_row),column=5).value = Utils.vlookup_ads(wb["매칭테이블"], row[0], "상품1")

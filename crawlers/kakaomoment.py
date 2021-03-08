@@ -19,6 +19,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from utils import Utils, DEFAULT_TIMEOUT_DELAY, RD_FILE
 
 
+
 class Kakaomoment:
 
     flag = True
@@ -220,7 +221,10 @@ class Kakaomoment:
     def logout(self, driver):
         driver.get("https://accounts.kakao.com/logout?continue=https://accounts.kakao.com/login/kakaoforbusiness?continue=https://business.kakao.com/dashboard/?sid=kmo&redirect=https://moment.kakao.com/dashboard")
 
-    def update_ad_costs(self, domain, day, workbooks):
+    def update_ad_costs(self, account, day, workbooks):
+
+        domain = account["domain"]
+        filename = account["filename"]
 
         # RD 엑셀 파일 로딩
         wb = workbooks[domain]
@@ -231,7 +235,7 @@ class Kakaomoment:
         if domain == "anua":
 
             # 카카오모먼트에서 받은 가장 최근 csv 파일 찾기
-            anua_path = Utils.get_recent_file("프로젝트21_맞춤보고서_*.csv")
+            anua_path = Utils.get_recent_file(filename)
 
             with open(anua_path, 'r', encoding='utf-16') as f:
                 reader = csv.reader(f, delimiter = "\t")
@@ -242,7 +246,7 @@ class Kakaomoment:
                     max_row = str(ws.max_row+1)
                     
                     ws.cell(row=int(max_row),column=1).value = row[1]
-                    ws.cell(row=int(max_row),column=2).value = row[2]
+                    ws.cell(row=int(max_row),column=2).value = datetime.datetime.strptime(row[2], '%Y-%m-%d').date()
                     ws.cell(row=int(max_row),column=3).value = Utils.get_day_name(row[2])
                     ws.cell(row=int(max_row),column=4).value = Utils.vlookup_ads(wb["매칭테이블"], row[1], "미디어")
                     ws.cell(row=int(max_row),column=5).value = Utils.vlookup_ads(wb["매칭테이블"], row[1], "상품1")
@@ -251,7 +255,7 @@ class Kakaomoment:
         if domain == "yuge":
         
             # 가장최근 yuge csv 파일
-            yuge_path = Utils.get_recent_file("유즈_*.csv")
+            yuge_path = Utils.get_recent_file(filename)
 
             with open(yuge_path, 'r', encoding='utf-16') as f:
                 reader = csv.reader(f, delimiter = "\t")
@@ -266,7 +270,7 @@ class Kakaomoment:
                     max_row = str(ws.max_row+1)
                     
                     ws.cell(row=int(max_row),column=1).value = row[0]
-                    ws.cell(row=int(max_row),column=2).value = date
+                    ws.cell(row=int(max_row),column=2).value = datetime.datetime.strptime(date, '%Y-%m-%d').date()
                     ws.cell(row=int(max_row),column=3).value = Utils.get_day_name(date)
                     ws.cell(row=int(max_row),column=4).value = Utils.vlookup_ads(wb["매칭테이블"], row[0], "미디어")
                     ws.cell(row=int(max_row),column=5).value = Utils.vlookup_ads(wb["매칭테이블"], row[0], "상품1")
@@ -293,7 +297,7 @@ class Kakaomoment:
                 self.move_dashboard_yuge(driver, account["number"])
             self.select_date(driver, account["domain"], day)
             self.download_csv(driver, account["domain"])
-            self.update_ad_costs(account["domain"], day, workbooks)
+            self.update_ad_costs(account, day, workbooks)
 
         self.flag = False
 

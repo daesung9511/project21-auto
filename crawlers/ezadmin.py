@@ -152,7 +152,7 @@ class Ezadmin:
             cutoff = channel+prod1+matching+cur_cutoff
             sales=int(data[-11].replace(",",""))
             try:
-                sales_ws["B" + sales_max_row].value = data[0]
+                sales_ws["B" + sales_max_row].value = datetime.datetime.strptime(data[0], '%Y-%m-%d').date()
                 sales_ws["C" + sales_max_row].value = Utils.get_day_name(data[0])
                 sales_ws["E" + sales_max_row].value = prod1
                 sales_ws["F" + sales_max_row].value = channel

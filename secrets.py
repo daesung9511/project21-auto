@@ -111,13 +111,15 @@ ACCOUNTS = {
             "id": "business@project21.kr",
             "pw": "pista1004",
             "domain": "anua",
-            "number": "47875"
+            "number": "47875",
+            "filename": "아누아_*.csv"
         },
         "yuge": {
             "id": "business@project21.kr",
             "pw": "pista1004",
             "domain": "yuge",
-            "number": "191246"
+            "number": "191246",
+            "filename": "유즈_*.csv"
         },
     },
     "facebook": {
@@ -156,7 +158,7 @@ ACCOUNTS = {
         },
         "yuge": {
             "client_customer_id": "390-049-6858",
-            "domain": "yuge"
+            "domain": "yuge"    
         },
         "project21": {
             "client_customer_id": "438-134-0254",
