@@ -127,7 +127,7 @@ class Naver_GFA:
         driver.find_element_by_css_selector(download_button).click()
 
         driver.implicitly_wait(1)
-        time.sleep(2)
+        time.sleep(10)
 
     def logout(self, driver):
         logout_button = "li.logout > a"
@@ -158,6 +158,8 @@ class Naver_GFA:
             file_path = Utils.get_recent_file("더파운더즈_성과리포트_*.csv")
         elif domain == "lavena":
             file_path = Utils.get_recent_file("라베나코리아_성과리포트_*.csv")
+        elif domain == "project21":
+            file_path = Utils.get_recent_file("더파운더즈21_성과리포트_*.csv")
 
         with open(file_path, 'r', encoding='utf-8') as f:
             reader = csv.reader(f, delimiter = ",")

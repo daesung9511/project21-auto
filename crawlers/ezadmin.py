@@ -116,7 +116,7 @@ class Ezadmin:
                 expected_conditions.alert_is_present()
             )
             driver.switch_to.alert.accept()
-            time.sleep(3)
+            time.sleep(10)
         except Exception as e:
             logging.debug(f"검색결과 없음 {e}")
             raise NameError("검색결과 없음") from e
@@ -165,6 +165,7 @@ class Ezadmin:
                 sales_ws["N" + sales_max_row].value = int(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "원가")) * sales
                 sales_ws["O" + sales_max_row].value = cutoff
             except Exception as e:
+                print("sheet line : " + sales_max_row)
                 print(e)
 
     @staticmethod
