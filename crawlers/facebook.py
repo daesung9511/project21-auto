@@ -29,7 +29,7 @@ class Facebook:
                 'name'
             ]   ,
         params={
-                'effective_status': ['ACTIVE'],
+            ##   'effective_status': ['ACTIVE'],
             },
         ))
 

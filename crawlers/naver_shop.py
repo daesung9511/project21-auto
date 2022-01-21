@@ -66,6 +66,7 @@ class Naver_shop:
                             break
             except Exception as e:
                 print(e)
+                raise e
         return info
 
     def get_data(self, account, days):
@@ -99,4 +100,6 @@ class Naver_shop:
         for n in range(1, days + 1):
             datas = self.get_n_days_past_data(n, account)
             self.update_ad_costs(account["domain"], datas, workbooks)
+
+    
 

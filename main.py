@@ -15,6 +15,8 @@ from config import RD_FILE
 import logging
 import sys
 import traceback
+import atexit
+import signal
 
 import time
 
@@ -60,7 +62,7 @@ def start(days: int, wbs: dict):
 
 if __name__ == '__main__':
     setup_logger()
-    
+
     wbs = {}
     domains = ["lavena", "yuge", "anua", "project21"]
     for domain in domains:
@@ -68,29 +70,33 @@ if __name__ == '__main__':
         wbs[domain] = load_workbook(Utils._get_raw_file_path(RD_FILE[domain]))
         print("Opened - ", domain )
     try:
-        command = sys.argv[1]
-        days: int = int(sys.argv[2])
-    except IndexError or ValueError:
-        command = "main"
-        days = 1
-    if command == "":
-        start(days, wbs)
-    elif command == "main":
-        start(days, wbs)
-    elif command == "kakaomoment":
-        run(Kakaomoment(), ACCOUNTS["kakaomoment"], days, wbs)
-    elif command == "facebook":
-        run(Facebook(), ACCOUNTS["facebook"], days, wbs)
-    elif command == "naver_shop":
-        run(Naver_shop(), ACCOUNTS["naver_shop"], days, wbs)
-    elif command == "naver_gfa":
-        run(Naver_GFA(), ACCOUNTS["naver_gfa"], days, wbs)
-    elif command == "cafe24":
-        run(Cafe24(), ACCOUNTS["cafe24"], days, wbs)
-    elif command == "ezadmin":
-        run(Ezadmin(), ACCOUNTS["ezadmin"], days, wbs)
-    elif command == "google":
-        run(Google(), ACCOUNTS["google"], days, wbs)    
-    
-    for domain in domains:
-        wbs[domain].save(Utils._get_raw_file_path(RD_FILE[domain]))
+        try:
+            command = sys.argv[1]
+            days: int = int(sys.argv[2])
+        except IndexError or ValueError:
+            command = "main"
+            days = 1
+        if command == "":
+            start(days, wbs)
+        elif command == "main":
+            start(days, wbs)
+        elif command == "kakaomoment":
+            run(Kakaomoment(), ACCOUNTS["kakaomoment"], days, wbs)
+        elif command == "facebook":
+            run(Facebook(), ACCOUNTS["facebook"], days, wbs)
+        elif command == "naver_shop":
+            run(Naver_shop(), ACCOUNTS["naver_shop"], days, wbs)
+        elif command == "naver_gfa":
+            run(Naver_GFA(), ACCOUNTS["naver_gfa"], days, wbs)
+        elif command == "cafe24":
+            run(Cafe24(), ACCOUNTS["cafe24"], days, wbs)
+        elif command == "ezadmin":
+            run(Ezadmin(), ACCOUNTS["ezadmin"], days, wbs)
+        elif command == "google":
+            run(Google(), ACCOUNTS["google"], days, wbs)
+    finally:
+        for domain, wb in wbs.items():
+            print("Closing - ", domain)
+            wbs[domain].save(Utils._get_raw_file_path(RD_FILE[domain]))
+            wb.close()
+            print("Closed - ", domain)

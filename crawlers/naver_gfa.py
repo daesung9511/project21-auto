@@ -200,5 +200,6 @@ class Naver_GFA:
             self.download_csv(driver, account["domain"])
             self.clear_tabs(driver)
             self.update_ad_costs(account["domain"], day, workbooks)
+            time.sleep(3)
         
         self.flag = False

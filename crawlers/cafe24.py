@@ -26,7 +26,7 @@ class Cafe24:
     def run(self, driver, account, days, workbooks):
         uid = account["id"]
         upw = account["pw"]
-        products = [ "유산균", "하루채움"]
+        products = [ "유산균 영양제", "하루채움"]
         for day in range(days, 0, -1):
             for product in products:
                 print(product)
@@ -46,6 +46,13 @@ class Cafe24:
         driver.find_element_by_css_selector(
             "#frm_user > div.tabCont > div.mButton > button").click()
 
+        time.sleep(2)
+        try:
+            btn_selector = "a.btnEm"
+            driver.find_element_by_css_selector(btn_selector).click()
+        except Exception as e:
+            print(e)
+            
         # Login complete
         return driver
 
@@ -63,7 +70,6 @@ class Cafe24:
         report_query = f"?searchDateRange=7&eOrderProductCode=&eOrderProductNo=&eOrderProductTag=&rows=10&sOrderBy=sale_cnt&sType=item&excel_public_auth=T&start_date={start_date}&end_date={end_date}&sCategory-1=&eProductSearchType=product_name&eOrderProductText={product_name}&sManufacturerCode=&sTrendCode=&sBrandCode=&sSupplierCode=&sClassificationCode=&iStartProductPrice=0&iEndProductPrice=0&sMobileFlag=ALL&sOverseaFlag=ALL"
 
         driver.get(f"{report_base_url}{report_query}")
-
         original_window = driver.current_window_handle
 
         request_excel_selector = "#QA_product3 > div.mState > div.gRight > div > a > span"
@@ -71,13 +77,15 @@ class Cafe24:
             expected_conditions.presence_of_element_located((By.CSS_SELECTOR, request_excel_selector))
         )
         driver.find_element_by_css_selector(request_excel_selector).click()
-
+        
+        
         excel_download_selector = "#eExcelDownloadButton"
         WebDriverWait(driver, DEFAULT_TIMEOUT_DELAY).until(
             expected_conditions.presence_of_element_located((By.CSS_SELECTOR, excel_download_selector))
         )
+        time.sleep(3)
         driver.find_element_by_css_selector(excel_download_selector).click()
-
+        
         WebDriverWait(driver, DEFAULT_TIMEOUT_DELAY).until(
             expected_conditions.alert_is_present()
         )
@@ -144,12 +152,20 @@ class Cafe24:
                     cafe24_ws.cell(row=cafe24_max_row, column=1).value = datetime.datetime.strptime(date, '%Y-%m-%d').date()
                     cafe24_ws.cell(row=cafe24_max_row, column=2).value = matching
                     cafe24_ws.cell(row=cafe24_max_row, column=3).value = prod2
-                    for idx, data in enumerate(row):
-                        cafe24_ws.cell(row=cafe24_max_row, column=idx + 4).value = data
+                    cafe24_ws.cell(row=cafe24_max_row, column=4).value = int(row[0])
+                    cafe24_ws.cell(row=cafe24_max_row, column=5).value = row[1]
+                    cafe24_ws.cell(row=cafe24_max_row, column=6).value = row[2]
+                    cafe24_ws.cell(row=cafe24_max_row, column=7).value = row[3]
+                    cafe24_ws.cell(row=cafe24_max_row, column=8).value = float(row[4])
+                    cafe24_ws.cell(row=cafe24_max_row, column=9).value = int(row[5])
+                    cafe24_ws.cell(row=cafe24_max_row, column=10).value = int(row[6])
+                    cafe24_ws.cell(row=cafe24_max_row, column=11).value = int(row[7])
+                    cafe24_ws.cell(row=cafe24_max_row, column=12).value = int(row[8])
+                    cafe24_ws.cell(row=cafe24_max_row, column=13).value = int(row[9])
                     cafe24_ws.cell(row=cafe24_max_row, column=12).number_format = '0'
 
 
-            elif product == "유산균":
+            elif product == "유산균 영양제":
                 dict = {}
                 for row in reader:
                     
@@ -171,8 +187,16 @@ class Cafe24:
                     cafe24_ws.cell(row=cafe24_max_row, column=1).value = datetime.datetime.strptime(date, '%Y-%m-%d').date()
                     cafe24_ws.cell(row=cafe24_max_row, column=2).value = matching
                     cafe24_ws.cell(row=cafe24_max_row, column=3).value = prod2
-                    for idx, data in enumerate(row):
-                        cafe24_ws.cell(row=cafe24_max_row, column=idx + 4).value = data
+                    cafe24_ws.cell(row=cafe24_max_row, column=4).value = int(row[0])
+                    cafe24_ws.cell(row=cafe24_max_row, column=5).value = row[1]
+                    cafe24_ws.cell(row=cafe24_max_row, column=6).value = row[2]
+                    cafe24_ws.cell(row=cafe24_max_row, column=7).value = row[3]
+                    cafe24_ws.cell(row=cafe24_max_row, column=8).value = float(row[4])
+                    cafe24_ws.cell(row=cafe24_max_row, column=9).value = int(row[5])
+                    cafe24_ws.cell(row=cafe24_max_row, column=10).value = int(row[6])
+                    cafe24_ws.cell(row=cafe24_max_row, column=11).value = int(row[7])
+                    cafe24_ws.cell(row=cafe24_max_row, column=12).value = int(row[8])
+                    cafe24_ws.cell(row=cafe24_max_row, column=13).value = int(row[9])
                     cafe24_ws.cell(row=cafe24_max_row, column=12).number_format = '0'
                
                 for matching in dict.keys():
@@ -198,3 +222,4 @@ class Cafe24:
                         sales_ws["O" + sales_max_row].value = cutoff
                     except Exception as e:
                         print(e)
+            

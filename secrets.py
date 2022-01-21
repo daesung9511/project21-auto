@@ -36,7 +36,7 @@ ACCOUNTS = {
         "index": ["project21"],
         "project21": {
             "id": "project21",
-            "pw": "pista1004!!"
+            "pw": "pista1004!"
         }
     },
     "naver_shop": {
@@ -143,7 +143,7 @@ ACCOUNTS = {
         "app": {
             "id": "1112299139212780",
             "secret": "bea043e3210b7da93aa3316dca3c50a8",
-            "access_token": "EAAPzoVMTpewBAGVHL2CuqtZBw9f1M63OYtf0DaeFDbJuqLBpMWVLXTTcyR212voBnyZCwl5YLy0casqU76GSg2uoqNxAex2884zZB1r8M8tzBF5NTxK3JXRcC13GTAY7DRNZAu4mG9cwrZAskXHFYbiLyYsxY3711bOfdpZBRAPuyHcQsMcpqZC"
+            "access_token": "EAAPzoVMTpewBAOAJej6HltoxMc7My0CO5bPURZCSThK7flez2QzTB8obS0m9P5Is7OrefHGsFORHy0WNRZArAs1oYU9VR85AXs16gcJSaRWSMWoeRwOUn75wVnks3Y1xyKR12xoKYgDUiMjRbSJZBXZBU6fRRoT6hJYuZBDLaQgZDZD"
         }
     },
     "google": {

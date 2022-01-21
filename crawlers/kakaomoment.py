@@ -119,20 +119,12 @@ class Kakaomoment:
         # dashboard url 
         dashboard_url = f"https://moment.kakao.com/dashboard/{number}"
 
-        # move to dashboard
+        #move to dashboard
         driver.get(dashboard_url)
 
-        # click ok button on alert
-        ok_button = """#app > section > div:nth-child(4) > div > div > div > div.layer_foot > div > button > span"""
-        try:
-            self.wait(driver, ok_button, DEFAULT_TIMEOUT_DELAY)
-            driver.find_element_by_css_selector(ok_button).click()
-        except Exception as e:
-            print(e)
-
-        date_form = """#mArticle > div > div.dashboard_check > div.f_right > div:nth-child(1) > div > div.btn_gm.gm_calendar > a"""
+        date_form = """#mArticle > div > div.set_table > div.set_head > div.f_right > div:nth-child(2) > div > a"""
         self.wait(driver, date_form, DEFAULT_TIMEOUT_DELAY)
-
+        
     def calc_date(self, day):
         today = datetime.date.today()
         token = datetime.timedelta(day)
@@ -154,9 +146,13 @@ class Kakaomoment:
             yesterday_button = """#mArticle > div > div.set_table > div.set_head > div.f_right > div:nth-child(3) > div > div.btn_gm.gm_calendar.open > div > div > div.layer_body > ul > li.on > a"""
             ok_button = """#mArticle > div > div.set_table > div.set_head > div.f_right > div:nth-child(3) > div > div.btn_gm.gm_calendar.open > div > div > div.layer_body > div > div.btn_wrap > button.btn_gm.gm_bl > span"""
         elif domain == "yuge":
-            date_form = """#mArticle > div > div.dashboard_check > div.f_right > div:nth-child(1) > div > div.btn_gm.gm_calendar > a"""
-            yesterday_button = """#mArticle > div > div.dashboard_check > div.f_right > div:nth-child(1) > div > div.btn_gm.gm_calendar.open > div > div > div.layer_body > ul > li:nth-child(2) > a"""
-            ok_button = """#mArticle > div > div.dashboard_check > div.f_right > div:nth-child(1) > div > div.btn_gm.gm_calendar.open > div > div > div.layer_body > div > div.btn_wrap > button.btn_gm.gm_bl > span"""
+            date_form = """#mArticle > div > div.adboardbox_search > div.inner_g > div.wrap_calendar > div > div.btn_gm.gm_calendar > a"""
+            yesterday_button = """#mArticle > div > div.adboardbox_search > div.inner_g > div.wrap_calendar > div > div.btn_gm.gm_calendar.open > div > div > div.layer_body > ul > li.on > a"""
+            ok_button = """#mArticle > div > div.adboardbox_search > div.inner_g > div.wrap_calendar > div > div.btn_gm.gm_calendar.open > div > div > div.layer_body > div > div.btn_wrap > button.btn_gm.gm_bl > span"""
+        
+            #date_form = """#mArticle > div > div.dashboard_check > div.f_right > div:nth-child(1) > div > div.btn_gm.gm_calendar > a"""
+            #yesterday_button = """#mArticle > div > div.dashboard_check > div.f_right > div:nth-child(1) > div > div.btn_gm.gm_calendar.open > div > div > div.layer_body > ul > li:nth-child(2) > a"""
+            #ok_button = """#mArticle > div > div.dashboard_check > div.f_right > div:nth-child(1) > div > div.btn_gm.gm_calendar.open > div > div > div.layer_body > div > div.btn_wrap > button.btn_gm.gm_bl > span"""
 
         # click date form
         self.wait(driver, date_form, DEFAULT_TIMEOUT_DELAY)
@@ -242,6 +238,9 @@ class Kakaomoment:
                 next(reader)
                 # 광고비 시트에 rd 대입
                 for row in reader:
+
+                    if float(row[4]) == 0:
+                        continue
                     
                     max_row = str(ws.max_row+1)
                     
@@ -262,9 +261,11 @@ class Kakaomoment:
                 next(reader)
                 # 광고비 시트에 rd 대입
                 for row in reader:
+                    if float(row[6]) == 0:
+                        continue
                     
                     # "집행 중" 상태인 캠페인만 통계
-                    if not row[1] == "집행 중":
+                    if not row[2] == "집행 중":
                         continue
                     
                     max_row = str(ws.max_row+1)
@@ -274,7 +275,7 @@ class Kakaomoment:
                     ws.cell(row=int(max_row),column=3).value = Utils.get_day_name(date)
                     ws.cell(row=int(max_row),column=4).value = Utils.vlookup_ads(wb["매칭테이블"], row[0], "미디어")
                     ws.cell(row=int(max_row),column=5).value = Utils.vlookup_ads(wb["매칭테이블"], row[0], "상품1")
-                    ws.cell(row=int(max_row),column=11).value = float(row[3])/1.1
+                    ws.cell(row=int(max_row),column=11).value = float(row[6])/1.1
 
     def run(self, driver, account, term, workbooks):
         # account list\

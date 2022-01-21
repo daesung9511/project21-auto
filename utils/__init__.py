@@ -54,7 +54,7 @@ class Utils:
         options.add_argument(f'--user-data-dir={user_config.user_data_path}')
         options.add_argument(f'--profile-directory={user_config.profile_name}')
 
-        return webdriver.Chrome(chrome_options=options)
+        return webdriver.Chrome(executable_path=".\chromedriver",chrome_options=options)
 
     @staticmethod
     def get_chrome_driver_gfa() -> WebDriver:
