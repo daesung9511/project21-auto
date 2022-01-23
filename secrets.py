@@ -106,7 +106,21 @@ ACCOUNTS = {
         },
     },
     "kakaomoment": {
-        "index": ["anua", "yuge"],
+        "index": ["lavena", "anua", "yuge", "project21"],
+        "lavena": {
+            "id": "business@project21.kr",
+            "pw": "pista1004",
+            "domain": "lavena",
+            "number": "254811",
+            "filename": "라베나 코리아_*.csv"
+        },
+        "project21": {
+            "id": "business@project21.kr",
+            "pw": "pista1004",
+            "domain": "project21",
+            "number": "267489",
+            "filename": "new프로젝트21_*.csv"
+        },
         "anua": {
             "id": "business@project21.kr",
             "pw": "pista1004",
