@@ -21,9 +21,9 @@ class AsCampaign(Campaign):
 
         return camp_list
 
-    def get_adgroup_list(self, customerId: int, campaignId: str) -> list[AdgroupObject]:
+    def get_adgroup_list(self, customerId: int, campaignId: str):
         query = {'customerId': str(customerId),
-                 'nccCampaignId': campaignId }
+                 'nccCampaignId': campaignId}
         result = self.r.get('/ncc/adgroups', query)
 
         adgroups = []
