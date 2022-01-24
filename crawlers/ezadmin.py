@@ -27,6 +27,7 @@ class Ezadmin:
             date = (datetime.datetime.now() + datetime.timedelta(days=-day)).strftime('%Y-%m-%d')
             Ezadmin.download_yesterday_revenue(driver, udomain, uid, upw, date)
             Ezadmin.update_rd_data(account["domain"], date, workbooks)
+            print('=================================')
 
     @staticmethod
     def get_admin_page(driver: WebDriver, domain: str, id: str, password: str) -> WebDriver:
@@ -116,9 +117,12 @@ class Ezadmin:
 
         # Open Ezadmin rd file
         xls_path = Utils.get_recent_file("판매처상품매출통계*.xls")
-
-        f = open(xls_path, 'r', encoding='UTF8')
-        datas = Ezadmin.parse_html_data(f)
+        try:
+            f = open(xls_path, 'r', encoding='UTF8')
+            datas = Ezadmin.parse_html_data(f)
+        except Exception as e:
+            print('날짜 파싱 오류')
+            raise e
         headers = datas.pop(0)
         df = pd.DataFrame(datas, columns=headers)
         for idx, row in df.iterrows():
@@ -142,13 +146,13 @@ class Ezadmin:
                 sales_ws["H" + sales_max_row].value = sales
                 sales_ws["I" + sales_max_row].value = Utils.vlookup_by_matching(sales_wb["매칭테이블"], matching, "상품 상세")
                 sales_ws["J" + sales_max_row].value = cur_cutoff
-                sales_ws["L" + sales_max_row].value = int(
-                    Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "판매가")) * sales
+                sales_ws["L" + sales_max_row].value = float(int(
+                    Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "판매가"))) * float(sales)
                 sales_ws["M" + sales_max_row].value = (1 - float(
                     Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "수수료"))) * float(
-                    Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "판매가")) * sales
-                sales_ws["N" + sales_max_row].value = int(
-                    Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "원가")) * sales
+                    Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "판매가")) * float(sales)
+                sales_ws["N" + sales_max_row].value = float(int(
+                    Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "원가"))) * float(sales)
                 sales_ws["O" + sales_max_row].value = cutoff
             except Exception as e:
                 print("sheet line : " + sales_max_row)
@@ -183,13 +187,13 @@ if __name__ == '__main__':
     days = 1
     uid = account["id"]
     upw = account["pw"]
-    driver = Utils.get_chrome_driver()
-    driver.set_window_size(1980, 1080)
+    # driver = Utils.get_chrome_driver()
+    # driver.set_window_size(1980, 1080)
     udomain = account["udomain"]
     workbooks = {
         'project21': load_workbook('./../02.프로젝트21_이지어드민_데이터 정리_실데이터_헤더변경 ★.xlsx')
     }
     for day in range(days, 0, -1):
         date = (datetime.datetime.now() + datetime.timedelta(days=-day)).strftime('%Y-%m-%d')
-        Ezadmin.download_yesterday_revenue(driver, udomain, uid, upw, date)
+        # Ezadmin.download_yesterday_revenue(driver, udomain, uid, upw, date)
         Ezadmin.update_rd_data(account["domain"], date, workbooks)

@@ -212,7 +212,7 @@ class Utils:
 
     @staticmethod
     def vlookup_by_cutoff(ws: worksheet, cutoff: str, content: str):
-        res = "0"
+        res = 0
         content_map = {
             "채널": 2,
             "상품1": 3,
