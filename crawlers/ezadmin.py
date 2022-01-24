@@ -2,7 +2,9 @@ import datetime
 import logging
 import time
 
+import pandas as pd
 from bs4 import BeautifulSoup
+from openpyxl import load_workbook
 from selenium.webdriver.android.webdriver import WebDriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -22,8 +24,9 @@ class Ezadmin:
         upw = account["pw"]
         udomain = account["udomain"]
         for day in range(days, 0, -1):
-            Ezadmin.download_yesterday_revenue(driver, udomain, uid, upw, day)
-            Ezadmin.update_rd_data(account["domain"], day, workbooks)
+            date = (datetime.datetime.now() + datetime.timedelta(days=-day)).strftime('%Y-%m-%d')
+            Ezadmin.download_yesterday_revenue(driver, udomain, uid, upw, date)
+            Ezadmin.update_rd_data(account["domain"], date, workbooks)
 
     @staticmethod
     def get_admin_page(driver: WebDriver, domain: str, id: str, password: str) -> WebDriver:
@@ -64,8 +67,7 @@ class Ezadmin:
         return driver
 
     @staticmethod
-    def download_yesterday_revenue(driver: WebDriver, domain: str, id: str, password: str, day: int) -> WebDriver:
-        date = (datetime.datetime.now() + datetime.timedelta(days=-day)).strftime('%Y-%m-%d')
+    def download_yesterday_revenue(driver: WebDriver, domain: str, id: str, password: str, date: str) -> WebDriver:
 
         driver = Ezadmin.get_admin_page(driver, domain, id, password)
 
@@ -106,7 +108,7 @@ class Ezadmin:
         return driver
 
     @staticmethod
-    def update_rd_data(domain: str, day: float, workbooks: dict):
+    def update_rd_data(domain: str, date: str, workbooks: dict):
 
         sales_wb = workbooks[domain]
         # TODO: 해당 날짜 시트겹치는 것 체크
@@ -117,25 +119,23 @@ class Ezadmin:
 
         f = open(xls_path, 'r', encoding='UTF8')
         datas = Ezadmin.parse_html_data(f)
-        datas.pop(0)
-
-        for data in datas:
-
-            channel = data[1]
-
+        headers = datas.pop(0)
+        df = pd.DataFrame(datas, columns=headers)
+        for idx, row in df.iterrows():
+            channel = row['판매처']
+            matching = row['판매처 상품명'] + row['판매처상품옵션']
+            sales = row['상품수']
             if Utils.exclude_by_keyword(domain, channel):
                 continue
 
             sales_max_row = str(sales_ws.max_row + 1)
-            matching = data[3] + data[4]
             prod1 = Utils.vlookup_by_matching(sales_wb["매칭테이블"], matching, "상품1")
 
             cur_cutoff = CUTOFF_VERSION[domain]
             cutoff = channel + prod1 + matching + cur_cutoff
-            sales = int(data[-11].replace(",", ""))
             try:
-                sales_ws["B" + sales_max_row].value = datetime.datetime.strptime(data[0], '%Y-%m-%d').date()
-                sales_ws["C" + sales_max_row].value = Utils.get_day_name(data[0])
+                sales_ws["B" + sales_max_row].value = datetime.datetime.strptime(date, '%Y-%m-%d').date()
+                sales_ws["C" + sales_max_row].value = Utils.get_day_name(date)
                 sales_ws["E" + sales_max_row].value = prod1
                 sales_ws["F" + sales_max_row].value = channel
                 sales_ws["G" + sales_max_row].value = matching
@@ -168,9 +168,8 @@ class Ezadmin:
     def parse_html_data(input):
 
         soup = BeautifulSoup(input, 'html.parser')
-        lines = soup.select("html>table>tr")
+        lines = soup.select("tr")
         data = []
-
         for line in lines:
             # print(row)
             cols = line.find_all('td')
@@ -180,12 +179,17 @@ class Ezadmin:
 
 
 if __name__ == '__main__':
-    account = ACCOUNTS["ezadmin"]['lavena']
+    account = ACCOUNTS["ezadmin"]['project21']
     days = 1
     uid = account["id"]
     upw = account["pw"]
     driver = Utils.get_chrome_driver()
     driver.set_window_size(1980, 1080)
     udomain = account["udomain"]
+    workbooks = {
+        'project21': load_workbook('./../02.프로젝트21_이지어드민_데이터 정리_실데이터_헤더변경 ★.xlsx')
+    }
     for day in range(days, 0, -1):
-        Ezadmin.download_yesterday_revenue(driver, udomain, uid, upw, day)
+        date = (datetime.datetime.now() + datetime.timedelta(days=-day)).strftime('%Y-%m-%d')
+        Ezadmin.download_yesterday_revenue(driver, udomain, uid, upw, date)
+        Ezadmin.update_rd_data(account["domain"], date, workbooks)

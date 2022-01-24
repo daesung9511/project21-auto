@@ -34,7 +34,7 @@ class Google:
     def get_ad_data(self, account, days):
         
         start_date = (datetime.now() + timedelta(days=-days)).strftime('%Y%m%d')
-        end_date =  (datetime.now() + timedelta(days=-1)).strftime('%Y%m%d')
+        end_date = (datetime.now() + timedelta(days=-1)).strftime('%Y%m%d')
         # Define output as a string
         output = io.StringIO()
 
