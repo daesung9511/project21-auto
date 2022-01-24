@@ -1,26 +1,18 @@
+import datetime
+import logging
+import time
+
+from bs4 import BeautifulSoup
 from selenium.webdriver.android.webdriver import WebDriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.common.keys import Keys
+
 from config import CUTOFF_VERSION
-import logging
-
-import datetime
-from openpyxl import Workbook
-from openpyxl import load_workbook
-
-import time
-
-import csv
-import os
-import fnmatch
-from bs4 import BeautifulSoup
-import re
-
+from secrets import ACCOUNTS
 from utils import Utils, DEFAULT_TIMEOUT_DELAY
-from config import RD_FILE
 
 
 class Ezadmin:
@@ -32,7 +24,7 @@ class Ezadmin:
         for day in range(days, 0, -1):
             Ezadmin.download_yesterday_revenue(driver, udomain, uid, upw, day)
             Ezadmin.update_rd_data(account["domain"], day, workbooks)
-    
+
     @staticmethod
     def get_admin_page(driver: WebDriver, domain: str, id: str, password: str) -> WebDriver:
         driver.get("https://www.ezadmin.co.kr/index.html#main")
@@ -79,16 +71,14 @@ class Ezadmin:
 
         menu_selector = "#mymenu > a"
         driver.find_element_by_css_selector(menu_selector).click()
-
-        for idx in range(1, 11):
-            revenue_selector = "#mymenu_list > li:nth-child(" + str(idx) + ") > a"
-            WebDriverWait(driver, DEFAULT_TIMEOUT_DELAY).until(
-                expected_conditions.presence_of_all_elements_located((By.CSS_SELECTOR, revenue_selector))
-            )
-            menu = driver.find_element_by_css_selector(revenue_selector)
-            if menu.text == "판매처상품매출통계":
-                menu.click()
-                break
+        time.sleep(2)
+        menus = driver.find_elements_by_css_selector("#mymenu_list > li")
+        mymenu = None
+        for menu in menus:
+            a_menu = menu.find_element_by_css_selector('a')
+            if a_menu.text == '판매처상품매출통계':
+                mymenu = a_menu
+        mymenu.click()
         time.sleep(3)
         query_type = '#query_type'
         select = Select(driver.find_element_by_css_selector(query_type))
@@ -96,61 +86,53 @@ class Ezadmin:
 
         date_selector = 'input.datepicker.hasDatepicker'
         date_inputs = driver.find_elements_by_css_selector(date_selector)
-        
+
         for date_input in date_inputs:
             length = len(date_input.get_attribute('value'))
             date_input.send_keys(length * Keys.BACKSPACE)
             date_input.send_keys(date)
 
         driver.find_element_by_css_selector('#search').click()
+        time.sleep(5)
 
-        try:
-            query_result_selector = '#table_container > table > tbody > tr:nth-child(2) > td:nth-child(1)'
-            WebDriverWait(driver, DEFAULT_TIMEOUT_DELAY).until(
-                expected_conditions.presence_of_all_elements_located((By.CSS_SELECTOR, query_result_selector))
-            )
-
-            download = '#download'
-            driver.find_element_by_css_selector(download).click()
-            WebDriverWait(driver, DEFAULT_TIMEOUT_DELAY).until(
-                expected_conditions.alert_is_present()
-            )
-            driver.switch_to.alert.accept()
-            time.sleep(10)
-        except Exception as e:
-            logging.debug(f"검색결과 없음 {e}")
-            raise NameError("검색결과 없음") from e
+        download = '#download'
+        driver.find_element_by_css_selector(download).click()
+        WebDriverWait(driver, DEFAULT_TIMEOUT_DELAY).until(
+            expected_conditions.alert_is_present()
+        )
+        driver.switch_to.alert.accept()
+        time.sleep(10)
 
         return driver
 
     @staticmethod
     def update_rd_data(domain: str, day: float, workbooks: dict):
-        
+
         sales_wb = workbooks[domain]
         # TODO: 해당 날짜 시트겹치는 것 체크
         sales_ws = Utils.create_xl_sheet(sales_wb, "RD")
 
         # Open Ezadmin rd file
-        xls_path = Utils.get_recent_file("판매처상품매출통계*.xls") 
+        xls_path = Utils.get_recent_file("판매처상품매출통계*.xls")
 
         f = open(xls_path, 'r', encoding='UTF8')
         datas = Ezadmin.parse_html_data(f)
         datas.pop(0)
 
         for data in datas:
-            
-            channel=data[1]
+
+            channel = data[1]
 
             if Utils.exclude_by_keyword(domain, channel):
                 continue
 
-            sales_max_row = str(sales_ws.max_row+1)
+            sales_max_row = str(sales_ws.max_row + 1)
             matching = data[3] + data[4]
-            prod1=Utils.vlookup_by_matching(sales_wb["매칭테이블"], matching, "상품1")
-            
+            prod1 = Utils.vlookup_by_matching(sales_wb["매칭테이블"], matching, "상품1")
+
             cur_cutoff = CUTOFF_VERSION[domain]
-            cutoff = channel+prod1+matching+cur_cutoff
-            sales=int(data[-11].replace(",",""))
+            cutoff = channel + prod1 + matching + cur_cutoff
+            sales = int(data[-11].replace(",", ""))
             try:
                 sales_ws["B" + sales_max_row].value = datetime.datetime.strptime(data[0], '%Y-%m-%d').date()
                 sales_ws["C" + sales_max_row].value = Utils.get_day_name(data[0])
@@ -160,9 +142,13 @@ class Ezadmin:
                 sales_ws["H" + sales_max_row].value = sales
                 sales_ws["I" + sales_max_row].value = Utils.vlookup_by_matching(sales_wb["매칭테이블"], matching, "상품 상세")
                 sales_ws["J" + sales_max_row].value = cur_cutoff
-                sales_ws["L" + sales_max_row].value = int(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "판매가")) * sales
-                sales_ws["M" + sales_max_row].value = (1-float(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "수수료"))) * float(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "판매가")) * sales
-                sales_ws["N" + sales_max_row].value = int(Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "원가")) * sales
+                sales_ws["L" + sales_max_row].value = int(
+                    Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "판매가")) * sales
+                sales_ws["M" + sales_max_row].value = (1 - float(
+                    Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "수수료"))) * float(
+                    Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "판매가")) * sales
+                sales_ws["N" + sales_max_row].value = int(
+                    Utils.vlookup_by_cutoff(sales_wb["매칭테이블"], cutoff, "원가")) * sales
                 sales_ws["O" + sales_max_row].value = cutoff
             except Exception as e:
                 print("sheet line : " + sales_max_row)
@@ -178,7 +164,6 @@ class Ezadmin:
         except Exception as e:
             return False
 
-
     @staticmethod
     def parse_html_data(input):
 
@@ -192,3 +177,15 @@ class Ezadmin:
             cols = [ele.text for ele in cols]
             data.append(cols)
         return data
+
+
+if __name__ == '__main__':
+    account = ACCOUNTS["ezadmin"]['lavena']
+    days = 1
+    uid = account["id"]
+    upw = account["pw"]
+    driver = Utils.get_chrome_driver()
+    driver.set_window_size(1980, 1080)
+    udomain = account["udomain"]
+    for day in range(days, 0, -1):
+        Ezadmin.download_yesterday_revenue(driver, udomain, uid, upw, day)
