@@ -129,7 +129,7 @@ class Ezadmin:
         for idx, row in df.iterrows():
             channel = row['판매처']
             matching = row['판매처 상품명'] + row['판매처상품옵션']
-            sales = row['상품수']
+            sales = row['주문수량']
             if Utils.exclude_by_keyword(domain, channel):
                 continue
 
@@ -192,7 +192,7 @@ if __name__ == '__main__':
     # driver.set_window_size(1980, 1080)
     udomain = account["udomain"]
     workbooks = {
-        'project21': load_workbook('./../02.프로젝트21_이지어드민_데이터 정리_실데이터_헤더변경 ★.xlsx')
+        'project21': load_workbook('./02.프로젝트21_이지어드민_데이터 정리_실데이터_헤더변경 ★.xlsx')
     }
     for day in range(days, 0, -1):
         date = (datetime.datetime.now() + datetime.timedelta(days=-day)).strftime('%Y-%m-%d')
