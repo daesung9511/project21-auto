@@ -65,6 +65,7 @@ if __name__ == '__main__':
 
     wbs = {}
     domains = ["lavena", "yuge", "anua", "project21"]
+    
     for domain in domains:
         print("Opening - ", domain )
         wbs[domain] = load_workbook(Utils._get_raw_file_path(RD_FILE[domain]))

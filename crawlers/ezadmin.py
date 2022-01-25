@@ -26,6 +26,7 @@ class Ezadmin:
         for day in range(days, 0, -1):
             date = (datetime.datetime.now() + datetime.timedelta(days=-day)).strftime('%Y-%m-%d')
             Ezadmin.download_yesterday_revenue(driver, udomain, uid, upw, date)
+            print('=================================111111')
             Ezadmin.update_rd_data(account["domain"], date, workbooks)
             print('=================================')
 
