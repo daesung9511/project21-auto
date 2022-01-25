@@ -84,8 +84,6 @@ class Naver_shop:
         wb = workbooks[domain]
         ws = Utils.create_xl_sheet(wb, "RD")
         for data in datas:
-            if float(data['cost']) == 0:
-                continue
             max_row = str(ws.max_row+1)
             
             ws.cell(row=int(max_row),column=1).value = data["name"]
