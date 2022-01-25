@@ -4,10 +4,12 @@ import csv
 import datetime
 import time
 
+from openpyxl import load_workbook
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.ui import WebDriverWait
 
+from secrets import ACCOUNTS
 from utils import Utils, DEFAULT_TIMEOUT_DELAY
 
 
@@ -250,7 +252,6 @@ class Kakaomoment:
         else:
             # 가장최근 csv 파일
             file_path = Utils.get_recent_file(filename)
-
             with open(file_path, 'r', encoding='utf-16') as f:
                 reader = csv.reader(f, delimiter="\t")
                 next(reader)
@@ -258,10 +259,9 @@ class Kakaomoment:
                 for row in reader:
                     if float(row[6]) == 0:
                         continue
-
-                    # "집행 중" 상태인 캠페인만 통계
-                    if not row[2] == "집행 중":
-                        continue
+                    # # "집행 중" 상태인 캠페인만 통계
+                    # if not row[2] == "집행 중":
+                    #     continue
 
                     max_row = str(ws.max_row + 1)
 
