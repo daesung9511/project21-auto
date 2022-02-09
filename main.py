@@ -62,10 +62,16 @@ def start(days: int, wbs: dict):
 
 if __name__ == '__main__':
     setup_logger()
-
+    brands = ["lavena", "yuge", "anua", "project21"]
     wbs = {}
-    domains = ["lavena", "yuge", "anua", "project21"]
-    
+    if len(sys.argv) < 4:
+        domains = ["lavena", "yuge", "anua", "project21"]
+    else:
+        domains = sys.argv[3:]
+    for domain in domains:
+        if domain not in brands:
+            raise Exception(f'올바르지 않은 브랜드 명입니다 다시확인해주세요! {domains}')
+
     for domain in domains:
         print("Opening - ", domain )
         wbs[domain] = load_workbook(Utils._get_raw_file_path(RD_FILE[domain]))
