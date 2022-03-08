@@ -26,7 +26,7 @@ RD_FILE = {
 CUTOFF_VERSION = {
     "lavena" : "220107",
     "anua": "211228",
-    "yuge": "211228",
+    "yuge": "220126",
     "project21": "210802",
 }
 
