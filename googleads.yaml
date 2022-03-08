@@ -19,9 +19,9 @@ adwords:
   #############################################################################
   # The following values configure the client for the installed application
   # flow.
-  client_id: 93172012175-bluag2sr87dqi78o1rab0s7pm4k4ehil.apps.googleusercontent.com
-  client_secret: veyuEe2EcP5iMjzEloWReyqp
-  refresh_token: 1//0eaVGgivCyyPICgYIARAAGA4SNwF-L9IrFcxzJwkQHTxu1ShE1klNNRUfypDrK4JoHdd0nTTy4-k4sdtppTYT4QSSiDyl_A5HGWo
+  client_id: 93172012175-h2m541tdp0s6dhbtpho74k0bronl7uv3.apps.googleusercontent.com
+  client_secret: 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
+  refresh_token: ya29.A0ARrdaM8aEZKEmnWw0AoBWkvO0lsZpDyj3Zkh0Ww0KWNSXcHhUXwkF89Sq9L8te4QxAlJIaxusmoMBsWjORjR6X8zeo5T49f6sxGDWeYb5h4ocSJ4-KXiVJWnjf78tEr_7gRiRO0qVocr0Hb_xvaD3rJ5VFBM
   # The following values configure the client for the service account flow.
   # path_to_private_key_file: INSERT_PATH_TO_JSON_KEY_FILE_HERE
   # delegated_account: INSERT_DOMAIN_WIDE_DELEGATION_ACCOUNT
