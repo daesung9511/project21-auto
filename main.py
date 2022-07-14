@@ -1,5 +1,7 @@
 import os
+import time
 from pathlib import Path
+from typing import List
 
 from crawlers.cafe24 import Cafe24
 from crawlers.ezadmin import Ezadmin
@@ -15,10 +17,7 @@ from config import RD_FILE
 import logging
 import sys
 import traceback
-import atexit
-import signal
 
-import time
 
 
 def setup_logger():
@@ -30,34 +29,35 @@ def setup_logger():
     logging.basicConfig(filename=path + os.sep + file_name, level=logging.DEBUG)
 
 
-def run(platform, account, days, workbooks):
+def run(platform, account, days, workbooks, domains):
     Utils.kill_proc("chrome*")
     driver = Utils.get_chrome_driver()
-    driver.set_window_size(1980, 1080)
+    driver.maximize_window()
 
     for brand in account["index"]:
         try:
-            platform.run(driver, account[brand], days, workbooks)
-            message = f"{platform.__class__} {brand} success."
-            logging.info(message)
-            print(message)
+            if brand in domains:
+                platform.run(driver, account[brand], days, workbooks)
+                message = f"{platform.__class__} {brand} success."
+                logging.info(message)
+                print(message)
         except Exception as e:
-            print(e)
+            print(traceback.format_exc())
             logging.error(e)
             print(f"{platform.__class__} {brand} failed.")
     driver.quit()
 
 
-def start(days: int, wbs: dict):
+def start(days: int, wbs: dict, domains: List[str]):
     Utils.backup_original_files()
     Utils.remove_old_backup_files()
-    run(Facebook(), ACCOUNTS["facebook"], days, wbs)
-    run(Google(), ACCOUNTS["google"], days, wbs)
-    run(Naver_shop(), ACCOUNTS["naver_shop"], days, wbs)
-    run(Kakaomoment(), ACCOUNTS["kakaomoment"], days, wbs)
-    run(Cafe24(), ACCOUNTS["cafe24"], days, wbs)
-    run(Ezadmin(), ACCOUNTS["ezadmin"], days, wbs)
-    run(Naver_GFA(), ACCOUNTS["naver_gfa"], days, wbs)
+    run(Facebook(), ACCOUNTS["facebook"], days, wbs, domains)
+    run(Google(), ACCOUNTS["google"], days, wbs, domains)
+    run(Naver_shop(), ACCOUNTS["naver_shop"], days, wbs, domains)
+    run(Kakaomoment(), ACCOUNTS["kakaomoment"], days, wbs, domains)
+    run(Cafe24(), ACCOUNTS["cafe24"], days, wbs, domains)
+    run(Ezadmin(), ACCOUNTS["ezadmin"], days, wbs, domains)
+    run(Naver_GFA(), ACCOUNTS["naver_gfa"], days, wbs, domains)
 
 
 if __name__ == '__main__':
@@ -73,9 +73,9 @@ if __name__ == '__main__':
             raise Exception(f'올바르지 않은 브랜드 명입니다 다시확인해주세요! {domains}')
 
     for domain in domains:
-        print("Opening - ", domain )
+        print("Opening - ", domain)
         wbs[domain] = load_workbook(Utils._get_raw_file_path(RD_FILE[domain]))
-        print("Opened - ", domain )
+        print("Opened - ", domain)
     try:
         try:
             command = sys.argv[1]
@@ -84,23 +84,23 @@ if __name__ == '__main__':
             command = "main"
             days = 1
         if command == "":
-            start(days, wbs)
+            start(days, wbs, domains)
         elif command == "main":
-            start(days, wbs)
+            start(days, wbs, domains)
         elif command == "kakaomoment":
-            run(Kakaomoment(), ACCOUNTS["kakaomoment"], days, wbs)
+            run(Kakaomoment(), ACCOUNTS["kakaomoment"], days, wbs, domains)
         elif command == "facebook":
-            run(Facebook(), ACCOUNTS["facebook"], days, wbs)
+            run(Facebook(), ACCOUNTS["facebook"], days, wbs, domains)
         elif command == "naver_shop":
-            run(Naver_shop(), ACCOUNTS["naver_shop"], days, wbs)
+            run(Naver_shop(), ACCOUNTS["naver_shop"], days, wbs, domains)
         elif command == "naver_gfa":
-            run(Naver_GFA(), ACCOUNTS["naver_gfa"], days, wbs)
+            run(Naver_GFA(), ACCOUNTS["naver_gfa"], days, wbs, domains)
         elif command == "cafe24":
-            run(Cafe24(), ACCOUNTS["cafe24"], days, wbs)
+            run(Cafe24(), ACCOUNTS["cafe24"], days, wbs, domains)
         elif command == "ezadmin":
-            run(Ezadmin(), ACCOUNTS["ezadmin"], days, wbs)
+            run(Ezadmin(), ACCOUNTS["ezadmin"], days, wbs, domains)
         elif command == "google":
-            run(Google(), ACCOUNTS["google"], days, wbs)
+            run(Google(), ACCOUNTS["google"], days, wbs, domains)
     finally:
         for domain, wb in wbs.items():
             print("Closing - ", domain)

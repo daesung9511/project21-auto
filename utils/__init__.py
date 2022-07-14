@@ -51,10 +51,10 @@ class Utils:
             "directory_upgrade": True
         }
         options.add_experimental_option('prefs', prefs)
-        options.add_argument(f'--user-data-dir={user_config.user_data_path}')
-        options.add_argument(f'--profile-directory={user_config.profile_name}')
+        # options.add_argument(f'--user-data-dir={user_config.user_data_path}')
+        # options.add_argument(f'--profile-directory={user_config.profile_name}')
 
-        return webdriver.Chrome(executable_path=".\chromedriver",chrome_options=options)
+        return webdriver.Chrome(executable_path="chromedriver",chrome_options=options)
 
     @staticmethod
     def get_chrome_driver_gfa() -> WebDriver:
@@ -171,7 +171,7 @@ class Utils:
 
     @staticmethod
     def _get_raw_file_path(file: str) -> str:
-        return f"{RAW_FILE_PATH}/{file}"
+        return f"{file}"
 
     @staticmethod
     def _get_backup_file_path(domain: str, file: str) -> str:

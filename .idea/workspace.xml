@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="8c2abd5e-a230-489d-9755-d5fe22cff73e" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/aws.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/project21.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/02.라베나_이지어드민_데이터 정리_2020 ★.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/02.라베나_이지어드민_데이터 정리_2020 ★.xlsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/02.아누아_이지어드민_데이터 정리_헤더변경 ★.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/02.아누아_이지어드민_데이터 정리_헤더변경 ★.xlsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/02.유즈_이지어드민_데이터 정리_헤더변경 ★.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/02.유즈_이지어드민_데이터 정리_헤더변경 ★.xlsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/02.프로젝트21_이지어드민_데이터 정리_실데이터_헤더변경 ★.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/02.프로젝트21_이지어드민_데이터 정리_실데이터_헤더변경 ★.xlsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/config.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/crawlers/cafe24.py" beforeDir="false" afterPath="$PROJECT_DIR$/crawlers/cafe24.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/crawlers/ezadmin.py" beforeDir="false" afterPath="$PROJECT_DIR$/crawlers/ezadmin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/crawlers/kakaomoment.py" beforeDir="false" afterPath="$PROJECT_DIR$/crawlers/kakaomoment.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/crawlers/naver_gfa.py" beforeDir="false" afterPath="$PROJECT_DIR$/crawlers/naver_gfa.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/googleads.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/googleads.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/secrets.py" beforeDir="false" afterPath="$PROJECT_DIR$/secrets.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/naverShop.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/naverShop.py" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectId" id="2BFEIfOtbnFC33ZlvMxE9uHFKMO" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="true" />
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="8c2abd5e-a230-489d-9755-d5fe22cff73e" name="Changes" comment="" />
+      <created>1656493356982</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1656493356982</updated>
+      <workItem from="1656493362075" duration="1710000" />
+      <workItem from="1656555834392" duration="20130000" />
+      <workItem from="1656693628499" duration="37830000" />
+      <workItem from="1657436829133" duration="599000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>

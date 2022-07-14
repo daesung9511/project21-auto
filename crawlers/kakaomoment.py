@@ -67,6 +67,7 @@ class Kakaomoment:
         return driver
 
     def login(self, driver, account):
+        time.sleep(10)
         # get kakao id form
         id_form = driver.find_element_by_id("id_email_2")
         id_form.send_keys(account["id"])
@@ -79,7 +80,7 @@ class Kakaomoment:
         kakao_login_button = driver.find_element_by_css_selector(
             """#login-form > fieldset > div.wrap_btn > button.btn_g.btn_confirm.submit""")
         kakao_login_button.click()
-
+        time.sleep(10)
         # wait for login
         dashboard = """#kakaoContent > div.cont_feature > ul > li.on > a"""
 
@@ -202,7 +203,7 @@ class Kakaomoment:
         if domain == "anua":
             download_button = """#mArticle > div > div.set_table > div.set_head > div.f_right > div:nth-child(4) > a > span > span"""
         else:
-            download_button = """div.set_head > div.f_right > div:nth-child(3) > a > span > span"""
+            download_button = """#mArticle > div > div.set_table > div.set_head > div.f_right > div:nth-child(2) > a > span"""
 
         self.wait(driver, download_button, DEFAULT_TIMEOUT_DELAY)
         download_button = driver.find_element_by_css_selector(download_button)

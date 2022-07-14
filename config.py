@@ -2,6 +2,8 @@
 KEY_SHEET_FILE_PATH = ""
 
 # ex) MAC "/Users/qualson/Library/Application Support/Google/Chrome"
+
+# CHROME_USER_DATA_PATH = "/Users/qualson/Library/Application Support/Google/Chrome"
 CHROME_USER_DATA_PATH = "C:\\Users\\i02\\AppData\\Local\\Google\\Chrome\\User Data"
 
 # ex) "Profile 2"
@@ -11,14 +13,15 @@ CHROME_GFA_PROFILE_NAME = "Profile 2"
 
 # 파일들 저장 경로
 # RAW_FILE_PATH = "C:\\Users\\i02\\주식회사더파운더즈\\이선형 - 더파운더즈(전체) (1)\\13_오퍼레이션\\01_판매실적"
-RAW_FILE_PATH = "C:\\Users\\i02\\OneDrive - 주식회사더파운더즈 (2)\\01_판매실적"
+RAW_FILE_PATH = "rd_file"
 
-GOOGLE_ADS_PATH = "C:\\Users\\i02\\project21-auto\\googleads.yaml"
+GOOGLE_ADS_PATH = "googleads.yaml"
 
 # 매칭테이블 포함 데이터 엑셀 파일
 RD_FILE = {
     "lavena": "02.라베나_이지어드민_데이터 정리_2020 ★.xlsx",
     "anua": "02.아누아_이지어드민_데이터 정리_헤더변경 ★.xlsx",
+    #"anua": "02.아누아_이지어드민_데이터 정리_헤더변경 ★-LAPTOP-I2K3DOQT.xlsx",
     "yuge": "02.유즈_이지어드민_데이터 정리_헤더변경 ★.xlsx",
     "project21": "02.프로젝트21_이지어드민_데이터 정리_실데이터_헤더변경 ★.xlsx",
 }
@@ -26,7 +29,7 @@ RD_FILE = {
 CUTOFF_VERSION = {
     "lavena" : "220107",
     "anua": "211228",
-    "yuge": "220126",
+    "yuge": "220308",
     "project21": "210802",
 }
 

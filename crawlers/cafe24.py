@@ -79,17 +79,17 @@ class Cafe24:
         driver.find_element_by_css_selector(request_excel_selector).click()
         
         
-        excel_download_selector = "#eExcelDownloadButton"
-        WebDriverWait(driver, DEFAULT_TIMEOUT_DELAY).until(
-            expected_conditions.presence_of_element_located((By.CSS_SELECTOR, excel_download_selector))
-        )
-        time.sleep(3)
-        driver.find_element_by_css_selector(excel_download_selector).click()
-        
-        WebDriverWait(driver, DEFAULT_TIMEOUT_DELAY).until(
-            expected_conditions.alert_is_present()
-        )
-        driver.switch_to.alert.dismiss()
+        # excel_download_selector = "#eExcelDownloadButton"
+        # WebDriverWait(driver, DEFAULT_TIMEOUT_DELAY).until(
+        #     expected_conditions.presence_of_element_located((By.CSS_SELECTOR, excel_download_selector))
+        # )
+        # time.sleep(3)
+        # driver.find_element_by_css_selector(excel_download_selector).click()
+        #
+        # WebDriverWait(driver, DEFAULT_TIMEOUT_DELAY).until(
+        #     expected_conditions.alert_is_present()
+        # )
+        # driver.switch_to.alert.dismiss()
         time.sleep(DOWNLOAD_TIME)
         download_done = False
 

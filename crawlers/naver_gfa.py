@@ -95,6 +95,7 @@ class Naver_GFA:
         # get login button
         login_button = driver.find_element_by_id("log.login")
         login_button.click()
+        time.sleep(20)
 
     def press_ok(self, driver):
         # wait for ok button after login
@@ -186,13 +187,14 @@ class Naver_GFA:
         
         Utils.kill_proc("chrome*")
         driver = Utils.get_chrome_driver_gfa()
-        driver.set_window_size(1980, 1080)
+        driver.maximize_window()
         
         self.init(driver, url)
-        naver_login_button = driver.find_element_by_css_selector(
-            """body > div > div.container.bg_white > div > div > div.login_box > ul > li.selected > a > span.platform_name""")
-        
-        naver_login_button.click()
+        self.login(driver, account)
+        # naver_login_button = driver.find_element_by_css_selector(
+        #     """body > div > div.container.bg_white > div > div > div.login_box > ul > li.selected > a > span.platform_name""")
+        #
+        # naver_login_button.click()
         time.sleep(3)
         self.press_ok(driver)
         for day in range(term, 0, -1):

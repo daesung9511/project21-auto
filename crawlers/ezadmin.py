@@ -5,6 +5,7 @@ import time
 import pandas as pd
 from bs4 import BeautifulSoup
 from openpyxl import load_workbook
+from pandas import DataFrame, Index
 from selenium.webdriver.android.webdriver import WebDriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -15,7 +16,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from config import CUTOFF_VERSION
 from secrets import ACCOUNTS
 from utils import Utils, DEFAULT_TIMEOUT_DELAY
-
+import numpy as np
 
 class Ezadmin:
 
@@ -37,7 +38,6 @@ class Ezadmin:
             expected_conditions.presence_of_all_elements_located((By.ID, "login-popup"))
         )
         driver.find_element_by_css_selector("#header > div.utilWrap > ul > li.login > a").click()
-
         driver.find_element_by_css_selector("#login-domain").send_keys(domain)
         driver.find_element_by_css_selector("#login-id").send_keys(id)
         pw_element = driver.find_element_by_css_selector("#login-pwd")
@@ -45,7 +45,8 @@ class Ezadmin:
         pw_element.send_keys(password)
 
         driver.find_element_by_css_selector(
-            "#login-popup > div.content-inner > form:nth-child(4) > input.login-btn").click()
+            "#login-popup > div.content-inner > form:nth-child(4) > input.login-btn"
+        ).click()
 
         # Login complete
         try:
@@ -72,7 +73,7 @@ class Ezadmin:
     def download_yesterday_revenue(driver: WebDriver, domain: str, id: str, password: str, date: str) -> WebDriver:
 
         driver = Ezadmin.get_admin_page(driver, domain, id, password)
-
+        time.sleep(12)
         menu_selector = "#mymenu > a"
         driver.find_element_by_css_selector(menu_selector).click()
         time.sleep(2)
@@ -95,12 +96,13 @@ class Ezadmin:
             length = len(date_input.get_attribute('value'))
             date_input.send_keys(length * Keys.BACKSPACE)
             date_input.send_keys(date)
+            time.sleep(5)
 
         driver.find_element_by_css_selector('#search').click()
         time.sleep(5)
 
-        download = '#download'
-        driver.find_element_by_css_selector(download).click()
+        download = '/html/body/div[3]/table/tbody/tr/td[3]/div[2]/div[1]/div[3]/div[2]/a/span'
+        driver.find_element_by_xpath(download).click()
         WebDriverWait(driver, DEFAULT_TIMEOUT_DELAY).until(
             expected_conditions.alert_is_present()
         )
@@ -108,6 +110,31 @@ class Ezadmin:
         time.sleep(10)
 
         return driver
+
+    @staticmethod
+    def match_columns(columns: Index):
+
+        for column in columns:
+            print(column)
+            if column == 1 or column == "Unnamed: 1" or column == np.nan or column == "nan":
+                return False
+        return True
+
+    @staticmethod
+    def match_columns_index(columns: Index):
+        col_tuple = ["판매처", "판매처 상품명", "판매처상품옵션", "주문수량", "상품수", "상품원가", "판매금액", "판매금액 합", "어드민 상품명", "상품판매가", "상품판매가x수량", "공급처 상품명", "정산금액"]
+        for column in columns:
+            print(column)
+            if column not in col_tuple:
+                return False
+        return True
+    @staticmethod
+    def find_the_real_column_name_index(df: DataFrame, count: int = 0):
+        if df.shape[0] == count - 1 or len(df) == 0:
+            return 0
+        if Ezadmin.match_columns_index(df.loc[count]):
+            return count
+        return Ezadmin.find_the_real_column_name_index(df, count+1)
 
     @staticmethod
     def update_rd_data(domain: str, date: str, workbooks: dict):
@@ -125,14 +152,27 @@ class Ezadmin:
             print('날짜 파싱 오류')
             raise e
         headers = datas.pop(0)
-        df = pd.DataFrame(datas, columns=headers)
-        for idx, row in df.iterrows():
+        df_list = pd.read_html(xls_path, header=0)
+        df_to_use = df_list[0]
+        print(df_to_use)
+        print(df_to_use.columns)
+        d = {df_to_use.columns[index]: key for index, key in enumerate(["판매처", "판매처 상품명", "판매처상품옵션", "주문수량", "상품수", "상품원가", "판매금액", "판매금액 합", "어드민 상품명", "상품판매가", "상품판매가x수량", "공급처 상품명", "정산금액"])}
+        print(f"dictionary: {d}")
+        print(df_to_use.columns)
+        if not Ezadmin.match_columns(df_to_use.columns):
+            print("true")
+            real_column_index = Ezadmin.find_the_real_column_name_index(df_to_use)
+            df_refresh = df_to_use.rename(columns=d).iloc[real_column_index+1:, :]
+        else:
+            print("false")
+            df_refresh = df_to_use
+        print(df_refresh.head())
+        for idx, row in df_refresh.fillna({"판매처상품옵션": ""}).iterrows():
             channel = row['판매처']
             matching = row['판매처 상품명'] + row['판매처상품옵션']
             sales = row['주문수량']
             if Utils.exclude_by_keyword(domain, channel):
                 continue
-
             sales_max_row = str(sales_ws.max_row + 1)
             prod1 = Utils.vlookup_by_matching(sales_wb["매칭테이블"], matching, "상품1")
 
