@@ -151,6 +151,12 @@ cython_debug/
 # vscode
 .vscode/
 .idea/**/*.xml
+02.라베나_이지어드민_데이터 정리_2020 ★.xlsx
+02.아누아_이지어드민_데이터 정리_헤더변경 ★.xlsx
+02.유즈_이지어드민_데이터 정리_헤더변경 ★.xlsx
+02.유즈_이지어드민_데이터 정리_헤더변경 ★ - 복사본.xlsx
+02.프로젝트21_이지어드민_데이터 정리_실데이터_헤더변경 ★.xlsx
 *.xlsx
-/*/**/*.xlsx
+*/**/*.xlsx
 "C:\\Users\\i02\\AppData\\Local\\Google\\Chrome\\User Data/"/*
+*.jpg

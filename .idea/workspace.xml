@@ -2,7 +2,43 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8c2abd5e-a230-489d-9755-d5fe22cff73e" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/02.라베나_이지어드민_데이터 정리_2020 ★.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/02.아누아_이지어드민_데이터 정리_헤더변경 ★.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/02.유즈_이지어드민_데이터 정리_헤더변경 ★ - 복사본.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/02.유즈_이지어드민_데이터 정리_헤더변경 ★.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/02.프로젝트21_이지어드민_데이터 정리_실데이터_헤더변경 ★.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ad_fee_data.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/anua_rd_data.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/lavena_rd_data.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project21_rd_data.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rd_file/anua_rd_data.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rd_file/backup/anua/2021-02-08-00-40-01-anua_rd_data.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rd_file/backup/anua/2021-02-08-00-41-01-anua_rd_data.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rd_file/backup/anua/2021-02-08-00-43-26-anua_rd_data.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rd_file/backup/anua/2021-02-08-00-43-41-anua_rd_data.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rd_file/backup/anua/anua_rd_data.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rd_file/backup/lavena/2021-02-08-00-40-01-lavena_rd_data.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rd_file/backup/lavena/2021-02-08-00-41-01-lavena_rd_data.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rd_file/backup/lavena/2021-02-08-00-43-26-lavena_rd_data.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rd_file/backup/lavena/2021-02-08-00-43-41-lavena_rd_data.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rd_file/backup/lavena/lavena_rd_data.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rd_file/backup/project21/2021-02-08-00-40-01-project21_rd_data.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rd_file/backup/project21/2021-02-08-00-41-01-project21_rd_data.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rd_file/backup/project21/2021-02-08-00-43-26-project21_rd_data.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rd_file/backup/project21/2021-02-08-00-43-41-project21_rd_data.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rd_file/backup/project21/project21_rd_data.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rd_file/backup/yuge/2021-02-08-00-40-01-yuge_rd_data.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rd_file/backup/yuge/2021-02-08-00-41-01-yuge_rd_data.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rd_file/backup/yuge/2021-02-08-00-43-26-yuge_rd_data.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rd_file/backup/yuge/2021-02-08-00-43-41-yuge_rd_data.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rd_file/backup/yuge/yuge_rd_data.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rd_file/lavena_rd_data.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rd_file/project21_rd_data.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rd_file/yuge_rd_data.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sales_data.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/yuge_rd_data.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/화면 캡처 2022-01-24 193700.jpg" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
