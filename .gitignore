@@ -152,4 +152,4 @@ cython_debug/
 .vscode/
 *.xlsx
 /*/**/*.xlsx
-"C:\\Users\\i02\\AppData\\Local\\Google\\Chrome\\User Data/"
+"C:\\Users\\i02\\AppData\\Local\\Google\\Chrome\\User Data/"/*
