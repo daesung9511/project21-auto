@@ -2,30 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8c2abd5e-a230-489d-9755-d5fe22cff73e" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/aws.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/project21.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/02.라베나_이지어드민_데이터 정리_2020 ★.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/02.라베나_이지어드민_데이터 정리_2020 ★.xlsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/02.아누아_이지어드민_데이터 정리_헤더변경 ★.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/02.아누아_이지어드민_데이터 정리_헤더변경 ★.xlsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/02.유즈_이지어드민_데이터 정리_헤더변경 ★.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/02.유즈_이지어드민_데이터 정리_헤더변경 ★.xlsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/02.프로젝트21_이지어드민_데이터 정리_실데이터_헤더변경 ★.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/02.프로젝트21_이지어드민_데이터 정리_실데이터_헤더변경 ★.xlsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/config.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/crawlers/cafe24.py" beforeDir="false" afterPath="$PROJECT_DIR$/crawlers/cafe24.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/crawlers/ezadmin.py" beforeDir="false" afterPath="$PROJECT_DIR$/crawlers/ezadmin.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/crawlers/kakaomoment.py" beforeDir="false" afterPath="$PROJECT_DIR$/crawlers/kakaomoment.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/crawlers/naver_gfa.py" beforeDir="false" afterPath="$PROJECT_DIR$/crawlers/naver_gfa.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/googleads.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/googleads.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/secrets.py" beforeDir="false" afterPath="$PROJECT_DIR$/secrets.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/test.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/naverShop.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/naverShop.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

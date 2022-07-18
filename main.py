@@ -52,10 +52,10 @@ def start(days: int, wbs: dict, domains: List[str]):
     Utils.backup_original_files()
     Utils.remove_old_backup_files()
     run(Facebook(), ACCOUNTS["facebook"], days, wbs, domains)
-    run(Google(), ACCOUNTS["google"], days, wbs, domains)
+    # run(Google(), ACCOUNTS["google"], days, wbs, domains)
     run(Naver_shop(), ACCOUNTS["naver_shop"], days, wbs, domains)
     run(Kakaomoment(), ACCOUNTS["kakaomoment"], days, wbs, domains)
-    run(Cafe24(), ACCOUNTS["cafe24"], days, wbs, domains)
+    # run(Cafe24(), ACCOUNTS["cafe24"], days, wbs, domains)
     run(Ezadmin(), ACCOUNTS["ezadmin"], days, wbs, domains)
     run(Naver_GFA(), ACCOUNTS["naver_gfa"], days, wbs, domains)
 
